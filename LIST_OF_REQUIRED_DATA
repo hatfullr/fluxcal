@@ -1,0 +1,19 @@
+This is a list of the data flux_cal will require. It should be considered
+a complete list once dependencies on StarSmasher have been removed.
+
+data files:
+Header (all in one line):
+t                 !time (real*8)
+Body:
+x(i)              !x position (real*8)
+y(i)              !y position (real*8)
+z(i)              !z position (real*8)
+am(i)             !mass (real*8)
+hp(i)             !smoothing length (real*8)
+rho(i)            !density (real*8)
+vx(i)             !x velocity (real*8)
+vy(i)             !y velocity (real*8)
+vz(i)             !z velocity (real*8)
+a(i)              !specific internal energy (real*8)
+wmeanmolecular(i) !mean molecular weight (real*8)
+g(i)              !local g magnitude (real*8)

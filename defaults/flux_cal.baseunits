@@ -1,0 +1,6 @@
+&baseunits
+ gram=1.d0 ! Grams (cgs) e.g. gram=1.d-3 makes kilograms
+ sec=1.d0  ! Seconds (cgs)
+ cm=1.d0   ! Centimeters (cgs)
+ kelvin=1.d0 ! Kelvin (cgs)
+&end

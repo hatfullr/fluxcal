@@ -1,0 +1,6 @@
+**/*.o
+**/*.orig
+**/*~
+**/*#
+defaults/flux_cal.input.Roger
+flux_cal
