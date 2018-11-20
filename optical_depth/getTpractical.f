@@ -4,6 +4,7 @@ c     Input = z0,z1,zthick,thick_p,h1
 c     Output = Tthin, Tthick, tau_thin
       
       include 'optical_depth.h'
+      integer i
 
       real*8 zstop
       real*8 z0,z1,zthick

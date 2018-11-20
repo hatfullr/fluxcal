@@ -145,3 +145,7 @@ c     Things Roger Hatfull added
 
       integer intout
       common/intoutput/ intout
+
+      real*8 rayout1(10,maxstp)
+      integer rayout2(maxstp),nstp
+      common/rayout/ rayout1,rayout2,nstp

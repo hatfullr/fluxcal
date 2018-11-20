@@ -72,7 +72,8 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       get_closest_particles=.false.
 
       ! Finds all the particles the ray-tracer comes in contact with at
-      ! posx, posy
+      ! posx, posy. Make sure this is in the same units as the rest of
+      ! your input data.
       get_particles_at_pos=.false.
       posx=0.d0
       posy=0.d0
@@ -129,7 +130,7 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       step2=1d30
       step3=1d4
       step4=1d15
-      
+
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
       taulimit=1.d0
@@ -228,7 +229,15 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
 !-----------------------------------------------------------------------
 
 
-      inquire(file="flux_cal.baseunits",exist=baseunitsexists)
+      inquire(file='flux_cal.input',exist=inputexists)
+      if(inputexists) then
+         open(44,file='flux_cal.input')
+         read(44,input)
+         close(44)
+      else
+         write(*,*) "No 'flux_cal.input' file found."
+         error stop "init.f line 241"
+      end if
       
       ! Base units (cgs). These are 
       gram=1.d0
@@ -249,8 +258,9 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
          inquire(file=trim(adjustl(flux_cal_dir))//
      $        "/defaults/flux_cal.baseunits",exist=baseunitsexists)
          if(baseunitsexists) then
-            write(*,*) "Using default baseunits file from "//
-     $           "flux_cal_dir/defaults."
+            write(*,*) "Using default baseunits file '"//
+     $           trim(adjustl(flux_cal_dir))//"/defaults/"//
+     $           "flux_cal.baseunits'."
             open(42,file=trim(adjustl(flux_cal_dir))//
      $           "/defaults/flux_cal.baseunits")
             read(42,baseunits)
@@ -258,9 +268,9 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
          else
             write(*,*)"WARNING: No 'flux_cal.baseunits' default file "//
      $           "found"
-            write(*,*)"in either the current working directory or the"//
-     $           " flux_cal_dir/defaults directory. Defaulting to cgs"//
-     $           " units."
+            write(*,*)"in either the current working directory or"
+            write(*,*)"'",trim(adjustl(flux_cal_dir)),"/defaults'."
+            write(*,*)"Assuming units cgs for all variables."
          end if
       end if
       
@@ -279,34 +289,27 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       distance=10.d0*pc         ! distance to get absolute magnitude
 
 
-      inquire(file='flux_cal.input',exist=inputexists)
-      if(inputexists) then
-         open(44,file='flux_cal.input')
-         read(44,input)
-         close(44)
-         runit=runit*cm
-         munit=munit*gram
-         tunit=tunit*sec
-         vunit=vunit*cm/sec
-         Eunit=Eunit*gram*cm**2.d0/sec**2.d0
-         rhounit=rhounit*gram/cm**3.d0
-         muunit=muunit*gram
-         gunit=gunit*cm/sec**2.d0
+      runit=runit*cm
+      munit=munit*gram
+      tunit=tunit*sec
+      vunit=vunit*cm/sec
+      Eunit=Eunit*gram*cm**2.d0/sec**2.d0
+      rhounit=rhounit*gram/cm**3.d0
+      muunit=muunit*gram
+      gunit=gunit*cm/sec**2.d0
+      
+      runit_out=runit_out*cm
+      munit_out=munit_out*gram
+      tunit_out=tunit_out*sec
+      vunit_out=vunit_out*cm/sec
+      Eunit_out=Eunit_out*gram*cm**2.d0/sec**2.d0
+      rhounit_out=rhounit_out*gram/cm**3.d0
+      muunit_out=muunit_out*gram
+      gunit_out=gunit_out*cm/sec**2.d0
+      tempunit_out=tempunit_out*kelvin
+      Lunit_out=Lunit_out*gram*cm**2.d0/sec**2.d0
 
-         runit_out=runit_out*cm
-         munit_out=munit_out*gram
-         tunit_out=tunit_out*sec
-         vunit_out=vunit_out*cm/sec
-         Eunit_out=Eunit_out*gram*cm**2.d0/sec**2.d0
-         rhounit_out=rhounit_out*gram/cm**3.d0
-         muunit_out=muunit_out*gram
-         gunit_out=gunit_out*cm/sec**2.d0
-         tempunit_out=tempunit_out*kelvin
-         Lunit_out=Lunit_out*gram*cm**2.d0/sec**2.d0
-      else
-         write(*,*) "No 'flux_cal.input' file found."
-         error stop "init.f line 241"
-      end if
+      
  97   format(A7," = ",I6,"   ",A10," = ",g10.4)
  98   format(A10," = ",I10,"   ",A10," = ",I10)
  99   format(A13," = ",E10.4,"   ",A11," = ",E10.4)
@@ -314,12 +317,13 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
  100  format(A13," = ",E10.4)
  101  format(A13," = ",I10)
  102  format(A27," = ",L1)
- 103  format(A13," = '",A,"'")
+ 103  format(A16," = '",A,"'")
  104  format("   ",A," = ",L1)
  105  format("   ",A," = ",E10.4)
  106  format("   ",A," = '",A,"'")
  107  format("   ",A," = ",I8)
  108  format(A13," = ",L1)
+ 109  format(A13," = '",A,"'")
 
 c     Write everything to the terminal
       write(*,*) ""
@@ -348,7 +352,7 @@ c     Write everything to the terminal
       write(*,97) "finish",finish,"angleydeg",angleydeg
       write(*,97) "step  ",step  ,"anglezdeg",anglezdeg
 
-      write(*,103) "flux_cal_dir",trim(adjustl(flux_cal_dir))
+      write(*,109) "flux_cal_dir",trim(adjustl(flux_cal_dir))
       
       write(*,*) ""
       write(*,101) "nkernel     ",nkernel
@@ -402,6 +406,13 @@ c      write(*,102) "rossonly    ",rossonly
       write(*,*) ""
 
 
+      if((get_integration_at_pos.eqv..true.) .and.
+     $     (get_fluxes.eqv..true.)) then
+         write(*,*) "Do not use get_integration_at_pos and get_fluxes"
+         write(*,*) "at the same time."
+         error stop "init.f line 410"
+      end if
+      
       if((get_integration_at_all_pos.eqv..true.) .and.
      $     (get_fluxes.eqv..false.)) then
          write(*,*) "get_integration_at_all_pos should not be called"
@@ -575,6 +586,10 @@ c         write(*,*) "thin material, and as such, results should not be"
 c         write(*,*) "expected to be physical."
 c      end if
 
+c     Transform some variables based on units
+      posx = posx*runit
+      posy = posy*runit
+      
       write(*,*) "** Complete **"
       write(*,*) ""
 

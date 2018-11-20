@@ -26,10 +26,10 @@
          enddo
          close(44)
       else
- 104     format(14E15.7,i15)
+ 104     format(14ES22.14,i22)
          open(44,file=trackingfile,status='unknown')
          write(*,*) "Writing to text file '",trim(trackingfile),"'"
-         write(44,"(E15.7)") t*tunit
+         write(44,"(ES22.14)") t*tunit
          do i=1,nmax
             if(track(i).gt.0) then
                m=track(i)

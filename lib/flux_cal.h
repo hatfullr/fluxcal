@@ -1,6 +1,6 @@
       implicit none
-      integer nmax,nnmax,ntab
-      PARAMETER (NMAX=420000,NNMAX=128)
+      integer nmax,nnmax,ntab,maxstp
+      PARAMETER (NMAX=420000,NNMAX=128,maxstp=10000)
 c      PARAMETER (NMAX=301000,NNMAX=128)
 c      PARAMETER (NMAX=221000,NNMAX=1000)
 c      PARAMETER (NMAX=180000,NNMAX=100)
@@ -25,7 +25,7 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 wtab(ntab),ctab
       common/wtabul/ wtab,ctab
 
-
+	
       CHARACTER*12 outfilename
       integer outfilenum,iform,iout,ni1,ni2,ni3,innit,nnit
       common/counter/ innit
@@ -82,7 +82,7 @@ c      integer i
       common/outputfile/ outfile
       real*8 t
       common/time/ t
-      namelist/input/ n,yscalconst,munit,runit,tunit,vunit,
+      namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
@@ -140,7 +140,6 @@ c      integer i
 
       real*8 Teff(nmax)
       common/teff/ Teff
-
 
 c Opacity tables for enevelope fitting
       real*8 gridR(100)

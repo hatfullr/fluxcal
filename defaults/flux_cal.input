@@ -35,7 +35,8 @@
       get_closest_particles=.false.
 
       ! Finds all the particles the ray-tracer comes in contact with at
-      ! posx, posy
+      ! posx, posy. Make sure this is in the same units as the rest of
+      ! your input data.
       get_particles_at_pos=.false.
       posx=0.d0
       posy=0.d0

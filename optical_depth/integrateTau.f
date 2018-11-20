@@ -2,38 +2,18 @@
       include 'optical_depth.h'
       real*8 pressure,g_sph,rpos,m_sph
       real*8 avgrpos,avgxhp
-      integer loop
+      integer i, cnt,ii,q
       common/analysis2/ avgrpos,avgxhp
       integer counter1, counter2, counter3
       real*8 ta,tb,rprimex,rprimey,deltax,deltay,
      $     arcx,arcy
 
-      integer kount1temp, i
-
-      real*8 tautemp(NVARMAX,KMAXX)
-      real*8 stemp(KMAXX)
-
-      real*8 taulimittemp
-      real*8 taustarttemp(NVARMAX)
-
-      real*8 hpi,ami,ui,xi,yi,zi,rhoi,temi
-      common/integration1/ ami,ui,xi,yi,zi
-      common/integration2/ hpi,rhoi,temi
-
-      logical usenata
-
-      integer ii
-      integer previous_part
-      real*8 xpos_temp, ypos_temp!, zpos_temp
-
-      integer info_particle_temp
-
-      integer kount1_thick
       real*8 opacit
 
       real*8 zstop
       real*8 TOTALTpracticalXY
       character*255 myfname
+
 
       ! Set the visible surface areas of each particle to zero
       do ip=1,nmax
@@ -59,6 +39,26 @@
          write(*,*) "Integrating through each point on the driving grid"
       end if
 
+c     Make one large data file per main loop.
+      if(get_integration_at_all_pos) then
+ 700     format('int_at_all_pos_',i4.4,'.dat')
+ 701     format('int_at_all_pos_',i5.5,'.dat')
+ 702     format('int_at_all_pos_',i6.6,'.dat')
+         if(innit.le.9999) then
+            write(myfname,700) innit
+         else if(innit.le.99999) then
+            write(myfname,701) innit
+         else
+            write(myfname,702) innit
+         end if
+
+         intout=655
+         open(intout,file=trim(adjustl(myfname)),status='unknown')
+         write(*,*) "Writing all integration data to '"//
+     $        trim(adjustl(myfname))//"'"
+         
+      end if
+
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
@@ -68,24 +68,44 @@
             
             if(zmin(i,j).lt.1d30)then
 
+c               if(get_integration_at_all_pos) then
+c 700              format('int_at_pos_',i3.3,'_',i3.3,'_',i4.4,'.dat')
+c 701              format('int_at_pos_',i3.3,'_',i3.3,'_',i5.5,'.dat')
+c 702              format('int_at_pos_',i3.3,'_',i3.3,'_',i6.6,'.dat')
+c                  if(innit.le.9999) then
+c                     write(myfname,700) i,j,innit
+c                  else if(innit.le.99999) then
+c                     write(myfname,701) i,j,innit
+c                  else
+c                     write(myfname,702) i,j,innit
+c                  end if
+c                  cnt=cnt+1
+c                  intout = 655
+c                  posx=xpos
+c                  posy=ypos
+c                  open(intout,file=myfname,status='unknown')
+c                  write(intout,'(2ES22.14)') posx,posy
+c                  write(intout,'(11A22)') "z","h","rho","u","g","mu","P",
+c     $                 "T","kappa","tau","particle"
+c               end if
+
                if(get_integration_at_all_pos) then
- 700              format('int_at_',i3.3,'_',i3.3,'_',i4.4,'.dat')
- 701              format('int_at_',i3.3,'_',i3.3,'_',i5.5,'.dat')
- 702              format('int_at_',i3.3,'_',i3.3,'_',i6.6,'.dat')
-                  if(innit.le.9999) then
-                     write(myfname,700) i,j,innit
-                  else if(innit.le.99999) then
-                     write(myfname,701) i,j,innit
-                  else
-                     write(myfname,702) i,j,innit
-                  end if
-                  intout = 655
+                  ! Initialize the integration results array
+                  do ii=1,maxstp
+                     rayout1(1,ii)  = 1d30
+                     rayout1(2,ii)  = 0.d0
+                     rayout1(3,ii)  = 0.d0
+                     rayout1(4,ii)  = 0.d0
+                     rayout1(5,ii)  = 0.d0
+                     rayout1(6,ii)  = 0.d0
+                     rayout1(7,ii)  = 0.d0
+                     rayout1(8,ii)  = 0.d0
+                     rayout1(9,ii)  = 0.d0
+                     rayout1(10,ii) = 0.d0
+                     rayout2(ii)    = 0
+                  end do
                   posx=xpos
                   posy=ypos
-                  open(intout,file=myfname,status='unknown')
-                  write(intout,'(2E15.7)') posx,posy
-                  write(intout,'(11A15)') "z","h","rho","u","g","mu","P",
-     $                 "T","kappa","tau","particle"
                end if
                
                call getTpractical(zmin(i,j),zmax(i,j),
@@ -95,6 +115,15 @@
                TOTALTpracticalXY=TpracticalXYthin(i,j)+
      $              TpracticalXYthick(i,j)
 
+               if(get_integration_at_all_pos) then
+                  write(intout,'(2ES22.14,2I22)') xpos/runit_out,
+     $                 ypos/runit_out,nstp,size(rayout1(:,1))+1
+                  do ii=1,nstp
+                     write(intout,'(10ES22.14,I22)')
+     $                    (rayout1(q,ii),q=1,size(rayout1(:,1))),
+     $                    rayout2(ii)
+                  end do
+               end if
 c               if(tauthin(i,j).gt.0.d0) then
 c                  write(*,*) "Optically thin material at ",i,j,xpos,ypos
 c               end if
@@ -255,11 +284,11 @@ c     wavelength is in centimeters
             TthermXY(I,J)=0.d0
             TXY(I,J)=TphotoXY(I,J)
 
-            if(get_integration_at_all_pos) then
-               close(intout)
-            end if
-            
          end do
       end do
-               
+
+      
+      if(get_integration_at_all_pos) then
+         close(intout)
+      end if       
       end subroutine

@@ -55,7 +55,6 @@ c     Find limits of integration:
             yposmax=y(ip)+2*hp(ip)
             jmin=max(int((yposmin-yminmap)/hymap+2),1)
             jmax=min(int((yposmax-yminmap)/hymap+1),nymap)
-            
             DO J=jmin,jmax
                YPOS=(J-1)*HYMAP+YMINMAP ! y of line of sight
                maxdx=(4*hp(ip)**2-(y(ip)-ypos)**2)**0.5d0

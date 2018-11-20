@@ -66,10 +66,10 @@ ccccc L164
       
 c 102  format(A5," ",A9," ",A9," ",A5," ",A9," ",A9," ",A5)
 c     103  format(i5," ",f9.2," ",f9.2," ",i5," ",f9.2," ",f9.2," ",i5)
- 102  format(" ",A5," ",A15  ," ",A15  ," ",A5," ",A15  ," ",A15  ," ",
-     $     A5," ",A15  )
- 103  format(" ",i5," ",E15.7," ",E15.7," ",i5," ",E15.7," ",E15.7," ",
-     $     i5," ",E15.7)
+ 102  format(" ",A5," ",A22  ," ",A22  ," ",A5," ",A22  ," ",A22  ," ",
+     $     A5," ",A22  )
+ 103  format(" ",i5," ",ES22.14," ",ES22.14," ",i5," ",ES22.14," ",
+     $     ES22.14," ",i5," ",ES22.14)
       
       inquire(file=FNAME2,exist=dimenFileAlreadyExists)
       if(.not.dimenFileAlreadyExists) then
@@ -212,8 +212,8 @@ c     Record the total luminosity for a later comparison:
          goto 41
       endif
 
- 100  format(A19," = ",E11.4,", ",E11.4)
- 101  format(A19," = ",I11,", ",I11)
+ 100  format(A19," = ",ES22.14,", ",ES22.14)
+ 101  format(A19," = ",I22,", ",I22)
       write(*,*) "Grid details:"
       write(*,100) "xminmap,xmaxmap",xminmap,xmaxmap
       write(*,100) "yminmap,ymaxmap",yminmap,ymaxmap

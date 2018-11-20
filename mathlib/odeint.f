@@ -1,11 +1,11 @@
       SUBROUTINE odeint(ystart,nvar,x1,x2,eps,h1,hmaximum,nok,nbad,
      $     derivs,rkqs)
       implicit none
-      INTEGER nbad,nok,nvar,KMAXX,MAXSTP,NMAX
+      INTEGER nbad,nok,nvar,KMAXX,NMAX,maxstp
       real*8 eps,h1,hmaximum,x1,x2,ystart(nvar) ! ,TINY
       EXTERNAL derivs,rkqs
-      PARAMETER (MAXSTP=10000,NMAX=50,KMAXX=200) !,TINY=1.d-30)
-      INTEGER i,kmax,kount,nstp,kount1 !,kount2
+      PARAMETER (NMAX=50,KMAXX=200,maxstp=10000) !,TINY=1.d-30)
+      INTEGER i,kmax,kount,kount1 !,kount2
       real*8 dxsav,h,hdid,hnext,x,xsav,dydx(NMAX),xp(KMAXX),y(NMAX),
      *yp(NMAX,KMAXX),yscal(NMAX)
       COMMON /path/ kmax,kount,dxsav,xp,yp
@@ -46,6 +46,11 @@
 
       real*8 tau_thick
       common/tauthick/ tau_thick
+
+      real*8 rayout1(10,maxstp)
+      integer rayout2(maxstp),nstp
+
+      common/rayout/ rayout1,rayout2,nstp
       
       real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
@@ -68,7 +73,9 @@ c      common /resolvedboolean/ resolved
 c      kount2=0
       do 11 i=1,nvar
         y(i)=ystart(i)
-11    continue
+ 11   continue
+
+
       do 16 nstp=1,MAXSTP
 c        print *,'looping',x,y(1)
         call derivs(x,y,dydx)
@@ -97,8 +104,8 @@ c     I want to make sure the penultimate step (the step right before the photos
         if((x+h-x2)*(x+h-x1).gt.0.d0) h=x2-x
         call rkqs(y,dydx,nvar,x,h,eps,yscal,hdid,hnext,derivs)
         intz = x
-        if(get_integration_at_pos .or. get_integration_at_all_pos) then
- 800       format(10E15.7,I15)
+        if(get_integration_at_pos) then
+ 800       format(10ES22.14,I22)
            call getLocalQuantities(posx,posy,x)
            call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
      $          ncooling,Rform,opacit)
@@ -106,8 +113,23 @@ c     I want to make sure the penultimate step (the step right before the photos
      $          rhocgs/rhounit_out,ucgs/Eunit_out*munit_out,
      $          gcgs/gunit_out,xh/muunit_out,pcgs/punit_out,
      $          tcgs/tempunit_out,opacit,y(1),lastpart
-c           write(intout,800) x,rhocgs,ucgs,gcgs,pcgs,tcgs,
-c     $          xhp,abs(dydx(1)*4.d0*xhp),opacit,y(1),lastpart
+        end if
+
+        if(get_integration_at_all_pos) then
+           call getLocalQuantities(posx,posy,x)
+           call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
+     $          ncooling,Rform,opacit)
+           rayout1(1,nstp)  = x/runit_out
+           rayout1(2,nstp)  = xhp/runit_out
+           rayout1(3,nstp)  = rhocgs/rhounit_out
+           rayout1(4,nstp)  = ucgs/Eunit_out*munit_out
+           rayout1(5,nstp)  = gcgs/gunit_out
+           rayout1(6,nstp)  = xh/muunit_out
+           rayout1(7,nstp)  = pcgs/punit_out
+           rayout1(8,nstp)  = tcgs/tempunit_out
+           rayout1(9,nstp)  = opacit
+           rayout1(10,nstp) = y(1)
+           rayout2(nstp)    = lastpart
         end if
         if(hdid.eq.h)then
           nok=nok+1

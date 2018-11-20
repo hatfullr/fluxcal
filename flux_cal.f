@@ -10,10 +10,10 @@
 
       call init                 ! Initialize
 
- 230  format(3A15)
- 231  format(3I15)
- 232  format(A20,3E15.7)
- 233  format(A20,3A15)
+ 230  format(3A22)
+ 231  format(3I22)
+ 232  format(A20,3ES22.14)
+ 233  format(A20,3A22)
       
       
       write(*,*) "** Main loop **"
@@ -96,7 +96,7 @@ c        ****************************************************************
 
 c        ****************************************************************
          if(get_integration_at_pos) then
-            write(*,*) "Finding data at integration steps for posx,posy"
+            write(*,*) "Finding data at integration steps at posx,posy"
             call integrationAtPos
          end if
 c        ****************************************************************
