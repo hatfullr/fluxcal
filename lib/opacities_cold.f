@@ -193,8 +193,9 @@ C     .  'init_g' - the same as 'init_d' but for gas opacities,
 C     .
 C     ...........................................................................
 
-      subroutine ini_opac_dust_and_gas
-      
+      subroutine ini_opac_dust_and_gas(file1,file2)
+C     file1 = "kR_h2001.dat"
+C     file2 = "kP_h2001.dat"
       IMPLICIT NONE
 C     Global variable(s):
       
@@ -206,6 +207,7 @@ C     Global variable(s):
       CHARACTER*1 shape  
       common/opac_dust/ eD,eG, model, top, shape
       LOGICAL ross
+      CHARACTER*255 file1,file2
       
 C
 C Open input file:
@@ -231,7 +233,7 @@ c     close(07)
 C Initialization of all necessary data for a chosen dust model:
       call init_d(ross,model,top,shape,eD)
 C Initialization of data for the gas model:
-      call init_g(ross,eG)
+      call init_g(ross,eG,file1,file2)
       END
 C............................................................................. 
 C Subroutine that initialize the polynomial fit coefficients for a chosen
@@ -429,7 +431,9 @@ C.............................................................................
 C
 C   'eG': eG(71,71) - Rosseland or Planck mean gas opacity grids
 C.............................................................................
-      SUBROUTINE init_g(ross,eG)
+      SUBROUTINE init_g(ross,eG,file1,file2)
+C     file1 = "kR_h2001.dat"
+C     file2 = "kP_h2001.dat"
       IMPLICIT NONE
 C Global variable(s):
       REAL*8 eG
@@ -438,16 +442,21 @@ C Global variable(s):
 C Local variable(s):
       INTEGER i, j, k
       REAL*8 seq, xmy
-      CHARACTER*80 kR_H, kP_H
-      PARAMETER (kR_H='kR_h2001.dat', !a file with Rosseland mean gas opacity,
-     &           kP_H='kP_h2001.dat') !a file with Planck mean gas opacity,
-      DIMENSION seq(71*71)    
+C      CHARACTER*80 kR_H, kP_H
+C      PARAMETER (kR_H='kR_h2001.dat', !a file with Rosseland mean gas opacity,
+C     &           kP_H='kP_h2001.dat') !a file with Planck mean gas opacity,
+      DIMENSION seq(71*71)
+      CHARACTER*255 file1,file2
 C      
-C Open input file: 
+C     Open input file:
       if (ross) then
-         open(unit=10,file=kR_H,status='old',access='sequential')
+         write(*,*) "Reading cold opacity file (Rosseland only)"
+         open(unit=10,file=trim(adjustl(file1)),status='old',
+     $        access='sequential')
       else
-         open(unit=10,file=kP_H,status='old',access='sequential')
+         write(*,*) "Reading cold opacity file"
+         open(unit=10,file=trim(adjustl(file2)),status='old',
+     $        access='sequential')
       end if
       rewind 10
 C Initialization of mean gas opacities:

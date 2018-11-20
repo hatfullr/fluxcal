@@ -42,6 +42,12 @@
       ! Finds the data being used at each integration step at posx, posy
       get_integration_at_pos=.false.
 
+      ! Finds the data being used at each integration step for all grid
+      ! cells. Creates one output file for every grid cell, so use with
+      ! extreme caution! You must also set get_fluxes=.true. to use this
+      ! routine.
+      get_integration_at_all_pos=.false.
+
       ! Track a list of particles through each input file and create
       ! output files containing their data. Specify the file name that
       ! contains the list of particle IDs in 'trackfile', and whether

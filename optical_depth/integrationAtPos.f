@@ -3,10 +3,9 @@
 
       character*255 myfname
       real*8 mytau,mt1,mt2
-      integer intout, i
-      common/intoutput/ intout
+      integer i
       
-      call createGrid
+c      call createGrid
 
       xminmap=posx
       hxmap=1.d0
@@ -36,18 +35,17 @@ c      hzmap=(zmax(i,j)-zmin(i,j))/(nzmap-1)
 
       intout=51
       open(intout,file=myfname,status='unknown')
- 801  format(E15.7,A15)
+ 801  format(2E15.7)
  802  format(11A15)
-      write(*,*) "Writing to ", trim(myfname)
-      write(intout,801) posx,"posx"
-      write(intout,801) posy,"posy"
-      write(intout,801) zmax(i,j), "zmax [cm]"
-      write(intout,801) zmin(i,j), "zmin [cm]"
-      write(intout,801) taulimit, "taulimit"
-      write(intout,801) tau_thick, "tau_thick"
-      write(intout,802) "z [cm]","rho [g/cm^3]","u [ergs/g]",
-     $     "g [cm/s^2]","P [g/cm/s^2]","T [K]","xhp [cm]",
-     $     "|dtauds*4*xhp|","kappa [cm^2/g]","tau","particle"
+      write(*,*) "Writing to ", trim(adjustl(myfname))
+      write(intout,801) posx, posy
+c      write(intout,801) posy,"posy"
+c      write(intout,801) zmax(i,j), "zmax [cm]"
+c      write(intout,801) zmin(i,j), "zmin [cm]"
+c      write(intout,801) taulimit, "taulimit"
+c      write(intout,801) tau_thick, "tau_thick"
+      write(intout,802) "z","h","rho","u","g","mu","P","T","kappa","tau",
+     $     "particle"
 
 
       call integrateTau

@@ -86,43 +86,7 @@ c        ****************************************************************
 c        ****************************************************************
          if(get_particles_at_pos) then
             write(*,*) "Finding all particles at posx, posy"
-            
             call particlesAtPos(posx,posy,pid,nid)
-c            if(innit.le.9999) then
-c               write(papfname,"('part_at_pos_',i4.4,'.dat')") innit
-c            else if(innit.le.99999) then
-c               write(papfname,"('part_at_pos_',i5.5,'.dat')") innit
-c            else
-c               write(papfname,"('part_at_pos_',i6.6,'.dat')") innit
-c            end if
-c            write(*,*) "Writing to ",trim(adjustl(papfname))
-c 800        format(14E15.7,i15)
-c 801        format(E15.7,A15)
-c 802        format(15A15)
-c            open(50,file=trim(adjustl(papfname)),status='unknown')
-c            write(50,802) "x [cm]","y [cm]","z [cm]",
-c     $           "am [g]","hp [cm]","rho [g/cm^3]",
-c     $           "a [erg/g]","mu*m_H [g]","g [cm/s^2]",
-c     $           "T [K]","P [g/cm/s^2]","kappa [cm^2/g]","Teff [K]",
-c     $           "tau","Particle ID"
-            
-c            do i=1,nid
-c               ip = pid(i)
-cc               call getOpacitySub(x(ip),y(ip),z(ip),tempp(ip),
-cc     $              rho(ip),0.d0,ncooling,Rform,opacit)
-cc               tauA = taucoef*am(ip)*opacit/hp(ip)**2.d0
-cc               if(envfit) then
-cc                  Teff = get_teff(pp(ip),tempp(ip),localg(ip))
-cc               else
-cc                  Teff = 0.d0
-cc               end if
-c               write(50,800) x(ip),y(ip),z(ip),am(ip),hp(ip),rho(ip),
-c     $              a(ip),wmeanmolecular(ip),localg(ip),tempp(ip),
-c     $              pp(ip),opacit,Teff(ip),tauA(ip),ip
-c            end do
-c            
-c            close(50)
-            
          end if
 c        ****************************************************************
 
@@ -132,13 +96,14 @@ c        ****************************************************************
 
 c        ****************************************************************
          if(get_integration_at_pos) then
-            write(*,*) "Finding data at integration steps at posx, posy"
+            write(*,*) "Finding data at integration steps for posx,posy"
             call integrationAtPos
          end if
 c        ****************************************************************
 
 
-         
+
+
 
 c        ****************************************************************
          if(track_particles) then

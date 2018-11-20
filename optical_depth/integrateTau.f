@@ -33,6 +33,7 @@
 
       real*8 zstop
       real*8 TOTALTpracticalXY
+      character*255 myfname
 
       ! Set the visible surface areas of each particle to zero
       do ip=1,nmax
@@ -67,6 +68,26 @@
             
             if(zmin(i,j).lt.1d30)then
 
+               if(get_integration_at_all_pos) then
+ 700              format('int_at_',i3.3,'_',i3.3,'_',i4.4,'.dat')
+ 701              format('int_at_',i3.3,'_',i3.3,'_',i5.5,'.dat')
+ 702              format('int_at_',i3.3,'_',i3.3,'_',i6.6,'.dat')
+                  if(innit.le.9999) then
+                     write(myfname,700) i,j,innit
+                  else if(innit.le.99999) then
+                     write(myfname,701) i,j,innit
+                  else
+                     write(myfname,702) i,j,innit
+                  end if
+                  intout = 655
+                  posx=xpos
+                  posy=ypos
+                  open(intout,file=myfname,status='unknown')
+                  write(intout,'(2E15.7)') posx,posy
+                  write(intout,'(11A15)') "z","h","rho","u","g","mu","P",
+     $                 "T","kappa","tau","particle"
+               end if
+               
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TpracticalXYthin(i,j),TpracticalXYthick(i,j),
@@ -74,9 +95,9 @@
                TOTALTpracticalXY=TpracticalXYthin(i,j)+
      $              TpracticalXYthick(i,j)
 
-               if(tauthin(i,j).gt.0.d0) then
-                  write(*,*) "Optically thin material at ",i,j,xpos,ypos
-               end if
+c               if(tauthin(i,j).gt.0.d0) then
+c                  write(*,*) "Optically thin material at ",i,j,xpos,ypos
+c               end if
                
                if(thick_part(i,j).gt.0) then
 c     This idea didn't work, but it was a good idea, so save it in case we want it in the future.
@@ -233,6 +254,11 @@ c     wavelength is in centimeters
             end if
             TthermXY(I,J)=0.d0
             TXY(I,J)=TphotoXY(I,J)
+
+            if(get_integration_at_all_pos) then
+               close(intout)
+            end if
+            
          end do
       end do
                

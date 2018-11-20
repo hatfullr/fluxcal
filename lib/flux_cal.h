@@ -62,7 +62,7 @@ c      integer i
       logical rossonly,get_particles_at_pos,
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_integration_at_pos,get_info_of_particle,
-     $      get_closest_particles
+     $      get_closest_particles,get_integration_at_all_pos
       common/opacitytype/ rossonly
       real*8 step1,step2,step3,step4
       common/steps/ step1,step2,step3,step4
@@ -77,7 +77,7 @@ c      integer i
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_info_of_particle,envfit,
      $      get_closest_particles,flux_cal_dir
-      common/getint/ get_integration_at_pos
+      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       character*255 outfile
       common/outputfile/ outfile
       real*8 t
@@ -92,7 +92,8 @@ c      integer i
      $      rossonly,step1,step2,step3,step4,taulimit,
      $      get_particles_at_pos,posx,posy,track_particles,trackfile,
      $      binary_tracking_file,get_fluxes,envfit,
-     $      get_integration_at_pos,get_info_of_particle,info_particle,
+     $      get_integration_at_pos,get_integration_at_all_pos,
+     $      get_info_of_particle,info_particle,
      $      outfile,tau_thick,eosfile,
      $      get_closest_particles,flux_cal_dir
       common/inputfilenames/ opacityfile,opacitydustfile,filtersfile,

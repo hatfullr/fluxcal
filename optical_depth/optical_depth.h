@@ -142,3 +142,6 @@ c     Things Roger Hatfull added
 
       logical codeerror
       common/errors/ codeerror
+
+      integer intout
+      common/intoutput/ intout

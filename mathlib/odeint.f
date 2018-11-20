@@ -20,8 +20,8 @@
       common/opacitytype/ rossonly,get_closest_taus
       real*8 taulimit,posx,posy
       common/inputstuff/ taulimit,posx,posy
-      logical get_integration_at_pos
-      common/getint/ get_integration_at_pos
+      logical get_integration_at_pos,get_integration_at_all_pos
+      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       real*8 rhocgs,xhp,gcgs,pcgs,tcgs,ucgs
       real xh,t6
       common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
@@ -46,6 +46,16 @@
 
       real*8 tau_thick
       common/tauthick/ tau_thick
+      
+      real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
+     $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
+     $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
+     $      Lunit_out
+      common/units/ munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
+     $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
+     $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
+     $      Lunit_out
+      
 
 c      logical resolved
 c      common /resolvedboolean/ resolved
@@ -87,31 +97,17 @@ c     I want to make sure the penultimate step (the step right before the photos
         if((x+h-x2)*(x+h-x1).gt.0.d0) h=x2-x
         call rkqs(y,dydx,nvar,x,h,eps,yscal,hdid,hnext,derivs)
         intz = x
-        if(get_integration_at_pos) then
+        if(get_integration_at_pos .or. get_integration_at_all_pos) then
  800       format(10E15.7,I15)
            call getLocalQuantities(posx,posy,x)
-           ! This is all from derivs2.f
-           if(t6.gt.0) then
-              if ((posx**2+posy**2+x**2)**0.5d0.lt.Rform) then
-                 opacit=getOpacity(ncooling,dble(t6*1d6),rhocgs,y(1),
-     $                usetable,usetable2)
-              else
-                 opacit1=getOpacity(ncooling,dble(t6*1d6),rhocgs,y(1),
-     $                usetable,usetable2)
-                 opacit2=getOpacity(ncooling,dble(t6*1d6),rhocgs,y(1),
-     $                usetabledust,usetabledust2)
-
-                 nn=1
-                 fcondense=1*(1-(Rform/(posx**2+posy**2+
-     $                x**2)**0.5d0)**(2+nn))**3
-                 opacit=(1-fcondense)*opacit1+fcondense*opacit2
-              endif
-           else
-              opacit=0.d0
-           endif
-           
-           write(intout,800) x,rhocgs,ucgs,gcgs,pcgs,tcgs,
-     $          xhp,abs(dydx(1)*4.d0*xhp),opacit,y(1),lastpart
+           call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
+     $          ncooling,Rform,opacit)
+           write(intout,800) x/runit_out,xhp/runit_out,
+     $          rhocgs/rhounit_out,ucgs/Eunit_out*munit_out,
+     $          gcgs/gunit_out,xh/muunit_out,pcgs/punit_out,
+     $          tcgs/tempunit_out,opacit,y(1),lastpart
+c           write(intout,800) x,rhocgs,ucgs,gcgs,pcgs,tcgs,
+c     $          xhp,abs(dydx(1)*4.d0*xhp),opacit,y(1),lastpart
         end if
         if(hdid.eq.h)then
           nok=nok+1
