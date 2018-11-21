@@ -71,7 +71,7 @@ c      character*255 fname
          end if
 
          call getOpacitySub(x(i),y(i),z(i),tempp(i),
-     $        rho(i),0.d0,ncooling,Rform,opacit)
+     $        rho(i),0.d0,Rform,opacit)
          opac_sph(i)=opacit 
 c         if(tempp(i).le.8000) write(*,*) "OPACITY", tempp(i), opacit
          tauA(i) = taucoef*am(i)*opacit/hp(i)**2.d0

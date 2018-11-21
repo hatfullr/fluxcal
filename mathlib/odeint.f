@@ -26,10 +26,7 @@
       real xh,t6
       common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
       real*8 opacit,opacit1,opacit2
-      real*8 getOpacity
       real*8 fcondense,nn
-      integer ncooling
-      common/integration/ ncooling
       real*8 Rform
       common/dust/ Rform
       integer intout
@@ -108,7 +105,7 @@ c     I want to make sure the penultimate step (the step right before the photos
  800       format(10ES22.14,I22)
            call getLocalQuantities(posx,posy,x)
            call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
-     $          ncooling,Rform,opacit)
+     $          Rform,opacit)
            write(intout,800) x/runit_out,xhp/runit_out,
      $          rhocgs/rhounit_out,ucgs/Eunit_out*munit_out,
      $          gcgs/gunit_out,xh/muunit_out,pcgs/punit_out,
@@ -118,7 +115,7 @@ c     I want to make sure the penultimate step (the step right before the photos
         if(get_integration_at_all_pos) then
            call getLocalQuantities(posx,posy,x)
            call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
-     $          ncooling,Rform,opacit)
+     $          Rform,opacit)
            rayout1(1,nstp)  = x/runit_out
            rayout1(2,nstp)  = xhp/runit_out
            rayout1(3,nstp)  = rhocgs/rhounit_out

@@ -25,7 +25,6 @@ lib_obj = $(llib)/usekappatable.o      \
           $(llib)/useeostable.o        \
           $(llib)/readineostable.o     \
           $(llib)/trackParticles.o     \
-          $(llib)/progressBar.o        \
           $(llib)/getOpacitySub.o      \
 	  $(llib)/opacities_cold.o     \
           $(llib)/quicksort.o          \

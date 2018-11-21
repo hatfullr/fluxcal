@@ -1,8 +1,7 @@
-      subroutine getOpacitySub(x,y,z,tem,rho,tau,ncooling,Rform,opacit)
+      subroutine getOpacitySub(x,y,z,tem,rho,tau,Rform,opacit)
 c      include 'flux_cal.h'
 
       real*8 tem,x,y,z,Rform,rho,tau
-      integer ncooling
 
       real*8 getOpacity
       external usetable,usetable2
@@ -13,10 +12,10 @@ c      include 'flux_cal.h'
 
       if(tem.gt.0.d0) then
          if((x**2.d0 + y**2.d0 + z**2.d0)**0.5d0 .lt. Rform) then
-            opacit=getOpacity(ncooling,tem,rho,tau,usetable,usetable2)
+            opacit=getOpacity(tem,rho,tau,usetable,usetable2)
          else
-            opacit1=getOpacity(ncooling,tem,rho,tau,usetable,usetable2)
-            opacit2=getOpacity(ncooling,tem,rho,tau,usetabledust,
+            opacit1=getOpacity(tem,rho,tau,usetable,usetable2)
+            opacit2=getOpacity(tem,rho,tau,usetabledust,
      $           usetabledust2)
             nn=1
             fcondense=1.d0*(1.d0-(Rform/(x**2.d0+y**2.d0
