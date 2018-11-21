@@ -1,0 +1,23 @@
+#!/bin/bash
+
+\cd ../../
+./make
+if [ $? -eq 0 ]; then
+    \cd test/standard_check/test
+    \rm -f *~ *# debug flux_cal.output int_at_all_pos_0000.dat dimen*.sph fluxes*.sph
+    echo ""
+    echo "Running flux_cal..."
+    ../../../flux_cal > debug
+    DIFF=$(diff ../original/int_at_all_pos_0000.dat ./int_at_all_pos_0000.dat)
+    echo "The test completed successfully."
+    if [ "$DIFF" != "" ]; then
+	echo "'original/int_at_all_pos_0000.dat' and 'test/int_at_all_pos_0000.dat' differ."
+	exit 1
+    fi
+
+    echo "'original/int_at_all_pos_0000.dat' and 'test/int_at_all_pos_0000.dat' are identical."
+    exit 0
+fi
+
+exit 1
+

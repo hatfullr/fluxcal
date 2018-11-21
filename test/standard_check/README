@@ -1,0 +1,4 @@
+This directory contains a flux_cal file that is not to change at all
+across code versions. When making an edit to the code, you should check
+to be sure the outputs have not changed if you did not intend for them
+to do so. To check, run ./check.
