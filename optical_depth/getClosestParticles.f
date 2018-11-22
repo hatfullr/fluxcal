@@ -5,7 +5,7 @@
       include 'optical_depth.h'
       integer pid(n)
       integer nid,count
-      integer cidsize, i
+      integer cidsize, i,j
       real*8 myhxmap, myhymap
       real*8 xparam, yparam
 

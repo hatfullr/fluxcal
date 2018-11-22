@@ -20,8 +20,8 @@
       common/opacitytype/ rossonly,get_closest_taus
       real*8 taulimit,posx,posy
       common/inputstuff/ taulimit,posx,posy
-      logical get_integration_at_pos,get_integration_at_all_pos
-      common/getint/ get_integration_at_pos,get_integration_at_all_pos
+c      logical get_integration_at_pos,get_integration_at_all_pos
+c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       real*8 rhocgs,xhp,gcgs,pcgs,tcgs,ucgs
       real xh,t6
       common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
@@ -46,8 +46,10 @@
 
       real*8 rayout1(10,maxstp)
       integer rayout2(maxstp),nstp
-
       common/rayout/ rayout1,rayout2,nstp
+
+      logical dointatpos,dointatallpos
+      common/intatpos/ dointatpos,dointatallpos
       
       real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
@@ -101,7 +103,7 @@ c     I want to make sure the penultimate step (the step right before the photos
         if((x+h-x2)*(x+h-x1).gt.0.d0) h=x2-x
         call rkqs(y,dydx,nvar,x,h,eps,yscal,hdid,hnext,derivs)
         intz = x
-        if(get_integration_at_pos) then
+        if(dointatpos) then
  800       format(10ES22.14,I22)
            call getLocalQuantities(posx,posy,x)
            call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
@@ -112,7 +114,7 @@ c     I want to make sure the penultimate step (the step right before the photos
      $          tcgs/tempunit_out,opacit,y(1),lastpart
         end if
 
-        if(get_integration_at_all_pos) then
+        if(dointatallpos) then
            call getLocalQuantities(posx,posy,x)
            call getOpacitySub(posx,posy,x,dble(t6*1d6),rhocgs,y(1),
      $          Rform,opacit)

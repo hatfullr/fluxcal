@@ -2,7 +2,7 @@
       include 'optical_depth.h'
       real*8 pressure,g_sph,rpos,m_sph
       real*8 avgrpos,avgxhp
-      integer i, cnt,ii,q
+      integer i,j, cnt,ii,q
       common/analysis2/ avgrpos,avgxhp
       integer counter1, counter2, counter3
       real*8 ta,tb,rprimex,rprimey,deltax,deltay,
@@ -39,26 +39,6 @@
          write(*,*) "Integrating through each point on the driving grid"
       end if
 
-c     Make one large data file per main loop.
-      if(get_integration_at_all_pos) then
- 700     format('int_at_all_pos_',i4.4,'.dat')
- 701     format('int_at_all_pos_',i5.5,'.dat')
- 702     format('int_at_all_pos_',i6.6,'.dat')
-         if(innit.le.9999) then
-            write(myfname,700) innit
-         else if(innit.le.99999) then
-            write(myfname,701) innit
-         else
-            write(myfname,702) innit
-         end if
-
-         intout=655
-         open(intout,file=trim(adjustl(myfname)),status='unknown')
-         write(*,*) "Writing all integration data to '"//
-     $        trim(adjustl(myfname))//"'"
-         
-      end if
-
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
@@ -68,28 +48,7 @@ c     Make one large data file per main loop.
             
             if(zmin(i,j).lt.1d30)then
 
-c               if(get_integration_at_all_pos) then
-c 700              format('int_at_pos_',i3.3,'_',i3.3,'_',i4.4,'.dat')
-c 701              format('int_at_pos_',i3.3,'_',i3.3,'_',i5.5,'.dat')
-c 702              format('int_at_pos_',i3.3,'_',i3.3,'_',i6.6,'.dat')
-c                  if(innit.le.9999) then
-c                     write(myfname,700) i,j,innit
-c                  else if(innit.le.99999) then
-c                     write(myfname,701) i,j,innit
-c                  else
-c                     write(myfname,702) i,j,innit
-c                  end if
-c                  cnt=cnt+1
-c                  intout = 655
-c                  posx=xpos
-c                  posy=ypos
-c                  open(intout,file=myfname,status='unknown')
-c                  write(intout,'(2ES22.14)') posx,posy
-c                  write(intout,'(11A22)') "z","h","rho","u","g","mu","P",
-c     $                 "T","kappa","tau","particle"
-c               end if
-
-               if(get_integration_at_all_pos) then
+               if(dointatallpos) then
                   ! Initialize the integration results array
                   do ii=1,maxstp
                      rayout1(1,ii)  = 1d30
@@ -115,7 +74,7 @@ c               end if
                TOTALTpracticalXY=TpracticalXYthin(i,j)+
      $              TpracticalXYthick(i,j)
 
-               if(get_integration_at_all_pos) then
+               if(dointatallpos) then
                   write(intout,'(2ES22.14,2I22)') xpos/runit_out,
      $                 ypos/runit_out,nstp,size(rayout1(:,1))+1
                   do ii=1,nstp
@@ -221,6 +180,15 @@ c                     write(*,*) thick_part(i,j), tauthin, tau_thick
                      ccphoto=ccphoto+1
                      TphotoXY(I,J) = TOTALTpracticalXY
 
+                     ! This part of the code may not work because the main part of the code
+                     ! that drove this has been removed.
+                     ! nphoto is part of the legacy code
+                     na=tau(3,kount1-1) ! tau(3) = # of smoothing lengths into the surface
+                     nb=tau(3,kount1)
+                     nphoto=(na*(tau(1,kount1)-1.d0)
+     $                    +nb*(1.d0-tau(1,kount1-1)))/
+     $                    (tau(1,kount1)-tau(1,kount1-1))
+                     
                      do insl=1,nsl
                         if(nphoto.ge.insl) then
                            goodtphoto4avg(insl)=goodtphoto4avg(insl)
@@ -288,7 +256,4 @@ c     wavelength is in centimeters
       end do
 
       
-      if(get_integration_at_all_pos) then
-         close(intout)
-      end if       
       end subroutine

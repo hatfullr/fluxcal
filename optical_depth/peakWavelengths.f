@@ -23,7 +23,7 @@ c     L908 to L950
                stop
             endif
 
-            print *, insl,ilambdamax,ratio,0.5d0*(ratio-1)/(ratio+1)
+c            print *, insl,ilambdamax,ratio,0.5d0*(ratio-1)/(ratio+1)
             loglambdamax=ilambdamax+0.5d0*(ratio-1)/(ratio+1) ! This
 !     makes a simple estimate as to where the peak actually occurs
 !     If ratio is very small, then the peak is likely halfway toward the

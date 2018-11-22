@@ -7,19 +7,19 @@
       character*255 filename
        
 c     initialize opacities for a photospheric fit
-      write(*,*) "Reading photospheric opacity file"
-      open(1,file=trim(adjustl(filename)),status='old')
+      write(*,*) "Reading envfit opacity file"
+      open(100,file=trim(adjustl(filename)),status='old')
 
       numr=19
-      read(1,*) dummy
-      read(1,*) dummy
-      read(1,*) dummy, dummy, (gridR(il),il=1,numr)
+      read(100,*) dummy
+      read(100,*) dummy
+      read(100,*) dummy, dummy, (gridR(il),il=1,numr)
 
       numo=85
       do jl=1,numo
-         read(1,*) gridT(jl), (kap(il,jl),il=1,numr)
+         read(100,*) gridT(jl), (kap(il,jl),il=1,numr)
       end do
-      close(1)
+      close(100)
 
       return
       end
@@ -34,22 +34,22 @@ c     initialize opacities for a photospheric fit
        
 c     initialize opacities for a photospheric fit
 c     open(1,file="lowT_fa05_gs98_z0.02_x0.7.data ",status='old')
-      write(*,*) "Reading photospheric cold opacity file"
-      open(1,file=trim(adjustl(filename)),status='old')
+      write(*,*) "Reading envfit cold opacity file"
+      open(100,file=trim(adjustl(filename)),status='old')
 
       numr=46
-      read(1,*) dummy
-      read(1,*) dummy
-      read(1,*) dummy
-      read(1,*) dummy
-      read(1,*) (gridR(il),il=1,numr)
+      read(100,*) dummy
+      read(100,*) dummy
+      read(100,*) dummy
+      read(100,*) dummy
+      read(100,*) (gridR(il),il=1,numr)
 
       numo=105
       do k=1,numo
          jl=numo+1-k
-         read(1,*) gridT(jl), (kap(il,jl),il=1,numr)
+         read(100,*) gridT(jl), (kap(il,jl),il=1,numr)
       end do
-      close(1)
+      close(100)
       return
       end
 

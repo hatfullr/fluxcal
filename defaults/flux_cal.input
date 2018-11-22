@@ -151,7 +151,9 @@
       Lunit_out=1.d0
       
       
-      
+
+
+
       !### Physics
       ! If true, use Rosseland opacities only. If false, will use
       ! Rosseland and Planck opacities with a smoothing function.
@@ -172,10 +174,27 @@
       ! Dust formation radius (set to 1.d30 for no dust)
       Rform=1.d30
 
+      ! Cold temperature dust parameters
+      !    dust_model controls the silicate type
+      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg)=0.3,
+      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg)=0.0,
+      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg)=0.4,
+      !    dust_topology controls the topology of the grains
+      !       'h' - homogeneous particles,
+      !       'c' - composite particles,
+      !       'p' - porous composite particles,
+      !    dust_shape controls the shape of the particles
+      !       's' - spherical dust,
+      !       'a' - aggregate dust,
+      !       '5' - 5-layered spherical dust
+      dust_model='nrm'
+      dust_topology='h'
+      dust_shape='s'
 
 
 
-      
+
+
       !### File names
       ! File name for the opacity files, filters file, and output file.
       ! Set opacitydustfile='' for no dust.

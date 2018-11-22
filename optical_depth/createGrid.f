@@ -39,26 +39,21 @@ c     Use a 3x3 grid for starters:
       NXMAPnext=3
       NYMAPnext=3
 
-      IF(innit.LE.99999) THEN
-         WRITE (FNAME,103) innit,nint(anglez*180.d0/pi),
+c     Initialize the file names for this iteration
+ 33   format ('dimen',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 34   format ('dimen',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 35   format ('fluxes',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 36   format ('fluxes',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+      if(innit.le.99999) then
+         write (fname2,33) innit,nint(anglez*180.d0/pi),
      $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-         WRITE (FNAME2,193) innit,nint(anglez*180.d0/pi),
+         write (fname,35) innit,nint(anglez*180.d0/pi),
      $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-      ELSE
-         WRITE (FNAME,104) innit,nint(anglez*180.d0/pi),
+      else
+         write (fname2,34) innit,nint(anglez*180.d0/pi),
      $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-         WRITE (FNAME2,194) innit,nint(anglez*180.d0/pi),
+         write (fname,36) innit,nint(anglez*180.d0/pi),
      $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-      endif
-c      WRITE (FNAME3,394) innit,nint(anglez*180.d0/pi),
-c     $     nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-      WRITE (FNAME4,494) innit,nint(anglez*180.d0/pi),
-     $     nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
- 103  FORMAT ('fluxes',I5.5,'_',I3.3,'_',I3.3,'_',I3.3,'.sph')
- 104  FORMAT ('fluxes',I6.6,'_',I3.3,'_',I3.3,'_',I3.3,'.sph')
- 193  FORMAT ('dimen',I5.5,'_',I3.3,'_',I3.3,'_',I3.3,'.sph')
- 194  FORMAT ('dimen',I6.6,'_',I3.3,'_',I3.3,'_',I3.3,'.sph')
-c 394  FORMAT ('spectrum',I6.6,'_',I3.3,'_',I3.3,'_',I3.3,'.sph')
- 494  FORMAT ('trangevsrho',I6.6,'_',I3.3,'_',I3.3,'_',I3.3,'.sph')
+      end if
 
       end subroutine

@@ -5,8 +5,11 @@ c     L346 to L468
       real*8 zmmax
       real*8 opacit
 
-      integer count, i
+      integer count, i,j
 
+      ! If we have already called this function, don't call it again.
+      if(prepareIntegrationCalled) return
+      
       eps=1.0d-6                ! parameter for desired accuracy in
                                 ! integration
       kmax=200
@@ -159,4 +162,5 @@ c     Find 3d density grid for quick look-up later
          endif
       enddo
 
+      prepareIntegrationCalled=.true.
       end subroutine

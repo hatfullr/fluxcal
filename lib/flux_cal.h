@@ -38,10 +38,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common /splotfilters/ wavelength,absoluteflux,numfilters
       common /filternames/ filtername
 c      integer i
-      integer ncooling
       character*255 opacityfile,opacitydustfile,filtersfile,trackfile,
      $      eosfile
-      common/integration/ ncooling
       real*8 yscalconst,fracaccuracy,metallicity
       integer nkernel
       common/kernels/ nkernel
@@ -82,11 +80,14 @@ c      integer i
       common/outputfile/ outfile
       real*8 t
       common/time/ t
+      character*3 dust_model
+      character*1 dust_topology, dust_shape
+      common/colddust/ dust_model,dust_topology,dust_shape
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out,
+     $      Lunit_out,dust_model,dust_topology,dust_shape,
      $      nkernel,opacityfile,opacitydustfile,filtersfile,metallicity,
      $      Rform,anglexdeg,angleydeg,anglezdeg,start,finish,step,
      $      rossonly,step1,step2,step3,step4,taulimit,
@@ -154,3 +155,6 @@ c     slops for envelope fitting
       real*8 nabla(400,400)
       integer num_g, num_t, slop_type
       common /slops/ nabla, grid_gn, grid_tn, num_g, num_t, slop_type
+
+      logical dointatpos,dointatallpos
+      common/intatpos/ dointatpos,dointatallpos

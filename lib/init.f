@@ -5,9 +5,6 @@
       logical inputexists,baseunitsexists,fileexists
       character*255 eosfilepath,inputfile, opacfile1, opacfile2
       character*255 file1,file2
-c      logical baseunitsdefaultexists
-c      character*255 baseunits_default
-
 
       write(*,*)" ___________________________________________________  "
       write(*,*)"/         ___  _              ___        _          \ "
@@ -208,6 +205,26 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
 
       ! Dust formation radius (set to 1.d30 for no dust)
       Rform=1.d30
+
+      ! Cold temperature dust parameters
+      !    dust_model controls the silicate type
+      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg)=0.3,
+      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg)=0.0,
+      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg)=0.4,
+      !    dust_topology controls the topology of the grains
+      !       'h' - homogeneous particles,
+      !       'c' - composite particles,
+      !       'p' - porous composite particles,
+      !    dust_shape controls the shape of the particles
+      !       's' - spherical dust,
+      !       'a' - aggregate dust,
+      !       '5' - 5-layered spherical dust
+      ! For any dust_model, you can not use:
+      !    dust_topology='h' AND dust_shape='5'
+      !    dust_topology='p' AND dust_shape='a'
+      dust_model='nrm'
+      dust_topology='h'
+      dust_shape='s'
 
 
 
@@ -474,48 +491,54 @@ c      end if
       write(file1,200) trim(adjustl(flux_cal_dir)),"kR_h2001.dat"
       inquire(file=trim(adjustl(file1)), exist=fileexists)
       if(.not. fileexists) then
-         write(*,*) "Could not find 'kR_h2001.dat' in"
-         write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*) "correct, and if flux_cal was properly installed."
+         write(*,*)"Could not find 'kR_h2001.dat' in"
+         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+         write(*,*)"correct, and if flux_cal was properly installed."
          error stop "init.f line 469"
       end if
       
       write(file2,200) trim(adjustl(flux_cal_dir)),"kP_h2001.dat"
       inquire(file=trim(adjustl(file2)), exist=fileexists)
       if(.not. fileexists) then
-         write(*,*) "Could not find 'kP_h2001.dat' in"
-         write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*) "correct, and if flux_cal was properly installed."
+         write(*,*)"Could not find 'kP_h2001.dat' in"
+         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+         write(*,*)"correct, and if flux_cal was properly installed."
          error stop "init.f line 478"
       end if
-
-      call ini_opac_dust_and_gas(file1,file2) ! cold T opacities initialization
-
       
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),
-     $     "lowT_fa05_gs98_z0.02_x0.7.data"
-      inquire(file=trim(adjustl(inputfile)), exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' in"
-         write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*) "correct, and if flux_cal was properly installed."
-         error stop "init.f line 491"
+      ! cold T opacities initialization
+      call ini_opac_dust_and_gas(file1,file2)
+
+      if(envfit) then
+         ! Initialize find_teff dependencies
+         write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $        "lowT_fa05_gs98_z0.02_x0.7.data"
+         inquire(file=trim(adjustl(inputfile)), exist=fileexists)
+         if(.not. fileexists) then
+            write(*,*) "Could not find '",trim(adjustl(filtersfile)),
+     $           "' in"
+            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+            write(*,*)"correct, and if flux_cal was properly installed."
+            error stop "init.f line 491"
+         end if
+         
+         call ini_opacity_photospehre_lowT(inputfile)
+         call create_density_array
+      
+         write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $        "table_nabla.dat"
+         inquire(file=trim(adjustl(inputfile)),exist=fileexists)
+         if(.not. fileexists) then
+            write(*,*) "Could not find '",trim(adjustl(filtersfile)),
+     $           "' in"
+            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+            write(*,*)"correct, and if flux_cal was properly installed."
+            error stop "init.f line 503"
+         end if
+      
+         call ini_slops(inputfile)
       end if
-
-      call ini_opacity_photospehre_lowT(inputfile)
-      call create_density_array
-      
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),"table_nabla.dat"
-      inquire(file=trim(adjustl(inputfile)),exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' in"
-         write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*) "correct, and if flux_cal was properly installed."
-         error stop "init.f line 503"
-      end if
-      
-      call ini_slops(inputfile)
-
+         
 c     Check to see if the filtersfile exists and read it if it does
       write(inputfile,200) trim(adjustl(flux_cal_dir)),
      $     trim(adjustl(filtersfile))
@@ -586,44 +609,14 @@ c         write(*,*) "thin material, and as such, results should not be"
 c         write(*,*) "expected to be physical."
 c      end if
 
-c     Transform some variables based on units
+c     Initialize some variables
       posx = posx*runit
       posy = posy*runit
+      dointatpos=.false.
+      dointatallpos=.false.
       
       write(*,*) "** Complete **"
       write(*,*) ""
 
-
-
-c      write(*,*)" ___________________________________________________  "
-c      write(*,*)"/         ___  _              ___        _          \ "
-c      write(*,*)"|        | __|| | _  _ __ __ / __| __ _ | |         | "
-c      write(*,*)"|        | _| | || || |\ \ /| (__ / _` || |         | "
-c      write(*,*)"|        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | "
-c      write(*,*)"\___________________________________________________/ "
-c      write(*,*)"|                                                   | "
-c      write(*,*)"|  FluxCal Copyright (C) 2018. Written by,          | "
-c      write(*,*)"|                                                   | "
-c      write(*,*)"|   Roger Hatfull      [Uni. of Alberta]            | "
-c      write(*,*)"|   Natasha Ivanova    [Uni. of Alberta]            | "
-c      write(*,*)"|   James C. Lombardi  [Allegheny College]          | "
-cc      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
-c      write(*,*)"|                                                   | "
-c      write(*,*)"|  This program comes with ABSOLUTELY NO WARRANTY.  | "
-c      write(*,*)"|  This is free software, and you are welcome to    | "
-c      write(*,*)"|  redistribute it under certain conditions. See    | "
-c      write(*,*)"|  LICENSE file for details, or visit               | "
-c      write(*,*)"|  https://www.gnu.org/licenses                     | "
-c      write(*,*)"\___________________________________________________/ "
-c      write(*,*)"|                   |                                 "
-c      write(*,*)"|   Version 0.0.1   |                                 "
-c      write(*,*)"\___________________/                                 "
-c      write(*,*)"                                                      "
-
-
-
-
-
-      
       return
       end subroutine

@@ -3,7 +3,7 @@ c     L669 to L817
       include 'optical_depth.h'
 
       real*8 TOTALTpracticalXY
-      integer i
+      integer i,j
       
       TMAX=0.d0
       TMIN=1.d+30

@@ -66,9 +66,9 @@ c        ****************************************************************
             open(89,file=trim(adjustl(outfile)),action='write',
      $           position='append')
             write(89,232) trim(adjustl(infname)), t,
-     $           TOTALpracticalLUM,
-     $           real(avgt)/real(numcell)
+     $           TOTALpracticalLUM,avgt/numcell
             close(89)
+            write(*,*) ""
          end if
 c        ****************************************************************
 
@@ -103,8 +103,19 @@ c        ****************************************************************
 
 
 
+         
+
+c        ****************************************************************
+         if(get_integration_at_all_pos) then
+            write(*,*) "Finding data at integration steps at posx,posy"
+            call integrationAtAllPos
+         end if
+c        ****************************************************************
 
 
+
+
+         
 c        ****************************************************************
          if(track_particles) then
             write(*,*) "Tracking particles"

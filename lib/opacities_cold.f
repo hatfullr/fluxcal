@@ -208,6 +208,10 @@ C     Global variable(s):
       common/opac_dust/ eD,eG, model, top, shape
       LOGICAL ross
       CHARACTER*255 file1,file2
+
+      character*3 dust_model
+      character*1 dust_topology, dust_shape
+      common/colddust/ dust_model,dust_topology,dust_shape
       
 C
 C Open input file:
@@ -224,10 +228,13 @@ c      read(07,'(3x,1e10.3)') T0
 c      read(07,'(3x,1e10.3)') T1
 C Close input file:
 c     close(07)
-      
-      model='nrm'
-      top='h'
-      shape='s'
+
+      model=dust_model
+      top=dust_topology
+      shape=dust_shape
+c      model='nrm'
+c      top='h'
+c      shape='s'
       ross=.false. ! we will use Plank opacities here
       
 C Initialization of all necessary data for a chosen dust model:

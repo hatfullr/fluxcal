@@ -14,7 +14,7 @@ user_input = raw_input("Enter file name(s) or patterns: ").split(" ")
 files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):
-        if ((i[:6] != "fluxes") or (i[-4:] != ".sph")):
+        if ((i[:6] != "fluxes") or (i[-4:] != ".dat")):
             print "ERROR: You must provide fluxes files from flux_cal output."
             print "Error on file",i
             sys.exit()
