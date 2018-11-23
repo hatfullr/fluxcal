@@ -14,7 +14,7 @@ user_input = raw_input("Enter file name(s) or patterns: ").split(" ")
 files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):
-        if ((i[:6] != "fluxes") or (i[-4:] != ".dat")):
+        if ((i[:5] != "teffs") or (i[-4:] != ".dat")):
             print "ERROR: You must provide fluxes files from flux_cal output."
             print "Error on file",i
             sys.exit()
@@ -280,7 +280,6 @@ for datafile in files:
         Tmax = vmax
         Tmin = vmin
 
-    print Tmin,Tmax
     if(mlibcolorbar):
         colors = np.array([])
         for i in range(0, ny):
@@ -316,7 +315,7 @@ for datafile in files:
 
     print "Average Teff =", np.mean(data[~np.isnan(data)]), "K"
 
-    savename = "Teffs"+datafile.split("/")[-1][6:-4]
+    savename = "teffs"+datafile.split("/")[-1][5:-4]
     if paperfriendly:
         savename = savename+".eps"
     else:
@@ -331,5 +330,5 @@ print "Finished."
 if len(files) > 1:
     print ""
     print "Use this command to make a movie:"
-    print "convert -delay 10 -loop 0 Teffs*.png Teffs.gif"
+    print "convert -delay 10 -loop 0 teffs*.png teffs.gif"
 

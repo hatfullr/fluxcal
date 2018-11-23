@@ -1,28 +1,36 @@
 #!/bin/bash
 
+error=0
 \cd ../../
 ./make
 if [ $? -eq 0 ]; then
     \cd test/standard_check/test
     \rm -f *~ *# debug flux_cal.output int_at_all_pos_0000.dat dimen*.dat fluxes*.dat
+    \cp ../original/dimen*.dat .
     echo ""
     echo "Running flux_cal..."
     ../../../flux_cal > debug
 
     DIFF=$(diff ../original/int_at_all_pos_0000.dat ./int_at_all_pos_0000.dat)
     if [ "$DIFF" != "" ]; then
-	echo "'int_at_all_pos_0000.dat'     differ"
-	exit 1
+	echo "'int_at_all_pos_0000.dat'    differ"
+	error=1
     else
-	echo "'int_at_all_pos_0000.dat'     identical"
-	DIFF=$(diff ../original/fluxes00000_000_000_000.dat ./fluxes00000_000_000_000.dat)
+	echo "'int_at_all_pos_0000.dat'    identical"
+	tail -n+2 ../original/teffs00000_000_000_000.dat > ../original/teffscheck.dat
+	tail -n+2 ./teffs00000_000_000_000.dat > teffscheck.dat
+	DIFF=$(diff ../original/teffscheck.dat ./teffscheck.dat)
 	if [ "$DIFF" != "" ]; then
-	    echo "'fluxes00000_000_000_000.dat' differ"
-	    exit 1
+	    echo "'teffs00000_000_000_000.dat' differ"
+	    error=1
 	else
-	    echo "'fluxes00000_000_000_000.dat' identical"
+	    echo "'teffs00000_000_000_000.dat' identical"
 	fi
     fi
 fi
 
-exit 0
+if [ $error == 1 ]; then
+    exit 1
+else
+    exit 0
+fi

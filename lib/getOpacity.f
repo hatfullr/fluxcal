@@ -65,25 +65,5 @@ c     We should use both rosseland and planck opacities, always.
       endif
 
       
-c      if(ncooling.le.1)then
-cc     opacit is local Rosseland opacity
-c         call table(rhocgs,tem,opacit)
-c         getOpacity=opacit
-c      else
-c         write(*,*) "ncooling = ", ncooling
-c         write(*,*) "getOpacity.f: ncooling > 1?"
-c         error stop
-cc     opacitross is local Rosseland opacity
-cc     opacitplanck is local Planck opacity
-c         call table2(rhocgs,tem,opacitross,opacitplanck)
-c         if(tau1.gt.0d0) then
-c            getOpacity=exp(-2*tau1)*opacitplanck
-c     $           +(1d0-exp(-2*tau1))*opacitross
-c         else
-c            getOpacity=opacitplanck
-c         endif
-c        
-c      endif
-
       return
       end function

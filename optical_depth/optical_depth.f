@@ -18,7 +18,6 @@ c      vunit=sqrt(gravconst*munit/runit)*1d-5 ! convert to km/s ! StarSmasher sp
 c      tunit=sqrt(runit**3/(gravconst*munit))/3600/24 ! convert to days ! StarSmasher specific
 c      print *,'unit of velocity (in km/s)=',real(vunit)
 c      print *,'unit of time (in days)=',real(tunit)
-ccccc L164
 
       write(*,*) "Estabilishing the grid"
       call createGrid
@@ -33,7 +32,6 @@ ccccc L164
          call useDimenFile
          call prepareIntegration
          call integrateTau
-         call getFlux
       else
          write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny","L"
          write(*,102) repeat("-",5), repeat("-",22), repeat("-",22),
@@ -55,7 +53,7 @@ c        yminmap and ymaxmap are the bottom & topmost coordinates of grid
          ymaxmap=ymaxmapnext
 
 C        Compute cell widths:             
-         hxmap=(xmaxmap-xminmap)/dble(nxmap-1)                           
+         hxmap=(xmaxmap-xminmap)/dble(nxmap-1)
          hymap=(ymaxmap-yminmap)/dble(nymap-1)
 
          prepareIntegrationCalled=.false. !Remake the integrating grid
@@ -63,7 +61,8 @@ C        Compute cell widths:
          call integrateTau
          call getFlux
 
-         write(*,103) counter,xminmap,hxmap,nxmap,yminmap,hymap,nymap,
+         write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,
      $        TOTALpracticalLUM
 
          if(codeerror) goto 626
@@ -115,25 +114,35 @@ c     Record the total luminosity for a later comparison:
             lastTOTALLUM=TOTALLUM
             goto 41
          end if
+         call writeDimenFile
       end if
-
-         
-c 41 continue
-c
+      
+      call writeTempsFile
+      call getFlux
+      
+c      inquire(file=trim(adjustl(fname2)),exist=dimenFileAlreadyExists)
+c      if(.not.dimenFileAlreadyExists) then
+c         write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny","L"
+c         write(*,102) repeat("-",5), repeat("-",22), repeat("-",22),
+c     $        repeat("-",5), repeat("-",22), repeat("-",22),
+c     $        repeat("-",5), repeat("-",22)
+c      end if
+c 41   continue
+c 
 c      counter = counter + 1
 c      call useDimenFile
 c      call prepareIntegration
 c      call integrateTau
 c      call getFlux
-c
+c 
 c      ! Write current grid information to standard output
 c      if(.not.dimenFileAlreadyExists) then
 c         write(*,103) counter,xminmap,hxmap,nxmap,yminmap,hymap,nymap,
 c     $        TOTALpracticalLUM
 c      end if
-c
+c 
 c      if(codeerror) goto 626
-c
+c 
 c      deltai=IMAXGLOW-IMINGLOW
 c      deltaj=JMAXGLOW-JMINGLOW
 c      if( (deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy)) .or. 
@@ -141,13 +150,13 @@ c     $     deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy)) .or.
 c     $     abs(TOTALLUM-lastTOTALLUM).gt.fracaccuracy*TOTALLUM) .and.
 c     $     .not. dimenFileAlreadyExists
 c     $     .and. (nxmap.lt.nxmapmax .or. nymap.lt.nymapmax) ) then
-c
+c 
 c!     The code gets inside this if statement if not enough of the grid
 c!     has "glowing" cells, or if the total luminosity is not in
-c!     sufficient agreement with the total luminosity calculated from the
+c!     sufficient agreemecnt with the total luminosity calculated from the
 c!     previous grid size.
 cc         print *,'no convergence yet...try again'
-c
+c 
 c!     In case there are two well-separated stars, don't start making
 c!     smaller grids too quickly:
 c         if(IMAXGLOW-IMINGLOW.le.2) then
@@ -157,50 +166,50 @@ c         endif
 c         if(JMAXGLOW-JMINGLOW.le.2) then
 c            JMINGLOW=min(JMINGLOW,2)
 c            JMAXGLOW=max(JMAXGLOW,NYMAP-1)
-c     endif
+c      endif
 c      
 cC     Decide upon appropriate boundaries for the next grid:
 c         xmaxmapnext=min(Imaxglow*hxmap+xminmap + 3*hymap ,xmax)
 c         xminmapnext=max((Iminglow-2)*hxmap+xminmap - 3*hymap ,xmin)
 c         ymaxmapnext=min(Jmaxglow*hymap+yminmap + 3*hxmap ,ymax)
 c         yminmapnext=max((Jminglow-2)*hymap+yminmap - 3*hxmap ,ymin)
-c
+c 
 cC     Determine whether we should resolve the x or y direction better
 cC     in the next grid:
 c         hxtmp=(xmaxmapnext-xminmapnext)/(nxmap-1)
 c         hytmp=(ymaxmapnext-yminmapnext)/(nymap-1)
 c         if(hxtmp.gt.hytmp .and. nxmap.lt.nxmapmax) then
-c            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,mxmapmax)
+c            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,nxmapmax)
 c         else if(hytmp.gt.hxtmp .and. nymap.lt.nymapmax) then
 c            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+7,nymapmax)
 c         else
 c            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+6,nxmapmax)
 c            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,nymapmax)
 c         endif
-c
+c 
 cc     Record the total luminosity for a later comparison:
 c         lastTOTALLUM=TOTALLUM
 c         prepareIntegrationCalled=.false. ! Remake the integrating grid
 c         goto 41
 c      endif
-      
+     
  100  format(A19," = ",ES22.14,", ",ES22.14)
  101  format(A19," = ",I22,", ",I22)
       write(*,*) "Grid details:"
-      write(*,100) "xminmap,xmaxmap",xminmap,xmaxmap
-      write(*,100) "yminmap,ymaxmap",yminmap,ymaxmap
-      write(*,100) "hxmap,hymap    ",hxmap,hymap
+      write(*,100) "xminmap,xmaxmap",xminmap/runit_out,xmaxmap/runit_out
+      write(*,100) "yminmap,ymaxmap",yminmap/runit_out,ymaxmap/runit_out
+      write(*,100) "hxmap,hymap    ",hxmap/runit_out,hymap/runit_out
       write(*,101) "nxmap,nymap    ",nxmap,nymap
-      call writeDimenFile
+c      call writeDimenFile
       write(*,*) ""
       
 c      write (*,*) 'Total luminosity in enclosed area=',real(TOTALLUM)
 c      write (*,*) 'Total practical luminosity in enclosed area=',
 c     $     real(TOTALpracticalLUM)
       write(*,'(A,ES22.14)')' Total luminosity in enclosed area=',
-     $     TOTALpracticalLUM
-      write(*,'(A,ES22.14)')' Maximum Teff=',TMAX
-      write(*,'(A,ES22.14)')' Average Teff=',avgt/numcell
+     $     TOTALpracticalLUM/Lunit_out
+      write(*,'(A,ES22.14)')' Maximum Teff=',TMAX/tempunit_out
+      write(*,'(A,ES22.14)')' Average Teff=',avgt/numcell/tempunit_out
       
       call peakWavelengths
 
@@ -218,8 +227,6 @@ c                  if(TXY(I,J).eq.TMAX) print *, 'MAX AT',i,j
             end do
          end do
       end if
-
-      call writeFluxesFile
 
  626  return
       end

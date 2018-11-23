@@ -1,26 +1,8 @@
       subroutine integrationAtAllPos
       include 'optical_depth.h'
-      character*255 dimenfname,myfname
-      logical dimenFileExists
+      character*255 myfname
       integer i
       real*8 posx_temp,posy_temp
-
- 193  format ('dimen',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
- 194  format ('dimen',I6.6,'_',I3.3,'_',I3.3,'_',I3.3,'.dat')
-      if(innit.le.99999) then
-         write(dimenfname,193) innit,nint(anglez*180.d0/pi),
-     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-      else
-         write(dimenfname,194) innit,nint(anglez*180.d0/pi),
-     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-      end if
-
-      inquire(file=trim(adjustl(dimenfname)),exist=dimenFileExists)
-      if(.not.dimenFileExists) then
-         write(*,*) "Could not find the appropriate dimen*.dat file."
-         write(*,*) "Try setting get_fluxes=.true."
-         error stop "integrationAtAllPos.f line 20"
-      end if
 
       call useDimenFile
       call prepareIntegration

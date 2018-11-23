@@ -95,42 +95,23 @@
  
  Finding the fluxes at each grid point
  Estabilishing the grid
-  iter                   xmin                     hx    Nx                   ymin                     hy    Ny                      L
- -----        ---------------        --------------- -----        ---------------        --------------- -----        ---------------
-     1  -5.71733222594914E+12   5.53794355335720E+12     3  -5.51757889474077E+12   5.31718504694433E+12     3   9.73021114342912E+37
-     2  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   1.61246379266865E+13     3   1.15177365476376E+38
-     3  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   5.37487930889550E+12     7   1.08076121369537E+38
-     4  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   2.30351970381235E+12    15   1.04249630426123E+38
-     5  -1.92144550736324E+13   1.68745501531566E+12    21  -1.66460412630417E+13   2.30351970381235E+12    15   1.08518549644319E+38
-     6  -1.92144550736324E+13   1.68745501531566E+12    21  -1.66460412630417E+13   1.34371982722387E+12    25   1.08234797691191E+38
-     7  -1.92144550736324E+13   8.88134218587188E+11    39  -1.66460412630417E+13   1.34371982722387E+12    25   1.06494396655485E+38
-     8  -1.92144550736324E+13   8.88134218587188E+11    39  -1.52792844371317E+13   7.35298072082450E+11    43   1.05942139165184E+38
-     9  -1.92144550736324E+13   4.62892252117311E+11    71  -1.42671967324810E+13   7.11200745781244E+11    43   1.05778547172161E+38
-    10  -1.92144550736324E+13   4.53695805326452E+11    71  -1.35222712514892E+13   3.83521356227414E+11    75   1.05811760399645E+38
+ Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
+ Creating the driving grid
+ Creating the integrating grid
+ Integrating through each point on the driving grid
+ Writing 'teffs00000_000_000_000.dat'
+ Calculating the flux at each grid point
  Grid details:
     xminmap,xmaxmap =  -1.92144550736324E+13,   1.25442512992192E+13
     yminmap,ymaxmap =  -1.35222712514892E+13,   1.48583091093395E+13
     hxmap,hymap     =   4.53695805326452E+11,   3.83521356227414E+11
     nxmap,nymap     =                     71,                     75
  
-     TXY_max=   9727.53418       3.98800278    
- Total luminosity in enclosed area=   1.36271943E+38
- Total practical luminosity in enclosed area=   1.05811759E+38
- Average Teff=   2939.38818    
-           0           0                       NaN                       NaN
-           1           0                       NaN                       NaN
-           2           0                       NaN                       NaN
-           3           0                       NaN                       NaN
-           4           0                       NaN                       NaN
-           5           0                       NaN                       NaN
-           6           0                       NaN                       NaN
-           7           0                       NaN                       NaN
-           8           0                       NaN                       NaN
-           9           0                       NaN                       NaN
-          10           0                       NaN                       NaN
- Writing dimen file
- Writing 'fluxes00000_000_000_000.dat'
+ Total luminosity in enclosed area=  1.05811760399645E+38
+ Maximum Teff=  9.72753413801444E+03
+ Average Teff=  2.93938810793937E+03
  Writing to output file
+ 
  Finding data at integration steps at posx,posy
  Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
  Writing to 'int_at_all_pos_0000.dat'

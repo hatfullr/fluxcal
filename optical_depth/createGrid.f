@@ -42,8 +42,8 @@ c     Use a 3x3 grid for starters:
 c     Initialize the file names for this iteration
  33   format ('dimen',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
  34   format ('dimen',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
- 35   format ('fluxes',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
- 36   format ('fluxes',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 35   format ('teffs',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 36   format ('teffs',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
       if(innit.le.99999) then
          write (fname2,33) innit,nint(anglez*180.d0/pi),
      $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)

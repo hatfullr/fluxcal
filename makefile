@@ -52,7 +52,7 @@ opdep_obj = $(opdeplib)/optical_depth.o        \
             $(opdeplib)/getTpractical.o        \
             $(opdeplib)/getClosestParticles.o  \
             $(opdeplib)/integrationAtAllPos.o  \
-            $(opdeplib)/writeFluxesFile.o     \
+            $(opdeplib)/writeTempsFile.o     \
 
 # find_teff objects
 findTeff_obj = $(findTefflib)/get_slop.o                \

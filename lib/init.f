@@ -422,26 +422,23 @@ c      write(*,102) "rossonly    ",rossonly
       write(*,103) "outfile        ",trim(adjustl(outfile))
       write(*,*) ""
 
-
-      if((get_integration_at_pos.eqv..true.) .and.
-     $     (get_fluxes.eqv..true.)) then
-         write(*,*) "Do not use get_integration_at_pos and get_fluxes"
-         write(*,*) "at the same time."
-         error stop "init.f line 410"
-      end if
+      ! Check for conflicting flags
+c      if(get_integration_at_pos .and. get_fluxes) then
+c         write(*,*) "Do not use get_integration_at_pos and get_fluxes"
+c         write(*,*) "at the same time."
+c         error stop "init.f line 410"
+c      end if
       
-      if((get_integration_at_all_pos.eqv..true.) .and.
-     $     (get_fluxes.eqv..false.)) then
-         write(*,*) "get_integration_at_all_pos should not be called"
-         write(*,*) "without setting get_fluxes to .true."
-         error stop "init.f line 409"
-      end if
+c      if(get_integration_at_all_pos.and..not.get_fluxes) then
+c         write(*,*) "get_integration_at_all_pos should not be called"
+c         write(*,*) "without setting get_fluxes to .true."
+c         error stop "init.f line 409"
+c      end if
 
-      if((get_integration_at_all_pos.eqv..true.) .and.
-     $     (get_integration_at_pos.eqv..true.)) then
-         write(*,*) "Do not use both of these at the same time."
-         error stop "init.f line 415"
-      end if
+c      if(get_integration_at_all_pos.and.get_integration_at_pos) then
+c         write(*,*) "Do not use both of these at the same time."
+c         error stop "init.f line 415"
+c      end if
 
       
  200  format(A,"/defaults/",A)

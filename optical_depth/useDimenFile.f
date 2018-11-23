@@ -1,15 +1,32 @@
       subroutine useDimenFile
+c     Check to see if the dimen file for this viewing angle and iteration
+c     already exists. If so, read from it. If not, throw an error.
       include 'optical_depth.h'
+      character*255 dimenfname
+      logical fileexists
 
-c     Check to see if appropriate dimen*.dat already exists.  If so, use
-c     it to set the grid size!
-c      inquire(file=trim(adjustl(fname2)),exist=dimenFileAlreadyExists)
+ 193  format ('dimen',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 194  format ('dimen',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+      if(innit.le.99999) then
+         write(dimenfname,193) innit,nint(anglez*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
+      else
+         write(dimenfname,194) innit,nint(anglez*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
+      end if
 
-c      if(dimenFileAlreadyExists) then
+      inquire(file=trim(adjustl(dimenfname)),exist=fileexists)
+      if(.not.fileexists) then
+         write(*,*) "Could not find dimen file '",
+     $        trim(adjustl(dimenfname)),"'."
+         write(*,*) "Try setting get_fluxes=.true."
+         error stop "useDimenFile.f line 23"
+      end if
+      
       write(*,*) "Reading pre-existing dimen file '" //
-     $     trim(adjustl(fname2)) // "'"
-      open (73,file=trim(adjustl(fname2)))
-      read(73,*)xminmap,hxmap,nxmap,yminmap,hymap,nymap
+     $     trim(adjustl(dimenfname)) // "'"
+      open (73,file=trim(adjustl(dimenfname)))
+      read(73,*) xminmap,hxmap,nxmap,yminmap,hymap,nymap
       close(73)
       xmaxmap=xminmap+hxmap*(nxmap-1)
       ymaxmap=yminmap+hymap*(nymap-1)
