@@ -1,0 +1,147 @@
+  ___________________________________________________  
+ /         ___  _              ___        _          \ 
+ |        | __|| | _  _ __ __ / __| __ _ | |         | 
+ |        | _| | || || |\ \ /| (__ / _` || |         | 
+ |        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | 
+ \___________________________________________________/ 
+ |                                                   | 
+ |  FluxCal Copyright (C) 2018. Written by,          | 
+ |                                                   | 
+ |   Roger Hatfull      [University of Alberta]      | 
+ |   Natasha Ivanova    [University of Alberta]      | 
+ |   James C. Lombardi  [Allegheny College]          | 
+ |                                                   | 
+ |  This program comes with ABSOLUTELY NO WARRANTY.  | 
+ |  This is free software, and you are welcome to    | 
+ |  redistribute it under certain conditions. See    | 
+ |  LICENSE file for details, or visit               | 
+ |  https://www.gnu.org/licenses                     | 
+ \___________________________________________________/ 
+ |                   |                                 
+ |   Version 0.0.1   |                                 
+ \___________________/                                 
+                                                       
+ ** Initializing **
+ Using default baseunits file '../../..//defaults/flux_cal.baseunits'.
+ 
+       gram   = 0.1000E+01   arad        = 0.7566E-14
+       sec    = 0.1000E+01   gravconst   = 0.6674E-07
+       cm     = 0.1000E+01   pc          = 0.3086E+19
+       kelvin = 0.1000E+01   distance    = 0.3086E+20
+       erg    = 0.1000E+01   boltz       = 0.1381E-15
+       crad   = 0.2998E+11   planck      = 0.6626E-26
+       sigma  = 0.5671E-04   
+ 
+       runit  = 0.6960E+11   munit       = 0.1989E+34
+       tunit  = 0.1594E+04   vunit       = 0.4368E+08
+       Eunit  = 0.3794E+49   rhounit     = 0.5900E+01
+       muunit = 0.1000E+01   gunit       = 0.2741E+05
+ 
+ runit_out    = 0.1000E+01   munit_out   = 0.1000E+01
+ tunit_out    = 0.1000E+01   vunit_out   = 0.1000E+01
+ Eunit_out    = 0.1000E+01   rhounit_out = 0.1000E+01
+ muunit_out   = 0.1000E+01   gunit_out   = 0.1000E+01
+ tempunit_out = 0.1000E+01   punit_out   = 0.1000E+01
+ Lunit_out    = 0.1000E+01   
+ 
+ start  =      0    anglexdeg =  0.000    
+ finish =      0    angleydeg =  0.000    
+ step   =      0    anglezdeg =  0.000    
+ flux_cal_dir = '../../../'
+ 
+ nkernel      =          2
+ yscalconst   = 0.6000E-01
+ fracaccuracy = 0.1000E-01
+ step1        = 0.1000E+01
+ step2        = 0.1000E+31
+ step3        = 0.1000E+05
+ step4        = 0.1000E+16
+ taulimit     = 0.1000E+01
+ tau_thick    = 0.1000E+02
+ envfit       = T
+ 
+ metallicity  = 0.2000E-01
+ Rform        = 0.1000E+31
+ 
+ get_fluxes                 = T
+ get_particles_at_pos       = F
+ get_integration_at_pos     = F
+ get_integration_at_all_pos = T
+ get_closest_particles      = F
+ track_particles            = F
+ get_info_of_particle       = F
+ rossonly                   = T
+ 
+ eosfile         = 'sph.eos'
+ opacityfile     = 'sph.opacities_ferguson_yes_grains_and_molecules'
+ opacitydustfile = 'sph.opacities_yes_grains_and_molecules_ncooling2'
+ filtersfile     = 'filters.dat'
+ outfile         = 'flux_cal.output'
+ 
+ Reading eos file
+ Reading opacity file
+ Reading opacity file for dust
+ Dust model: "normal" silicates; homogeneous spheres
+ Reading cold opacity file
+ Reading photospheric cold opacity file
+ look up table for density is created
+ Reading filtersfile
+ ** Complete **
+ 
+ ** Main loop **
+ Clearing 'flux_cal.output'
+ Reading 'fluxcal_0000.dat'
+ 
+ Finding the fluxes at each grid point
+ Estabilishing the grid
+  iter                   xmin                     hx    Nx                   ymin                     hy    Ny                      L
+ -----        ---------------        --------------- -----        ---------------        --------------- -----        ---------------
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     1  -5.71733222594914E+12   5.53794355335720E+12     3  -5.51757889474077E+12   5.31718504694433E+12     3   9.73021114342912E+37
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     2  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   1.61246379266865E+13     3   1.15177365476376E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     3  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   5.37487930889550E+12     7   1.08076121369537E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     4  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   2.30351970381235E+12    15   1.04249630426123E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     5  -1.92144550736324E+13   1.68745501531566E+12    21  -1.66460412630417E+13   2.30351970381235E+12    15   1.08518549644319E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     6  -1.92144550736324E+13   1.68745501531566E+12    21  -1.66460412630417E+13   1.34371982722387E+12    25   1.08234797691191E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     7  -1.92144550736324E+13   8.88134218587188E+11    39  -1.66460412630417E+13   1.34371982722387E+12    25   1.06494396655485E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     8  -1.92144550736324E+13   8.88134218587188E+11    39  -1.52792844371317E+13   7.35298072082450E+11    43   1.05942139165184E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+     9  -1.92144550736324E+13   4.62892252117311E+11    71  -1.42671967324810E+13   7.11200745781244E+11    43   1.05778547172161E+38
+ Writing all integration data to 'int_at_all_pos_0000.dat'
+    10  -1.92144550736324E+13   4.53695805326452E+11    71  -1.35222712514892E+13   3.83521356227414E+11    75   1.05811760399645E+38
+ Grid details:
+    xminmap,xmaxmap =  -1.92144550736324E+13,   1.25442512992192E+13
+    yminmap,ymaxmap =  -1.35222712514892E+13,   1.48583091093395E+13
+    hxmap,hymap     =   4.53695805326452E+11,   3.83521356227414E+11
+    nxmap,nymap     =                     71,                     75
+ 
+     TXY_max=   9727.53418       3.98800278    
+ Total luminosity in enclosed area=   1.36271943E+38
+ Total practical luminosity in enclosed area=   1.05811759E+38
+ Average Teff=   2939.38818    
+           0         -37   2.0813248572377676E-002 -0.47961111045386084     
+           1         -37                       NaN                       NaN
+           2         -37                       NaN                       NaN
+           3         -37                       NaN                       NaN
+           4         -37                       NaN                       NaN
+           5         -37                       NaN                       NaN
+           6         -37                       NaN                       NaN
+           7         -37                       NaN                       NaN
+           8         -37                       NaN                       NaN
+           9         -37                       NaN                       NaN
+          10         -37                       NaN                       NaN
+ Writing dimen file
+ Writing 'fluxes00000_000_000_000.sph'
+ Writing to output file
+ 
+ **************************************************
+ 
+ ** Complete **
+ 

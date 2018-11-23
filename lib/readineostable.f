@@ -21,7 +21,7 @@
 
       character*255 eosfile
 
-      write(*,*) "Reading eos file"
+      write(*,*) "Reading SPH eos file"
       open (43,file=trim(adjustl(eosfile)))
       read(43,*) xxx
       read(43,*) yyy

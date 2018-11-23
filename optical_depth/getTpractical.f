@@ -4,6 +4,7 @@ c     Input = z0,z1,zthick,thick_p,h1
 c     Output = Tthin, Tthick, tau_thin
       
       include 'optical_depth.h'
+      integer i
 
       real*8 zstop
       real*8 z0,z1,zthick
@@ -46,17 +47,17 @@ c     T of an optically thick particle
                stop
             end if
 
-            if(Teff(thick_p).ge.7000) then
-               write(*,*) "a moderately hot particle is outside:",
-     &              tempp(thick_p),Teff(thick_p), thick_p
-            end if
+c            if(Teff(thick_p).ge.7000) then
+c               write(*,*) "a moderately hot particle is outside:",
+c     &              tempp(thick_p),Teff(thick_p), thick_p
+c            end if
 
             
             if(Teff(thick_p).lt.-15000.and.Teff(thick_p).ge.-25000) then
-               write(*,*) "a cold particle is outside",
-     &              tempp(thick_p), rho(thick_p),
-     &              tauA(thick_p), opac_sph(thick_p),
-     &              hp(thick_p)*2./6.06e10,thick_p
+c               write(*,*) "a cold particle is outside",
+c     &              tempp(thick_p), rho(thick_p),
+c     &              tauA(thick_p), opac_sph(thick_p),
+c     &              hp(thick_p)*2./6.06e10,thick_p
                Tthick=tempp(thick_p)
             end if
             

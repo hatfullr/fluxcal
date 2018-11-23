@@ -1,47 +1,44 @@
       subroutine useDimenFile
-c     L296 to L344
+c     Check to see if the dimen file for this viewing angle and iteration
+c     already exists. If so, read from it. If not, throw an error.
       include 'optical_depth.h'
+      character*255 dimenfname
+      logical fileexists
 
-c     Check to see if appropriate dimen*.sph already exists.  If so, use
-c     it to set the grid size!
-      inquire(file=FNAME2,exist=dimenFileAlreadyExists)
-
-      if(dimenFileAlreadyExists) then
-         write(*,*) "Reading pre-existing dimen file '" //
-     $        trim(adjustl(fname2)) // "'"
-         OPEN (73,FILE=FNAME2)
-         read(73,*)xminmap,hxmap,nxmap,yminmap,hymap,nymap
-         close(73)
-         xmaxmap=xminmap+hxmap*(nxmap-1)
-         ymaxmap=yminmap+hymap*(nymap-1)
-c         print *,'Set grid size according to pre-existing file ',FNAME2
-         if(nxmap.gt.nxmapmax) then
-            nxmap=nxmapmax
-            hxmap=(xmaxmap-xminmap)/(nxmap-1)
-            print *,'Reset nxmap=',nxmap,' hxmap=',hxmap
-         endif
-         if(nymap.gt.nymapmax) then
-            nymap=nymapmax
-            hymap=(ymaxmap-yminmap)/(nymap-1)
-            print *,'Reset nymap=',nymap,' hymap=',hymap
-         endif
-
+ 193  format ('dimen',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 194  format ('dimen',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+      if(innit.le.99999) then
+         write(dimenfname,193) innit,nint(anglez*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
       else
-       
-c     NXMAP and NYMAP are how many grid cells to use in the X and Y
-c     directions, respectively:
-         NXMAP=NXMAPnext
-         NYMAP=NYMAPnext
+         write(dimenfname,194) innit,nint(anglez*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
+      end if
 
-c     xminmap and xmaxmap are the left and rightmost coordinates of grid
-c     yminmap and ymaxmap are the bottom and topmost coordinates of grid
-         xminmap=xminmapnext
-         xmaxmap=xmaxmapnext
-         yminmap=yminmapnext
-         ymaxmap=ymaxmapnext
-
-C     Compute cell widths:             
-         HXMAP=(XMAXMAP-XMINMAP)/DBLE(NXMAP-1)                           
-         HYMAP=(YMAXMAP-YMINMAP)/DBLE(NYMAP-1)
+      inquire(file=trim(adjustl(dimenfname)),exist=fileexists)
+      if(.not.fileexists) then
+         write(*,*) "Could not find dimen file '",
+     $        trim(adjustl(dimenfname)),"'."
+         write(*,*) "Try setting get_fluxes=.true."
+         error stop "useDimenFile.f line 23"
+      end if
+      
+      write(*,*) "Reading pre-existing dimen file '" //
+     $     trim(adjustl(dimenfname)) // "'"
+      open (73,file=trim(adjustl(dimenfname)))
+      read(73,*) xminmap,hxmap,nxmap,yminmap,hymap,nymap
+      close(73)
+      xmaxmap=xminmap+hxmap*(nxmap-1)
+      ymaxmap=yminmap+hymap*(nymap-1)
+      if(nxmap.gt.nxmapmax) then
+         nxmap=nxmapmax
+         hxmap=(xmaxmap-xminmap)/(nxmap-1)
+         print *,'Reset nxmap=',nxmap,' hxmap=',hxmap
       endif
+      if(nymap.gt.nymapmax) then
+         nymap=nymapmax
+         hymap=(ymaxmap-yminmap)/(nymap-1)
+         print *,'Reset nymap=',nymap,' hymap=',hymap
+      endif
+      
       end subroutine

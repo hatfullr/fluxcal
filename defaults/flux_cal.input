@@ -35,13 +35,20 @@
       get_closest_particles=.false.
 
       ! Finds all the particles the ray-tracer comes in contact with at
-      ! posx, posy
+      ! posx, posy. Make sure this is in the same units as the rest of
+      ! your input data.
       get_particles_at_pos=.false.
       posx=0.d0
       posy=0.d0
 
       ! Finds the data being used at each integration step at posx, posy
       get_integration_at_pos=.false.
+
+      ! Finds the data being used at each integration step for all grid
+      ! cells. Creates one output file for every grid cell, so use with
+      ! extreme caution! You must also set get_fluxes=.true. to use this
+      ! routine.
+      get_integration_at_all_pos=.false.
 
       ! Track a list of particles through each input file and create
       ! output files containing their data. Specify the file name that
@@ -144,7 +151,9 @@
       Lunit_out=1.d0
       
       
-      
+
+
+
       !### Physics
       ! If true, use Rosseland opacities only. If false, will use
       ! Rosseland and Planck opacities with a smoothing function.
@@ -165,10 +174,27 @@
       ! Dust formation radius (set to 1.d30 for no dust)
       Rform=1.d30
 
+      ! Cold temperature dust parameters
+      !    dust_model controls the silicate type
+      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg)=0.3,
+      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg)=0.0,
+      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg)=0.4,
+      !    dust_topology controls the topology of the grains
+      !       'h' - homogeneous particles,
+      !       'c' - composite particles,
+      !       'p' - porous composite particles,
+      !    dust_shape controls the shape of the particles
+      !       's' - spherical dust,
+      !       'a' - aggregate dust,
+      !       '5' - 5-layered spherical dust
+      dust_model='nrm'
+      dust_topology='h'
+      dust_shape='s'
 
 
 
-      
+
+
       !### File names
       ! File name for the opacity files, filters file, and output file.
       ! Set opacitydustfile='' for no dust.

@@ -1,6 +1,6 @@
       implicit none
-      integer nmax,nnmax,ntab
-      PARAMETER (NMAX=420000,NNMAX=128)
+      integer nmax,nnmax,ntab,maxstp
+      PARAMETER (NMAX=420000,NNMAX=128,maxstp=10000)
 c      PARAMETER (NMAX=301000,NNMAX=128)
 c      PARAMETER (NMAX=221000,NNMAX=1000)
 c      PARAMETER (NMAX=180000,NNMAX=100)
@@ -25,7 +25,7 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 wtab(ntab),ctab
       common/wtabul/ wtab,ctab
 
-
+	
       CHARACTER*12 outfilename
       integer outfilenum,iform,iout,ni1,ni2,ni3,innit,nnit
       common/counter/ innit
@@ -38,10 +38,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common /splotfilters/ wavelength,absoluteflux,numfilters
       common /filternames/ filtername
 c      integer i
-      integer ncooling
       character*255 opacityfile,opacitydustfile,filtersfile,trackfile,
      $      eosfile
-      common/integration/ ncooling
       real*8 yscalconst,fracaccuracy,metallicity
       integer nkernel
       common/kernels/ nkernel
@@ -62,7 +60,7 @@ c      integer i
       logical rossonly,get_particles_at_pos,
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_integration_at_pos,get_info_of_particle,
-     $      get_closest_particles
+     $      get_closest_particles,get_integration_at_all_pos
       common/opacitytype/ rossonly
       real*8 step1,step2,step3,step4
       common/steps/ step1,step2,step3,step4
@@ -77,22 +75,26 @@ c      integer i
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_info_of_particle,envfit,
      $      get_closest_particles,flux_cal_dir
-      common/getint/ get_integration_at_pos
+      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       character*255 outfile
       common/outputfile/ outfile
       real*8 t
       common/time/ t
-      namelist/input/ n,yscalconst,munit,runit,tunit,vunit,
+      character*3 dust_model
+      character*1 dust_topology, dust_shape
+      common/colddust/ dust_model,dust_topology,dust_shape
+      namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out,
+     $      Lunit_out,dust_model,dust_topology,dust_shape,
      $      nkernel,opacityfile,opacitydustfile,filtersfile,metallicity,
      $      Rform,anglexdeg,angleydeg,anglezdeg,start,finish,step,
      $      rossonly,step1,step2,step3,step4,taulimit,
      $      get_particles_at_pos,posx,posy,track_particles,trackfile,
      $      binary_tracking_file,get_fluxes,envfit,
-     $      get_integration_at_pos,get_info_of_particle,info_particle,
+     $      get_integration_at_pos,get_integration_at_all_pos,
+     $      get_info_of_particle,info_particle,
      $      outfile,tau_thick,eosfile,
      $      get_closest_particles,flux_cal_dir
       common/inputfilenames/ opacityfile,opacitydustfile,filtersfile,
@@ -140,7 +142,6 @@ c      integer i
       real*8 Teff(nmax)
       common/teff/ Teff
 
-
 c Opacity tables for enevelope fitting
       real*8 gridR(100)
       real*8 gridT(200)
@@ -154,3 +155,6 @@ c     slops for envelope fitting
       real*8 nabla(400,400)
       integer num_g, num_t, slop_type
       common /slops/ nabla, grid_gn, grid_tn, num_g, num_t, slop_type
+
+      logical dointatpos,dointatallpos
+      common/intatpos/ dointatpos,dointatallpos

@@ -1,8 +1,7 @@
 # Makefile for flux_cal
 # Use gfortran because it's more standard
 FC = $(shell which gfortran)
-FFLAGS = -O4 -ffixed-line-length-132
-%-mcmodel=large
+FFLAGS = -O4 -ffixed-line-length-132 -mcmodel=large
 
 LIB = -L/usr/lib
 
@@ -26,17 +25,16 @@ lib_obj = $(llib)/usekappatable.o      \
           $(llib)/useeostable.o        \
           $(llib)/readineostable.o     \
           $(llib)/trackParticles.o     \
-          $(llib)/progressBar.o        \
           $(llib)/getOpacitySub.o      \
 	  $(llib)/opacities_cold.o     \
           $(llib)/quicksort.o          \
           $(llib)/makeOutputFile.o     \
-          $(llib)/output.o
+          $(llib)/output.o             \
 
 # Math objects
 math_obj = $(mathlib)/odeint.o \
            $(mathlib)/rkck.o   \
-           $(mathlib)/rkqs.o
+           $(mathlib)/rkqs.o   \
 
 # Optical depth objects
 opdep_obj = $(opdeplib)/optical_depth.o        \
@@ -53,25 +51,23 @@ opdep_obj = $(opdeplib)/optical_depth.o        \
             $(opdeplib)/getParticleInfo.o      \
             $(opdeplib)/getTpractical.o        \
             $(opdeplib)/getClosestParticles.o  \
+            $(opdeplib)/integrationAtAllPos.o  \
+            $(opdeplib)/writeTempsFile.o     \
 
 # find_teff objects
 findTeff_obj = $(findTefflib)/get_slop.o                \
                $(findTefflib)/get_teff.o                \
                $(findTefflib)/get_kappa.o               \
                $(findTefflib)/ini_opacity_photosphere.o \
-               $(findTefflib)/rho_out_pt.o \
-               $(findTefflib)/ini_slops.o
+               $(findTefflib)/rho_out_pt.o              \
+               $(findTefflib)/ini_slops.o               \
 
 # All objects
 process_obj = $(executable).o $(lib_obj) $(math_obj) $(opdep_obj) $(findTeff_obj)
 
 $(executable): $(process_obj)
 	$(FC) -o $(executable) $(process_obj) $(LIB)
-	#\cp $(executable) ../
-
 
 # Delete all made stuff
 clean:
 	@\rm -rf $(process_obj) $(executable)
-
-

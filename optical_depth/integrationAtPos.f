@@ -3,22 +3,34 @@
 
       character*255 myfname
       real*8 mytau,mt1,mt2
-      integer intout, i
-      common/intoutput/ intout
+      integer i
+      real*8 xminmap_temp,hxmap_temp,yminmap_temp,hymap_temp
+      integer nxmap_temp,nymap_temp
       
-      call createGrid
+c      call createGrid
 
+c     hxmap and hymap need to be exactly equal to 1 in whatever units
+c     are being used. This is so that prepareIntegration correctly sets
+c     xpos=posx and ypos=posy in its calculations.
+      xminmap_temp = xminmap
+      hxmap_temp = hxmap
+      nxmap_temp = nxmap
+      yminmap_temp = yminmap
+      hymap_temp = hymap
+      nymap_temp = nymap
+      
       xminmap=posx
-      hxmap=1.d0
+      hxmap=runit
       nxmap=1
       yminmap=posy
-      hymap=1.d0
+      hymap=runit
       nymap=1
 
-      xmaxmap=xminmap+hxmap*(nxmap-1)
-      ymaxmap=yminmap+hymap*(nymap-1)
-
+      prepareIntegrationCalled=.false. ! Pretend we haven't called yet
       call prepareIntegration
+      ! Reset this boolean because we only prepared the integration for
+      ! one single point and not the whole driving grid.
+      prepareIntegrationCalled=.false.
 
       if(innit.le.9999) then
          write(myfname,"('int_at_pos_',i4.4,'.dat')") innit
@@ -28,30 +40,26 @@
          write(myfname,"('int_at_pos_',i6.6,'.dat')") innit
       end if
 
-      i=nint((posx-xminmap)/hxmap + 1)
-      j=nint((posy-yminmap)/hymap + 1)
-c      xpos=(i-1)*hxmap+xminmap  ! x of line of sight should be close to posx
-c      ypos=(j-1)*hymap+yminmap  ! y of line of sight should be close to posy
-c      hzmap=(zmax(i,j)-zmin(i,j))/(nzmap-1)
-
       intout=51
-      open(intout,file=myfname,status='unknown')
- 801  format(E15.7,A15)
- 802  format(11A15)
-      write(*,*) "Writing to ", trim(myfname)
-      write(intout,801) posx,"posx"
-      write(intout,801) posy,"posy"
-      write(intout,801) zmax(i,j), "zmax [cm]"
-      write(intout,801) zmin(i,j), "zmin [cm]"
-      write(intout,801) taulimit, "taulimit"
-      write(intout,801) tau_thick, "tau_thick"
-      write(intout,802) "z [cm]","rho [g/cm^3]","u [ergs/g]",
-     $     "g [cm/s^2]","P [g/cm/s^2]","T [K]","xhp [cm]",
-     $     "|dtauds*4*xhp|","kappa [cm^2/g]","tau","particle"
+      open(intout,file=trim(adjustl(myfname)),status='unknown')
+ 801  format(2ES22.14)
+ 802  format(11A22)
+      write(*,*) "Writing to ", trim(adjustl(myfname))
+      write(intout,801) posx/runit_out, posy/runit_out
+      write(intout,802)"z","h","rho","u","g","mu","P","T","kappa","tau",
+     $     "particle"
 
-
+      dointatpos=.true.
       call integrateTau
-
+      dointatpos=.false.
+      
       close(intout)
+
+      xminmap = xminmap_temp
+      hxmap = hxmap_temp
+      nxmap = nxmap_temp
+      yminmap = yminmap_temp
+      hymap = hymap_temp
+      nymap = nymap_temp
       
       end subroutine

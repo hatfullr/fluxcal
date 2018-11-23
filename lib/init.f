@@ -4,9 +4,7 @@
       integer i
       logical inputexists,baseunitsexists,fileexists
       character*255 eosfilepath,inputfile, opacfile1, opacfile2
-c      logical baseunitsdefaultexists
-c      character*255 baseunits_default
-
+      character*255 file1,file2
 
       write(*,*)" ___________________________________________________  "
       write(*,*)"/         ___  _              ___        _          \ "
@@ -71,13 +69,20 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       get_closest_particles=.false.
 
       ! Finds all the particles the ray-tracer comes in contact with at
-      ! posx, posy
+      ! posx, posy. Make sure this is in the same units as the rest of
+      ! your input data.
       get_particles_at_pos=.false.
       posx=0.d0
       posy=0.d0
 
       ! Finds the data being used at each integration step at posx, posy
       get_integration_at_pos=.false.
+
+      ! Finds the data being used at each integration step for all grid
+      ! cells. Creates one output file for every grid cell, so use with
+      ! extreme caution! You must also set get_fluxes=.true. to use this
+      ! routine.
+      get_integration_at_all_pos=.false.
 
       ! Track a list of particles through each input file and create
       ! output files containing their data. Specify the file name that
@@ -122,7 +127,7 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       step2=1d30
       step3=1d4
       step4=1d15
-      
+
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
       taulimit=1.d0
@@ -201,6 +206,26 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       ! Dust formation radius (set to 1.d30 for no dust)
       Rform=1.d30
 
+      ! Cold temperature dust parameters
+      !    dust_model controls the silicate type
+      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg)=0.3,
+      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg)=0.0,
+      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg)=0.4,
+      !    dust_topology controls the topology of the grains
+      !       'h' - homogeneous particles,
+      !       'c' - composite particles,
+      !       'p' - porous composite particles,
+      !    dust_shape controls the shape of the particles
+      !       's' - spherical dust,
+      !       'a' - aggregate dust,
+      !       '5' - 5-layered spherical dust
+      ! For any dust_model, you can not use:
+      !    dust_topology='h' AND dust_shape='5'
+      !    dust_topology='p' AND dust_shape='a'
+      dust_model='nrm'
+      dust_topology='h'
+      dust_shape='s'
+
 
 
 
@@ -221,7 +246,15 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
 !-----------------------------------------------------------------------
 
 
-      inquire(file="flux_cal.baseunits",exist=baseunitsexists)
+      inquire(file='flux_cal.input',exist=inputexists)
+      if(inputexists) then
+         open(44,file='flux_cal.input')
+         read(44,input)
+         close(44)
+      else
+         write(*,*) "No 'flux_cal.input' file found."
+         error stop "init.f line 241"
+      end if
       
       ! Base units (cgs). These are 
       gram=1.d0
@@ -242,8 +275,9 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
          inquire(file=trim(adjustl(flux_cal_dir))//
      $        "/defaults/flux_cal.baseunits",exist=baseunitsexists)
          if(baseunitsexists) then
-            write(*,*) "Using default baseunits file from "//
-     $           "flux_cal_dir/defaults."
+            write(*,*) "Using default baseunits file '"//
+     $           trim(adjustl(flux_cal_dir))//"/defaults/"//
+     $           "flux_cal.baseunits'."
             open(42,file=trim(adjustl(flux_cal_dir))//
      $           "/defaults/flux_cal.baseunits")
             read(42,baseunits)
@@ -251,9 +285,9 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
          else
             write(*,*)"WARNING: No 'flux_cal.baseunits' default file "//
      $           "found"
-            write(*,*)"in either the current working directory or the"//
-     $           " flux_cal_dir/defaults directory. Defaulting to cgs"//
-     $           " units."
+            write(*,*)"in either the current working directory or"
+            write(*,*)"'",trim(adjustl(flux_cal_dir)),"/defaults'."
+            write(*,*)"Assuming units cgs for all variables."
          end if
       end if
       
@@ -272,67 +306,62 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       distance=10.d0*pc         ! distance to get absolute magnitude
 
 
-      inquire(file='flux_cal.input',exist=inputexists)
-      if(inputexists) then
-         open(44,file='flux_cal.input')
-         read(44,input)
-         close(44)
-         runit=runit*cm
-         munit=munit*gram
-         tunit=tunit*sec
-         vunit=vunit*cm/sec
-         Eunit=Eunit*gram*cm**2.d0/sec**2.d0
-         rhounit=rhounit*gram/cm**3.d0
-         muunit=muunit*gram
-         gunit=gunit*cm/sec**2.d0
+      runit=runit*cm
+      munit=munit*gram
+      tunit=tunit*sec
+      vunit=vunit*cm/sec
+      Eunit=Eunit*gram*cm**2.d0/sec**2.d0
+      rhounit=rhounit*gram/cm**3.d0
+      muunit=muunit*gram
+      gunit=gunit*cm/sec**2.d0
+      
+      runit_out=runit_out*cm
+      munit_out=munit_out*gram
+      tunit_out=tunit_out*sec
+      vunit_out=vunit_out*cm/sec
+      Eunit_out=Eunit_out*gram*cm**2.d0/sec**2.d0
+      rhounit_out=rhounit_out*gram/cm**3.d0
+      muunit_out=muunit_out*gram
+      gunit_out=gunit_out*cm/sec**2.d0
+      tempunit_out=tempunit_out*kelvin
+      Lunit_out=Lunit_out*gram*cm**2.d0/sec**2.d0
 
-         runit_out=runit_out*cm
-         munit_out=munit_out*gram
-         tunit_out=tunit_out*sec
-         vunit_out=vunit_out*cm/sec
-         Eunit_out=Eunit_out*gram*cm**2.d0/sec**2.d0
-         rhounit_out=rhounit_out*gram/cm**3.d0
-         muunit_out=muunit_out*gram
-         gunit_out=gunit_out*cm/sec**2.d0
-         tempunit_out=tempunit_out*kelvin
-         Lunit_out=Lunit_out*gram*cm**2.d0/sec**2.d0
-      else
-         write(*,*) "No 'flux_cal.input' file found."
-         error stop "init.f line 241"
-      end if
+      
  97   format(A7," = ",I6,"   ",A10," = ",g10.4)
  98   format(A10," = ",I10,"   ",A10," = ",I10)
- 99   format(A10," = ",E10.4,"   ",A10," = ",E10.4)
+ 99   format(A13," = ",E10.4,"   ",A11," = ",E10.4)
  999  format(A10," = ",E10.4)
  100  format(A13," = ",E10.4)
  101  format(A13," = ",I10)
- 102  format(A23," = ",L1)
+ 102  format(A27," = ",L1)
  103  format(A16," = '",A,"'")
  104  format("   ",A," = ",L1)
  105  format("   ",A," = ",E10.4)
  106  format("   ",A," = '",A,"'")
  107  format("   ",A," = ",I8)
+ 108  format(A13," = ",L1)
+ 109  format(A13," = '",A,"'")
 
 c     Write everything to the terminal
       write(*,*) ""
-      write(*,99) "gram  ",gram  ,"arad     ",arad
-      write(*,99) "sec   ",sec   ,"gravconst",gravconst
-      write(*,99) "cm    ",cm    ,"pc       ",pc
-      write(*,99) "kelvin",kelvin,"distance ",distance
-      write(*,99) "erg   ",erg   ,"boltz    ",boltz
-      write(*,99) "crad  ",crad  ,"planck   ",planck
+      write(*,99) "gram  ",gram  ,"arad       ",arad
+      write(*,99) "sec   ",sec   ,"gravconst  ",gravconst
+      write(*,99) "cm    ",cm    ,"pc         ",pc
+      write(*,99) "kelvin",kelvin,"distance   ",distance
+      write(*,99) "erg   ",erg   ,"boltz      ",boltz
+      write(*,99) "crad  ",crad  ,"planck     ",planck
       write(*,99) "sigma ",sigma
       write(*,*) ""
-      write(*,99) "runit       ",runit       , "munit      ",munit
-      write(*,99) "tunit       ",tunit       , "vunit      ",vunit
-      write(*,99) "Eunit       ",Eunit       , "rhounit    ",rhounit
-      write(*,99) "muunit      ",muunit      , "gunit      ",gunit
+      write(*,99) "runit ",runit ,"munit      ",munit
+      write(*,99) "tunit ",tunit ,"vunit      ",vunit
+      write(*,99) "Eunit ",Eunit ,"rhounit    ",rhounit
+      write(*,99) "muunit",muunit,"gunit      ",gunit
       write(*,*) ""
-      write(*,99) "runit_out   ",runit_out   , "munit_out  ",munit_out
-      write(*,99) "tunit_out   ",tunit_out   , "vunit_out  ",vunit_out
-      write(*,99) "Eunit_out   ",Eunit_out   , "rhounit_out",rhounit_out
-      write(*,99) "muunit_out  ",muunit_out  , "gunit_out  ",gunit_out
-      write(*,99) "tempunit_out",tempunit_out, "punit_out  ",punit_out
+      write(*,99) "runit_out   ",runit_out   ,"munit_out  ",munit_out
+      write(*,99) "tunit_out   ",tunit_out   ,"vunit_out  ",vunit_out
+      write(*,99) "Eunit_out   ",Eunit_out   ,"rhounit_out",rhounit_out
+      write(*,99) "muunit_out  ",muunit_out  ,"gunit_out  ",gunit_out
+      write(*,99) "tempunit_out",tempunit_out,"punit_out  ",punit_out
       write(*,99) "Lunit_out   ",Lunit_out
       write(*,*) ""
       
@@ -340,10 +369,9 @@ c     Write everything to the terminal
       write(*,97) "finish",finish,"angleydeg",angleydeg
       write(*,97) "step  ",step  ,"anglezdeg",anglezdeg
 
-      write(*,103) "flux_cal_dir",trim(adjustl(flux_cal_dir))
+      write(*,109) "flux_cal_dir",trim(adjustl(flux_cal_dir))
       
       write(*,*) ""
-      write(*,101) "n           ",n
       write(*,101) "nkernel     ",nkernel
       write(*,100) "yscalconst  ",yscalconst
       write(*,100) "fracaccuracy",fracaccuracy
@@ -353,37 +381,38 @@ c     Write everything to the terminal
       write(*,100) "step4       ",step4
       write(*,100) "taulimit    ",taulimit
       write(*,100) "tau_thick   ",tau_thick
-      write(*,102) "envfit      ",envfit
+      write(*,108) "envfit      ",envfit
       write(*,*) ""
 c      write(*,102) "rossonly    ",rossonly
       write(*,100) "metallicity ",metallicity
       write(*,100) "Rform       ",Rform
       
       write(*,*) ""
-      write(*,102) "get_fluxes            ",get_fluxes
-
-      write(*,102) "get_particles_at_pos  ",get_particles_at_pos
-      write(*,102) "get_integration_at_pos",get_integration_at_pos
+      write(*,102) "get_fluxes                ",get_fluxes
+      write(*,102) "get_particles_at_pos      ",get_particles_at_pos
+      write(*,102) "get_integration_at_pos    ",get_integration_at_pos
+      write(*,102) "get_integration_at_all_pos",
+     $     get_integration_at_all_pos
       
       if(get_particles_at_pos.or.get_integration_at_pos) then
          write(*,105) "posx",posx
          write(*,105) "posy",posy
       end if
       
-      write(*,102) "get_closest_particles ",get_closest_particles
-      write(*,102) "track_particles       ",track_particles
+      write(*,102) "get_closest_particles     ",get_closest_particles
+      write(*,102) "track_particles           ",track_particles
       
       if(track_particles) then
          write(*,104) "binary_tracking_file",binary_tracking_file
          write(*,106) "trackfile           ",trim(adjustl(trackfile))
       end if
       
-      write(*,102) "get_info_of_particle  ",get_info_of_particle
+      write(*,102) "get_info_of_particle      ",get_info_of_particle
       if(get_info_of_particle) then
          write(*,107) "info_particle", info_particle
       end if
       
-      write(*,102) "rossonly              ",rossonly
+      write(*,102) "rossonly                  ",rossonly
 
       write(*,*) ""
       write(*,103) "eosfile        ",trim(adjustl(eosfile))
@@ -393,6 +422,25 @@ c      write(*,102) "rossonly    ",rossonly
       write(*,103) "outfile        ",trim(adjustl(outfile))
       write(*,*) ""
 
+      ! Check for conflicting flags
+c      if(get_integration_at_pos .and. get_fluxes) then
+c         write(*,*) "Do not use get_integration_at_pos and get_fluxes"
+c         write(*,*) "at the same time."
+c         error stop "init.f line 410"
+c      end if
+      
+c      if(get_integration_at_all_pos.and..not.get_fluxes) then
+c         write(*,*) "get_integration_at_all_pos should not be called"
+c         write(*,*) "without setting get_fluxes to .true."
+c         error stop "init.f line 409"
+c      end if
+
+c      if(get_integration_at_all_pos.and.get_integration_at_pos) then
+c         write(*,*) "Do not use both of these at the same time."
+c         error stop "init.f line 415"
+c      end if
+
+      
  200  format(A,"/defaults/",A)
       
       write(inputfile,200) trim(adjustl(flux_cal_dir)),
@@ -401,7 +449,7 @@ c      write(*,102) "rossonly    ",rossonly
       if(.not. fileexists) then
          write(*,*) "Could not find EOS file '",
      $        trim(adjustl(eosfile)),"' in flux_cal_dir/defaults."
-         error stop "init.f line 358"
+         error stop "init.f line 427"
       end if
       call readineostable(inputfile)
 
@@ -415,7 +463,7 @@ c      write(*,102) "rossonly    ",rossonly
      $        trim(adjustl(opacityfile)),"'"
          write(*,*) "in flux_cal_dir/defaults. Make sure flux_cal_dir"
          write(*,*)"is correct, and if flux_cal was properly installed."
-         error stop "init.f line 392"
+         error stop "init.f line 441"
       end if
       
       call readinkappatable(inputfile)
@@ -437,32 +485,57 @@ c      if(fileexists .and. (Rform .gt. 0.d0)) then
 c         call readinkappatabledust
 c      end if
 
-      call ini_opac_dust_and_gas   ! cold T opacities initialization
-
-      
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),"lowT_fa05_gs98_z0.02_x0.7.data"
-      inquire(file=trim(adjustl(inputfile)), exist=fileexists)
+      write(file1,200) trim(adjustl(flux_cal_dir)),"kR_h2001.dat"
+      inquire(file=trim(adjustl(file1)), exist=fileexists)
       if(.not. fileexists) then
-         write(*,*) "Could not find 'opac.dat' in flux_cal_dir/defaults"
-         write(*,*) "Make sure flux_cal_dir is correct, and if flux_cal"
-         write(*,*) "was properly installed."
-         error stop "init.f line 402"
-      end if
-
-      call ini_opacity_photospehre_lowT(inputfile)
-      call create_density_array
-      
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),"table_nabla.dat"
-      inquire(file=trim(adjustl(inputfile)),exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*) "Could not find 'table_nable.dat' in "
-         write(*,*) "flux_cal_dir/defaults. Make sure flux_cal_dir is"
-         write(*,*) "correct, and if flux_cal was properly installed."
-         error stop "init.f line 413"
+         write(*,*)"Could not find 'kR_h2001.dat' in"
+         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+         write(*,*)"correct, and if flux_cal was properly installed."
+         error stop "init.f line 469"
       end if
       
-      call ini_slops(inputfile)
+      write(file2,200) trim(adjustl(flux_cal_dir)),"kP_h2001.dat"
+      inquire(file=trim(adjustl(file2)), exist=fileexists)
+      if(.not. fileexists) then
+         write(*,*)"Could not find 'kP_h2001.dat' in"
+         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+         write(*,*)"correct, and if flux_cal was properly installed."
+         error stop "init.f line 478"
+      end if
+      
+      ! cold T opacities initialization
+      call ini_opac_dust_and_gas(file1,file2)
 
+      if(envfit) then
+         ! Initialize find_teff dependencies
+         write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $        "lowT_fa05_gs98_z0.02_x0.7.data"
+         inquire(file=trim(adjustl(inputfile)), exist=fileexists)
+         if(.not. fileexists) then
+            write(*,*) "Could not find '",trim(adjustl(filtersfile)),
+     $           "' in"
+            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+            write(*,*)"correct, and if flux_cal was properly installed."
+            error stop "init.f line 491"
+         end if
+         
+         call ini_opacity_photospehre_lowT(inputfile)
+         call create_density_array
+      
+         write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $        "table_nabla.dat"
+         inquire(file=trim(adjustl(inputfile)),exist=fileexists)
+         if(.not. fileexists) then
+            write(*,*) "Could not find '",trim(adjustl(filtersfile)),
+     $           "' in"
+            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+            write(*,*)"correct, and if flux_cal was properly installed."
+            error stop "init.f line 503"
+         end if
+      
+         call ini_slops(inputfile)
+      end if
+         
 c     Check to see if the filtersfile exists and read it if it does
       write(inputfile,200) trim(adjustl(flux_cal_dir)),
      $     trim(adjustl(filtersfile))
@@ -471,7 +544,7 @@ c     Check to see if the filtersfile exists and read it if it does
          write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' in"
          write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
          write(*,*) "correct, and if flux_cal was properly installed."
-         error stop "init.f line 426"
+         error stop "init.f line 516"
       end if
       
       write(*,*) "Reading filtersfile"
@@ -490,7 +563,7 @@ c     Check to see if the filtersfile exists and read it if it does
          if(.not.fileexists) then
             write(*,*) "Could not find trackfile '",
      $           trim(adjustl(trackfile)),"'."
-            error stop "init.f line 445"
+            error stop "init.f line 535"
          end if
          
          write(*,*) "Reading trackfile"
@@ -507,18 +580,18 @@ c     Catch some runtime errors
       if ((start.gt.finish).and.(step.gt.0)) then
          write(*,*) "Must have start < finish when step > 0."
          write(*,*) "start=",start,"finish=",finish
-         error stop "init.f line 387"
+         error stop "init.f line 552"
       end if
       if ((start.lt.finish).and.(step.lt.0)) then
          write(*,*) "Must have start > finish when step < 0."
          write(*,*) "start=",start,"finish=",finish
-         error stop "init.f line 392"
+         error stop "init.f line 557"
       end if
 
       if(start.lt.0) then
          write(*,*) "Starting file index must be > 0."
          write(*,*) "start=",start
-         error stop "init.f line 398"
+         error stop "init.f line 563"
       end if
 
       if((step.eq.0).or.(start.eq.finish)) then
@@ -532,41 +605,15 @@ c         write(*,*) "integrations that stop part way through optically"
 c         write(*,*) "thin material, and as such, results should not be"
 c         write(*,*) "expected to be physical."
 c      end if
+
+c     Initialize some variables
+      posx = posx*runit
+      posy = posy*runit
+      dointatpos=.false.
+      dointatallpos=.false.
       
       write(*,*) "** Complete **"
       write(*,*) ""
 
-
-
-c      write(*,*)" ___________________________________________________  "
-c      write(*,*)"/         ___  _              ___        _          \ "
-c      write(*,*)"|        | __|| | _  _ __ __ / __| __ _ | |         | "
-c      write(*,*)"|        | _| | || || |\ \ /| (__ / _` || |         | "
-c      write(*,*)"|        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | "
-c      write(*,*)"\___________________________________________________/ "
-c      write(*,*)"|                                                   | "
-c      write(*,*)"|  FluxCal Copyright (C) 2018. Written by,          | "
-c      write(*,*)"|                                                   | "
-c      write(*,*)"|   Roger Hatfull      [Uni. of Alberta]            | "
-c      write(*,*)"|   Natasha Ivanova    [Uni. of Alberta]            | "
-c      write(*,*)"|   James C. Lombardi  [Allegheny College]          | "
-cc      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
-c      write(*,*)"|                                                   | "
-c      write(*,*)"|  This program comes with ABSOLUTELY NO WARRANTY.  | "
-c      write(*,*)"|  This is free software, and you are welcome to    | "
-c      write(*,*)"|  redistribute it under certain conditions. See    | "
-c      write(*,*)"|  LICENSE file for details, or visit               | "
-c      write(*,*)"|  https://www.gnu.org/licenses                     | "
-c      write(*,*)"\___________________________________________________/ "
-c      write(*,*)"|                   |                                 "
-c      write(*,*)"|   Version 0.0.1   |                                 "
-c      write(*,*)"\___________________/                                 "
-c      write(*,*)"                                                      "
-
-
-
-
-
-      
       return
       end subroutine

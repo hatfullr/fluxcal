@@ -5,8 +5,11 @@ c     L346 to L468
       real*8 zmmax
       real*8 opacit
 
-      integer count, i
+      integer count, i,j
 
+      ! If we have already called this function, don't call it again.
+      if(prepareIntegrationCalled) return
+      
       eps=1.0d-6                ! parameter for desired accuracy in
                                 ! integration
       kmax=200
@@ -55,7 +58,6 @@ c     Find limits of integration:
             yposmax=y(ip)+2*hp(ip)
             jmin=max(int((yposmin-yminmap)/hymap+2),1)
             jmax=min(int((yposmax-yminmap)/hymap+1),nymap)
-            
             DO J=jmin,jmax
                YPOS=(J-1)*HYMAP+YMINMAP ! y of line of sight
                maxdx=(4*hp(ip)**2-(y(ip)-ypos)**2)**0.5d0
@@ -160,4 +162,5 @@ c     Find 3d density grid for quick look-up later
          endif
       enddo
 
+      prepareIntegrationCalled=.true.
       end subroutine

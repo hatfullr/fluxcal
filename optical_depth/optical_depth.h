@@ -47,7 +47,7 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
       external derivs2,rkqs,derivs3
       integer NXMAP, NYMAP
       real*8 HXMAP, HYMAP
-      integer J, IP
+      integer IP
       real*8 rhocgs,xhp,gcgs,ucgs,pcgs,tcgs
       real xh,t6
       common/localQuantities/ rhocgs,xh,t6,xhp,ucgs,gcgs,pcgs,tcgs
@@ -142,3 +142,14 @@ c     Things Roger Hatfull added
 
       logical codeerror
       common/errors/ codeerror
+
+      integer intout
+      common/intoutput/ intout
+
+      real*8 rayout1(10,maxstp)
+      integer rayout2(maxstp),nstp
+      common/rayout/ rayout1,rayout2,nstp
+
+      logical prepareIntegrationCalled
+      common/called/ prepareIntegrationCalled
+       

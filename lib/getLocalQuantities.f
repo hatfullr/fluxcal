@@ -119,11 +119,11 @@ c      end if
       lastpart=last_part(ix,iy,iz)
       t6=tcgs*1.e-6
 
-      if(t6.eq.0.d0) then
-         write(*,*) "getLocalQuantities: t6 = 0"
-         write(*,*) "dens         = ", dens
-         write(*,*) "t6, tt, tcgs = ", t6, tt, tcgs
-      end if
+c      if(t6.eq.0.d0) then
+c         write(*,*) "getLocalQuantities: t6 = 0"
+c         write(*,*) "dens         = ", dens
+c         write(*,*) "t6, tt, tcgs = ", t6, tt, tcgs
+c      end if
 
       if(t6.ne.t6) then
          write(*,*) "getLocalQuantities.f: t6 = ",t6

@@ -73,16 +73,16 @@ c     t6 is the temperature in millions of degrees Kelvin
          if ((xpos**2+ypos**2+zpos**2)**0.5d0.lt.Rform) then
             
 c     We're too close to the origin for there to be dust
-            opacit=getOpacity(ncooling,dble(t6*1d6),rhocgs,tau(1),
+            opacit=getOpacity(dble(t6*1d6),rhocgs,tau(1),
      $           usetable,usetable2)
          else
 
 c     There will be some dust at this location
 c     opacit1 is local Rosseland opacity without dust or molecules
 c     opacit2 is local Rosseland opacity with dust and molecules
-            opacit1=getOpacity(ncooling,dble(t6*1d6),rhocgs,tau(1),
+            opacit1=getOpacity(dble(t6*1d6),rhocgs,tau(1),
      $           usetable,usetable2)
-            opacit2=getOpacity(ncooling,dble(t6*1d6),rhocgs,tau(1),
+            opacit2=getOpacity(dble(t6*1d6),rhocgs,tau(1),
      $           usetabledust,usetabledust2)
 
 c     here we are setting f=f_max*(1-(r_form/r)^2) which comes from combining

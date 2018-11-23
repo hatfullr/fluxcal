@@ -11,9 +11,10 @@ c     this function creates a table to get back density if T and P are known
       real*8 drho, du, dt, dp, tloc, ploc, rholoc, uloc, err_tp
       integer nrho, nu, ip, it, np, nt
       integer  jrho, ju, jp, jt
-c      real*8 useeostable
-      integer which
-       
+c     real*8 useeostable
+
+      write(*,*) "Creating envfit density lookup table"
+
       nt=150
       np=340
       nt_tabrho=nt
@@ -30,7 +31,7 @@ c      real*8 useeostable
       rhomin=-15.
       rhomax=0.
       umin=5.
-      umax=15.     
+      umax=15.
       nrho=3000
       nu=4000
       drho=(rhomax-rhomin)/nrho
@@ -43,7 +44,7 @@ c      real*8 useeostable
             derr(jp, jt)=100.
          end do
       end do
-      
+
       do jrho=1,nrho
          do ju=1,nu
             rholoc=10.**(rhomin+drho*(jrho-1))
@@ -54,7 +55,8 @@ c      real*8 useeostable
             ploc=log10(ploc)
             jt=ceiling(1.d0*(tloc-tmin_rho)/dt)
             jp=ceiling(1.d0*(ploc-pmin_rho)/dp)
-             if(jt.ge.1.and.jt.le.nt.and.jp.ge.1.and.jp.le.np) then 
+
+            if(jt.ge.1.and.jt.le.nt.and.jp.ge.1.and.jp.le.np) then
                err_tp=sqrt( (abs(tloc-tmin_rho-dt*jt)/dt)**2+
      &              (abs(ploc-pmin_rho-dp*jp)/dp)**2)
                if(err_tp.lt.derr(jp,jt)) then
@@ -65,7 +67,7 @@ c      real*8 useeostable
          end do
       end do
 
-      write(*,*) "look up table for density is created"
+c      write(*,*) "look up table for density is created"
 
       return
       end
@@ -80,14 +82,12 @@ c     this function used useeos to find closest density that is work for this T 
       real*8 rho_pt(1000,1000)
       common /rho_lookup/ rho_pt, tmin_rho, tmax_rho,pmin_rho,
      &     pmax_rho, dt_tabrho, dp_tabrho, nt_tabrho, np_tabrho
-      
-      
+
       real*8 rho, p, t, Rgas, a_rad
       integer ip,it, found
       Rgas=8.31e7
       a_rad=7.565e-15
-      
-      
+
       ip=ceiling((log10(p)-pmin_rho)/dp_tabrho)
       it=ceiling((log10(t)-tmin_rho)/dt_tabrho)
 
@@ -101,10 +101,10 @@ c     this function used useeos to find closest density that is work for this T 
       if(rho.ge.-40) then
          rho=10.**rho
       else
-         if(temp.le.5000) then
+         if(t.le.5000) then
             rho=(p-a_rad*(t**4)/3.)/Rgas*1.293/t
          else
-           rho=(p-a_rad*(t**4)/3.)/Rgas*0.6/t            
+            rho=(p-a_rad*(t**4)/3.)/Rgas*0.6/t            
          end if
       end if
       

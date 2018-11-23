@@ -4,7 +4,7 @@ c     pid.
       include 'flux_cal.h'
       character*255 filename
       integer pid
- 200  format(13E15.7,i15)
+ 200  format(13ES22.14,i22)
       open(10,file=trim(adjustl(filename)),action='write',
      $     position='append')
       write(10,200) x(pid)/runit_out,y(pid)/runit_out,z(pid)/runit_out,
