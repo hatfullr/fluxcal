@@ -158,3 +158,6 @@ c     slops for envelope fitting
 
       logical dointatpos,dointatallpos
       common/intatpos/ dointatpos,dointatallpos
+
+      character*255 pinfo_file
+      common/infofile/ pinfo_file

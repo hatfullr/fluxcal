@@ -5,6 +5,7 @@
       logical inputexists,baseunitsexists,fileexists
       character*255 eosfilepath,inputfile, opacfile1, opacfile2
       character*255 file1,file2
+      character*255 info_particle_string
 
       write(*,*)" ___________________________________________________  "
       write(*,*)"/         ___  _              ___        _          \ "
@@ -611,6 +612,13 @@ c     Initialize some variables
       posy = posy*runit
       dointatpos=.false.
       dointatallpos=.false.
+
+      if(get_info_of_particle) then
+         write(info_particle_string,*) info_particle
+         pinfo_file = trim("particle_" //
+     $        trim(adjustl(info_particle_string))) // ".dat"
+         call makeOutputFile(pinfo_file)
+      end if
       
       write(*,*) "** Complete **"
       write(*,*) ""

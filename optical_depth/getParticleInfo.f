@@ -1,7 +1,9 @@
-      subroutine getParticleInfo(m,file)
+      subroutine getParticleInfo(m)
       include 'optical_depth.h'
 
-      integer file
+      character*255 filename
+      
+c      integer file
       integer m
 
       real*8 central_tau
@@ -24,10 +26,14 @@ c      end if
          scgs = 0.d0
       end if
       
- 100  format(18E22.14)
-      write(file,100) t,x(m),y(m),z(m),am(m),hp(m),rho(m),a(m),
-     $     wmeanmolecular(m),localg(m),tempp(m),pp(m),scgs,opacit,
-     $     Teff(m),tauA(m),Avis(m),sigma*4d0*Avis(m)*Teff(m)**4.d0
+c      open(33,file=trim(adjustl(filename)),action='write',
+c     $           position='append')
+c     100  format(18E22.14)
+c      call makeOutputFile(filename)
+      call output(pinfo_file,m)
+c      write(file,100) t,x(m),y(m),z(m),am(m),hp(m),rho(m),a(m),
+c     $     wmeanmolecular(m),localg(m),tempp(m),pp(m),scgs,opacit,
+c     $     Teff(m),tauA(m),Avis(m),sigma*4d0*Avis(m)*Teff(m)**4.d0
 
       
       end subroutine
