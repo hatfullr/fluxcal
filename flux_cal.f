@@ -28,30 +28,6 @@
       close(89)
 
 
-c      if(get_info_of_particle) then
-cc        Determine the character size of the integer
-c         holder = info_particle
-c         int_size = 0
-c         do while ( holder > 0 )
-c            holder = holder/10
-c            int_size = int_size + 1
-c         end do
-c         
-c         write(info_particle_string,*) info_particle
-c         pinfo_file = trim("particle_" //
-c     $        trim(adjustl(info_particle_string))) // ".dat"
-c
-c         write(*,*) "Clearing '", trim(pinfo_file),"'"
-c         open(33,file=pinfo_file,status='replace')
-c 101     format(18A15)
-c         write(33,101) "t [s]","x [cm]","y [cm]",
-c     $        "z [cm]","am [g]","hp [cm]","rho [g/cm^3]","a [erg/g]",
-c     $        "mu*mH [g]","g [cm/s^2]","T [K]","P [g/cm/s^2]",
-c     $        "s [erg/K]","kappa [cm^2/g]","Teff [K]","tau",
-c     $        "A_vis [cm^2]","L_vis [erg/s]"
-c         close(33)
-c      end if
-      
       DO innit=start,finish,step
          call read_fluxcal(innit)
          call setViewingAngle
@@ -130,31 +106,17 @@ c        ****************************************************************
 c        ****************************************************************
          if(get_info_of_particle) then
             write(*,*) "Finding data of particle ",info_particle
-c            open(33,file=trim(adjustl(pinfo_file)),action='write',
-c     $           position='append')
-            call getParticleInfo(info_particle)
-c            close(33)
+            call output(pinfo_file,info_particle)
          end if
 c        ****************************************************************
 
 
          
-c         if(get_fluxes) then
-c            write(*,*) "Finding the fluxes at each grid point"
-c            call optical_depth
-c            write(*,*) "Writing to output file"
-c            open(89,file=trim(adjustl(outfile)),action='write',
-c     $           position='append')
-c            write(89,232) trim(adjustl(infname)), t*tunit,
-c     $           TOTALpracticalLUM,
-c     $           (avgt4/numcell)**0.25d0
-c            close(89)
-c         end if
+
          write(*,*) ""
          write(*,*) "**************************************************"
          write(*,*) ""
       enddo
-c      close(89)
       write(*,*) "** Complete **"
       write(*,*) ""
  500  format(A20," ",f15.7," ",A4)

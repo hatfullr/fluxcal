@@ -48,7 +48,6 @@ opdep_obj = $(opdeplib)/optical_depth.o        \
             $(opdeplib)/writeDimenFile.o       \
             $(opdeplib)/particlesAtPos.o       \
             $(opdeplib)/integrationAtPos.o     \
-            $(opdeplib)/getParticleInfo.o      \
             $(opdeplib)/getTpractical.o        \
             $(opdeplib)/getClosestParticles.o  \
             $(opdeplib)/integrationAtAllPos.o  \
