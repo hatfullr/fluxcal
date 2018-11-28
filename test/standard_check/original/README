@@ -1,0 +1,8 @@
+Changes:
+   11/28/2018 (Roger)
+      I came up with a better way to find the "last particle" in odeint.
+      Now that it is implemented, the "last particle" ID number in the
+      int_at_all_pos_0000.dat file will be different. I double-checked
+      the output to make sure that NONE of the changes I made affected
+      the final output files, EXCEPT for the change to "last particle".
+

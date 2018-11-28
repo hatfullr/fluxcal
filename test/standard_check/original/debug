@@ -78,13 +78,14 @@
  filtersfile     = 'filters.dat'
  outfile         = 'flux_cal.output'
  
- Reading eos file
+ Reading SPH eos file
  Reading opacity file
  Reading opacity file for dust
  Dust model: "normal" silicates; homogeneous spheres
  Reading cold opacity file
- Reading photospheric cold opacity file
- look up table for density is created
+ Reading envfit cold opacity file
+ Creating envfit density lookup table
+ Reading envfit nabla file
  Reading filtersfile
  ** Complete **
  
@@ -92,54 +93,34 @@
  Clearing 'flux_cal.output'
  Reading 'fluxcal_0000.dat'
  
- Finding the fluxes at each grid point
- Estabilishing the grid
-  iter                   xmin                     hx    Nx                   ymin                     hy    Ny                      L
- -----        ---------------        --------------- -----        ---------------        --------------- -----        ---------------
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     1  -5.71733222594914E+12   5.53794355335720E+12     3  -5.51757889474077E+12   5.31718504694433E+12     3   9.73021114342912E+37
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     2  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   1.61246379266865E+13     3   1.15177365476376E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     3  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   5.37487930889550E+12     7   1.08076121369537E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     4  -1.92144550736324E+13   3.37491003063132E+12    11  -1.66460412630417E+13   2.30351970381235E+12    15   1.04249630426123E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     5  -1.92144550736324E+13   1.68745501531566E+12    21  -1.66460412630417E+13   2.30351970381235E+12    15   1.08518549644319E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     6  -1.92144550736324E+13   1.68745501531566E+12    21  -1.66460412630417E+13   1.34371982722387E+12    25   1.08234797691191E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     7  -1.92144550736324E+13   8.88134218587188E+11    39  -1.66460412630417E+13   1.34371982722387E+12    25   1.06494396655485E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     8  -1.92144550736324E+13   8.88134218587188E+11    39  -1.52792844371317E+13   7.35298072082450E+11    43   1.05942139165184E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-     9  -1.92144550736324E+13   4.62892252117311E+11    71  -1.42671967324810E+13   7.11200745781244E+11    43   1.05778547172161E+38
- Writing all integration data to 'int_at_all_pos_0000.dat'
-    10  -1.92144550736324E+13   4.53695805326452E+11    71  -1.35222712514892E+13   3.83521356227414E+11    75   1.05811760399645E+38
- Grid details:
-    xminmap,xmaxmap =  -1.92144550736324E+13,   1.25442512992192E+13
-    yminmap,ymaxmap =  -1.35222712514892E+13,   1.48583091093395E+13
-    hxmap,hymap     =   4.53695805326452E+11,   3.83521356227414E+11
-    nxmap,nymap     =                     71,                     75
+ Establishing the grid
+  iter            xmin              hx    Nx            ymin              hy    Ny               L
+ ----- --------------- --------------- ----- --------------- --------------- ----- ---------------
+     1  -5.7173322E+12   5.5379436E+12     3  -5.5175789E+12   5.3171850E+12     3   9.7302111E+37
+     2  -1.9214455E+13   3.3749100E+12    11  -1.6646041E+13   1.6124638E+13     3   1.1517737E+38
+     3  -1.9214455E+13   3.3749100E+12    11  -1.6646041E+13   5.3748793E+12     7   1.0807612E+38
+     4  -1.9214455E+13   3.3749100E+12    11  -1.6646041E+13   2.3035197E+12    15   1.0424963E+38
+     5  -1.9214455E+13   1.6874550E+12    21  -1.6646041E+13   2.3035197E+12    15   1.0851855E+38
+     6  -1.9214455E+13   1.6874550E+12    21  -1.6646041E+13   1.3437198E+12    25   1.0823480E+38
+     7  -1.9214455E+13   8.8813422E+11    39  -1.6646041E+13   1.3437198E+12    25   1.0649440E+38
+     8  -1.9214455E+13   8.8813422E+11    39  -1.5279284E+13   7.3529807E+11    43   1.0594214E+38
+     9  -1.9214455E+13   4.6289225E+11    71  -1.4267197E+13   7.1120075E+11    43   1.0577855E+38
+    10  -1.9214455E+13   4.5369581E+11    71  -1.3522271E+13   3.8352136E+11    75   1.0581176E+38
  
-     TXY_max=   9727.53418       3.98800278    
- Total luminosity in enclosed area=   1.36271943E+38
- Total practical luminosity in enclosed area=   1.05811759E+38
- Average Teff=   2939.38818    
-           0         -37   2.0813248572377676E-002 -0.47961111045386084     
-           1         -37                       NaN                       NaN
-           2         -37                       NaN                       NaN
-           3         -37                       NaN                       NaN
-           4         -37                       NaN                       NaN
-           5         -37                       NaN                       NaN
-           6         -37                       NaN                       NaN
-           7         -37                       NaN                       NaN
-           8         -37                       NaN                       NaN
-           9         -37                       NaN                       NaN
-          10         -37                       NaN                       NaN
+ Grid details:
+    xminmap,xmaxmap =   -19214455073632.387        12544251299219.238     
+    yminmap,ymaxmap =   -13522271251489.168        14858309109339.465     
+    hxmap,hymap     =    453695805326.45178        383521356227.41394     
+    nxmap,nymap     =           71          75
+ 
  Writing dimen file
- Writing 'fluxes00000_000_000_000.sph'
- Writing to output file
+ Writing 'teffs00000_000_000_000.dat'
+ Total luminosity in enclosed area=  1.05811760399645E+38
+ Average Teff=  2.93938810793937E+03
+ Writing to 'flux_cal.output'
+ 
+ Finding data at integration steps at posx,posy
+ Writing to 'int_at_all_pos_0000.dat'
  
  **************************************************
  

@@ -174,7 +174,7 @@
 
 
 
-
+      
       !### File names
       ! File name for the opacity files, filters file, and output file.
       ! Set opacitydustfile='' for no dust.

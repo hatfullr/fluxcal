@@ -17,15 +17,13 @@ if [ $? -eq 0 ]; then
 	error=1
     else
 	echo "'int_at_all_pos_0000.dat'    identical"
-	tail -n+2 ../original/teffs00000_000_000_000.dat > ../original/teffscheck.dat
-	tail -n+2 ./teffs00000_000_000_000.dat > teffscheck.dat
-	DIFF=$(diff ../original/teffscheck.dat ./teffscheck.dat)
-	if [ "$DIFF" != "" ]; then
-	    echo "'teffs00000_000_000_000.dat' differ"
-	    error=1
-	else
-	    echo "'teffs00000_000_000_000.dat' identical"
-	fi
+    fi
+    DIFF=$(diff ../original/teffs00000_000_000_000.dat ./teffs00000_000_000_000.dat)
+    if [ "$DIFF" != "" ]; then
+	echo "'teffs00000_000_000_000.dat' differ"
+	error=1
+    else
+	echo "'teffs00000_000_000_000.dat' identical"
     fi
 fi
 

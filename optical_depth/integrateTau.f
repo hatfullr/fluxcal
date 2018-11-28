@@ -19,7 +19,8 @@
       do ip=1,nmax
          Avis(ip)=0.d0
       end do
-      
+
+
       do j=1,NYMAP
          do i=1,NXMAP
             nataT(I,J) = 0.d0

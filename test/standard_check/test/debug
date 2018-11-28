@@ -93,29 +93,15 @@
  Clearing 'flux_cal.output'
  Reading 'fluxcal_0000.dat'
  
- Finding the fluxes at each grid point
- Estabilishing the grid
+ Establishing the grid
  Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
- Creating the driving grid
- Creating the integrating grid
- Integrating through each point on the driving grid
  Writing 'teffs00000_000_000_000.dat'
- Calculating the flux at each grid point
- Grid details:
-    xminmap,xmaxmap =  -1.92144550736324E+13,   1.25442512992192E+13
-    yminmap,ymaxmap =  -1.35222712514892E+13,   1.48583091093395E+13
-    hxmap,hymap     =   4.53695805326452E+11,   3.83521356227414E+11
-    nxmap,nymap     =                     71,                     75
- 
  Total luminosity in enclosed area=  1.05811760399645E+38
- Maximum Teff=  9.72753413801444E+03
  Average Teff=  2.93938810793937E+03
- Writing to output file
+ Writing to 'flux_cal.output'
  
  Finding data at integration steps at posx,posy
- Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
  Writing to 'int_at_all_pos_0000.dat'
- Integrating through each point on the driving grid
  
  **************************************************
  
