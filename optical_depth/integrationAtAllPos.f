@@ -25,9 +25,9 @@
       write(*,*) "Writing to '",trim(adjustl(myfname)),"'"
 
 
-      dointatallpos=.true.
+      printIntegrationSteps=.true.
       call integrateTau
-      dointatallpos=.false.
+      printIntegrationSteps=.false.
 
       
       close(intout)

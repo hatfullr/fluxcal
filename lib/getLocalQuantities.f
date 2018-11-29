@@ -1,34 +1,5 @@
       subroutine getLocalQuantities(myx,myy,myz)
       include '../optical_depth/optical_depth.h'
-c      real*8 r2, wpc, xpos, ypos, zpos, dens, rhocgs,xhp,
-c     $     gcgs,pcgs,tcgs
-c      integer index
-c      real xh,t6, zz, uu, gg,ppp,tt
-c      real*8 ucgs,temperatur
-c      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
-c      real xhi
-cc     real*8 useeostable
-c      integer nxmapmax,nymapmax,nzmap
-cc      PARAMETER (NXMAPMAX=999,NYMAPMAX=999,NZMAP=202)
-cc      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      PARAMETER (nxmapmax=499,nymapmax=499,nzmap=416)
-c      real rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      real uxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      real hpxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      real xhxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      real gxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      real pxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      real txyz(NXMAPMAX,NYMAPMAX,NZMAP)
-c      integer last_part(NXMAPMAX,NYMAPMAX,NZMAP)
-c      integer lastpart
-c      common/lastparticle/ lastpart,last_part
-c      real*8 xminmap,yminmap,hxmap,hymap,hzmap
-c      real*8 zmin(NXMAPMAX,NYMAPMAX),zmax(NXMAPMAX,NYMAPMAX)
-c      common/densitygrid/xminmap,yminmap,zmin,zmax,
-c     $     hxmap,hymap,rhoxyz,uxyz,hpxyz,xhxyz,gxyz,pxyz,txyz
-c      integer ix,iy,iz,ip
-c      real*8 realiz,zzz,bigd,minbigd
-c      common/metals/zzz
 
       real*8 myx,myy,myz
       real*8 realiz
@@ -48,6 +19,8 @@ c      common/metals/zzz
          iz=1
       end if
 
+     
+      
       if((rhoxyz(ix,iy,iz+1).le.0.d0).or.
      $     (rhoxyz(ix,iy,iz).le.0.d0)) then ! One or both cells are empty
 c        Find a precise value for boundary cases
@@ -94,7 +67,7 @@ c        Find a precise value for boundary cases
                tcgs = am(ip)*wpc*tempp(ip)
                lastpart = ip
             end if
-         end if  
+         end if
       else
 c        Take a weighted average between the two nearest grid cells
          rhocgs=rhoxyz(ix,iy,iz)*(iz+1-realiz)

@@ -37,7 +37,7 @@
        Eunit  = 0.3794E+49   rhounit     = 0.5900E+01
        muunit = 0.1000E+01   gunit       = 0.2741E+05
  
- runit_out    = 0.1000E+01   munit_out   = 0.1000E+01
+ runit_out    = 0.6960E+11   munit_out   = 0.1000E+01
  tunit_out    = 0.1000E+01   vunit_out   = 0.1000E+01
  Eunit_out    = 0.1000E+01   rhounit_out = 0.1000E+01
  muunit_out   = 0.1000E+01   gunit_out   = 0.1000E+01
@@ -63,10 +63,12 @@
  metallicity  = 0.2000E-01
  Rform        = 0.1000E+31
  
- get_fluxes                 = T
+ get_fluxes                 = F
  get_particles_at_pos       = F
- get_integration_at_pos     = F
- get_integration_at_all_pos = T
+ get_integration_at_pos     = T
+ get_integration_at_all_pos = F
+   posx = -.1131E+03
+   posy = -.1943E+03
  get_closest_particles      = F
  track_particles            = F
  get_info_of_particle       = F
@@ -95,13 +97,8 @@
  
  Establishing the grid
  Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
- Writing 'teffs00000_000_000_000.dat'
- Total luminosity in enclosed area=  1.05811761261412E+38
- Average Teff=  2.93937855099254E+03
- Writing to 'flux_cal.output'
- 
  Finding data at integration steps at posx,posy
- Writing to 'int_at_all_pos_0000.dat'
+ Writing to int_at_pos_0000.dat
  
  **************************************************
  

@@ -50,9 +50,6 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       integer lastpart
       common/lastparticle/ lastpart
 
-      real*8 intz
-      common/intedz/ intz
-
       real*8 tau_thick
       common/tauthick/ tau_thick
 
@@ -60,17 +57,21 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       integer rayout2(maxstp),nstp
       common/rayout/ rayout1,rayout2,nstp
 
-      logical dointatpos,dointatallpos
-      common/intatpos/ dointatpos,dointatallpos
+      logical printIntegrationSteps
+      common/intatpos/ printIntegrationSteps
       
       real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
-     $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
-     $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out
+     $     runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
+     $     rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
+     $     Lunit_out
       common/units/ munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
-     $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
-     $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out
+     $     runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
+     $     rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
+     $     Lunit_out
+
+      real*8 xpos,ypos
+      common/taugrid/xpos,ypos
+      
       
 
 c      logical resolved
@@ -114,33 +115,16 @@ c     I want to make sure the penultimate step (the step right before the photos
 
         if((xint+h-x2)*(xint+h-x1).gt.0.d0) h=x2-xint
         call rkqs(yint,dydx,nvar,xint,h,eps,yscal,hdid,hnext,derivs)
-        intz = xint
 
-        if(dointatpos.or.dointatallpos) then
-           call getLocalQuantities(posx,posy,xint)
-           call getOpacitySub(posx,posy,xint,dble(t6*1d6),rhocgs,yint(1),
-     $          Rform,opacit)
-           
-           if(dointatpos) then
- 800          format(10ES22.14,I22)
-              write(intout,800) xint/runit_out,xhp/runit_out,
-     $             rhocgs/rhounit_out,ucgs/Eunit_out*munit_out,
-     $             gcgs/gunit_out,xh/muunit_out,pcgs/punit_out,
-     $             tcgs/tempunit_out,opacit,yint(1),lastpart
-           end if
-           if(dointatallpos) then
-              rayout1(1,nstp)  = xint/runit_out
-              rayout1(2,nstp)  = xhp/runit_out
-              rayout1(3,nstp)  = rhocgs/rhounit_out
-              rayout1(4,nstp)  = ucgs/Eunit_out*munit_out
-              rayout1(5,nstp)  = gcgs/gunit_out
-              rayout1(6,nstp)  = xh/muunit_out
-              rayout1(7,nstp)  = pcgs/punit_out
-              rayout1(8,nstp)  = tcgs/tempunit_out
-              rayout1(9,nstp)  = opacit
-              rayout1(10,nstp) = yint(1)
-              rayout2(nstp)    = lastpart
-           end if
+        if(printIntegrationSteps) then
+           call getLocalQuantities(xpos,ypos,xint)
+           call getOpacitySub(xpos,ypos,xint,dble(t6*1d6),rhocgs,
+     $          yint(1),Rform,opacit)
+           write(intout,'(12ES22.14,I22)')xpos/runit_out,ypos/runit_out,
+     $             xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
+     $             ucgs/Eunit_out*munit_out,gcgs/gunit_out,
+     $             xh/muunit_out,pcgs/punit_out,tcgs/tempunit_out,
+     $             opacit,yint(1),lastpart
         end if
         
         if(hdid.eq.h)then

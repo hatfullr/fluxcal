@@ -24,7 +24,7 @@
       
       !### Runtime options
       ! Calculate the flux at each grid cell and record the data.
-      get_fluxes=.true.
+      get_fluxes=.false.
       
       ! Set this to true to create a data file containing all the
       ! particles whose surfaces are closest to the observer  along each
@@ -37,17 +37,17 @@
       ! posx, posy. Make sure this is in the same units as the rest of
       ! your input data.
       get_particles_at_pos=.false.
-      posx=0.d0
-      posy=0.d0
+      posx=-1.13107559706760E+02
+      posy=-1.94291089564200E+02
 
       ! Finds the data being used at each integration step at posx, posy
-      get_integration_at_pos=.false.
+      get_integration_at_pos=.true.
 
       ! Finds the data being used at each integration step for all grid
       ! cells. Creates one output file for every grid cell, so use with
       ! extreme caution! You must also set get_fluxes=.true. to use this
       ! routine.
-      get_integration_at_all_pos=.true.
+      get_integration_at_all_pos=.false.
 
       ! Track a list of particles through each input file and create
       ! output files containing their data. Specify the file name that
@@ -137,7 +137,7 @@
       ! you desire the output units to be in. Internal (cgs) values will
       ! be divided by these to produce your output.
       ! These values are affected by the flux_cal.baseunits file.
-      runit_out=1.d0
+      runit_out=6.9598d10
       munit_out=1.d0
       tunit_out=1.d0
       vunit_out=1.d0

@@ -49,25 +49,6 @@
             
             if(zmin(i,j).lt.1d30)then
 
-               if(dointatallpos) then
-                  ! Initialize the integration results array
-                  do ii=1,maxstp
-                     rayout1(1,ii)  = 1d30
-                     rayout1(2,ii)  = 0.d0
-                     rayout1(3,ii)  = 0.d0
-                     rayout1(4,ii)  = 0.d0
-                     rayout1(5,ii)  = 0.d0
-                     rayout1(6,ii)  = 0.d0
-                     rayout1(7,ii)  = 0.d0
-                     rayout1(8,ii)  = 0.d0
-                     rayout1(9,ii)  = 0.d0
-                     rayout1(10,ii) = 0.d0
-                     rayout2(ii)    = 0
-                  end do
-                  posx=xpos
-                  posy=ypos
-               end if
-               
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TpracticalXYthin(i,j),TpracticalXYthick(i,j),
@@ -75,15 +56,6 @@
                TOTALTpracticalXY=TpracticalXYthin(i,j)+
      $              TpracticalXYthick(i,j)
 
-               if(dointatallpos) then
-                  write(intout,'(2ES22.14,2I22)') xpos/runit_out,
-     $                 ypos/runit_out,nstp,size(rayout1(:,1))+1
-                  do ii=1,nstp
-                     write(intout,'(10ES22.14,I22)')
-     $                    (rayout1(q,ii),q=1,size(rayout1(:,1))),
-     $                    rayout2(ii)
-                  end do
-               end if
 c               if(tauthin(i,j).gt.0.d0) then
 c                  write(*,*) "Optically thin material at ",i,j,xpos,ypos
 c               end if

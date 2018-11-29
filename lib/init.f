@@ -610,8 +610,7 @@ c      end if
 c     Initialize some variables
       posx = posx*runit
       posy = posy*runit
-      dointatpos=.false.
-      dointatallpos=.false.
+      printIntegrationSteps = .false.
 
       if(get_info_of_particle) then
          write(info_particle_string,*) info_particle

@@ -6,9 +6,15 @@
       integer i
       real*8 xminmap_temp,hxmap_temp,yminmap_temp,hymap_temp
       integer nxmap_temp,nymap_temp
+      real*8 xpos_temp,ypos_temp
       
 c      call createGrid
 
+      xpos_temp = xpos
+      ypos_temp = ypos
+      xpos = posx
+      ypos = posy
+      
 c     hxmap and hymap need to be exactly equal to 1 in whatever units
 c     are being used. This is so that prepareIntegration correctly sets
 c     xpos=posx and ypos=posy in its calculations.
@@ -19,10 +25,10 @@ c     xpos=posx and ypos=posy in its calculations.
       hymap_temp = hymap
       nymap_temp = nymap
       
-      xminmap=posx
+      xminmap=xpos
       hxmap=runit
       nxmap=1
-      yminmap=posy
+      yminmap=ypos
       hymap=runit
       nymap=1
 
@@ -45,13 +51,13 @@ c     xpos=posx and ypos=posy in its calculations.
  801  format(2ES22.14)
  802  format(11A22)
       write(*,*) "Writing to ", trim(adjustl(myfname))
-      write(intout,801) posx/runit_out, posy/runit_out
-      write(intout,802)"z","h","rho","u","g","mu","P","T","kappa","tau",
-     $     "particle"
+c      write(intout,801) posx/runit_out, posy/runit_out
+c      write(intout,802)"z","h","rho","u","g","mu","P","T","kappa","tau",
+c     $     "particle"
 
-      dointatpos=.true.
+      printIntegrationSteps=.true.
       call integrateTau
-      dointatpos=.false.
+      printIntegrationSteps=.false.
       
       close(intout)
 
@@ -61,5 +67,8 @@ c     xpos=posx and ypos=posy in its calculations.
       yminmap = yminmap_temp
       hymap = hymap_temp
       nymap = nymap_temp
+
+      xpos = xpos_temp
+      ypos = ypos_temp
       
       end subroutine
