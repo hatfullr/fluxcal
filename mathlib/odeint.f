@@ -129,26 +129,29 @@ c           lp = lastpart
            ! This is the "last particle entered by the integrator"
            maxbigd = 0.d0
            lp = 0               ! Particle 0 should be empty space
-           do ip=1,n
-              dx2 = (x(ip)-posx)**2.d0
-              dy2 = (y(ip)-posy)**2.d0
-              dz2 = (z(ip)-xint)**2.d0
-              dr2 = dx2 + dy2 + dz2
-              if(dr2.le.(4.d0*hp(ip)**2.d0)) then
-                 if(xint .le. z(ip)) then ! If we are past the particle
-                    bigd = ((2.d0*hp(ip))**2.d0 - dy2 - dx2)**0.5d0
-     $                   + dz2**0.5d0
-                 else           ! If we haven't passed the particle
-                    bigd = ((2.d0*hp(ip))**2.d0 - dy2 - dx2)**0.5d0
-     $                   - dz2**0.5d0
+
+           if(rhocgs.gt.0) then
+              do ip=1,n
+                 dx2 = (x(ip)-posx)**2.d0
+                 dy2 = (y(ip)-posy)**2.d0
+                 dz2 = (z(ip)-xint)**2.d0
+                 dr2 = dx2 + dy2 + dz2
+                 if(dr2.le.(4.d0*hp(ip)**2.d0)) then
+                    !write(*,*) posx,posy,dr2,4.d0*hp(ip)**2.d0,maxbigd
+                    if(xint .le. z(ip)) then !If we are past the particle
+                       bigd = (4.d0*hp(ip)**2.d0 - dy2 - dx2)**0.5d0
+     $                      + dz2**0.5d0
+                    else        ! If we haven't passed the particle
+                       bigd = (4.d0*hp(ip)**2.d0 - dy2 - dx2)**0.5d0
+     $                      - dz2**0.5d0
+                    end if
+                    if(bigd.gt.maxbigd) then
+                       lp = ip
+                       maxbigd = bigd
+                    end if
                  end if
-                 if(bigd.gt.maxbigd) then
-                    lp = ip
-                    maxbigd = bigd
-                 end if
-              end if
-           end do
-       
+              end do
+           end if
            if(dointatpos) then
  800          format(10ES22.14,I22)
               write(intout,800) xint/runit_out,xhp/runit_out,
