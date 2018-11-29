@@ -1,64 +1,120 @@
-      subroutine getLocalQuantities(xpos,ypos,zpos)
-      include 'flux_cal.h'
-      real*8 R2, R2MAX, WPC, XPOS, YPOS, ZPOS, dens, rhocgs,xhp,
-     $     gcgs,pcgs,tcgs
-      integer INDEX
-      real xh,t6, zz, uu, gg,ppp,tt
-      real*8 ucgs,temperatur
-      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
-      real xhi
-c      real*8 useeostable
-      integer NXMAPMAX,NYMAPMAX,NZMAP
-c      PARAMETER (NXMAPMAX=999,NYMAPMAX=999,NZMAP=202)
-c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      PARAMETER (NXMAPMAX=499,NYMAPMAX=499,NZMAP=416)
-      real rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      real uxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      real hpxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      real xhxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      real gxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      real pxyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      real txyz(NXMAPMAX,NYMAPMAX,NZMAP)
-      integer last_part(NXMAPMAX,NYMAPMAX,NZMAP)
-      integer lastpart
-      common/lastparticle/ lastpart,last_part
-      real*8 xminmap,yminmap,hxmap,hymap,hzmap
-      real*8 zmin(NXMAPMAX,NYMAPMAX),zmax(NXMAPMAX,NYMAPMAX)
-      common/densitygrid/xminmap,yminmap,zmin,zmax,
-     $     hxmap,hymap,rhoxyz,uxyz,hpxyz,xhxyz,gxyz,pxyz,txyz
-      integer ix,iy,iz
-      real*8 realiz,zzz
-      common/metals/zzz
+      subroutine getLocalQuantities(myx,myy,myz)
+      include '../optical_depth/optical_depth.h'
+c      real*8 r2, wpc, xpos, ypos, zpos, dens, rhocgs,xhp,
+c     $     gcgs,pcgs,tcgs
+c      integer index
+c      real xh,t6, zz, uu, gg,ppp,tt
+c      real*8 ucgs,temperatur
+c      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
+c      real xhi
+cc     real*8 useeostable
+c      integer nxmapmax,nymapmax,nzmap
+cc      PARAMETER (NXMAPMAX=999,NYMAPMAX=999,NZMAP=202)
+cc      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      PARAMETER (nxmapmax=499,nymapmax=499,nzmap=416)
+c      real rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      real uxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      real hpxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      real xhxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      real gxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      real pxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      real txyz(NXMAPMAX,NYMAPMAX,NZMAP)
+c      integer last_part(NXMAPMAX,NYMAPMAX,NZMAP)
+c      integer lastpart
+c      common/lastparticle/ lastpart,last_part
+c      real*8 xminmap,yminmap,hxmap,hymap,hzmap
+c      real*8 zmin(NXMAPMAX,NYMAPMAX),zmax(NXMAPMAX,NYMAPMAX)
+c      common/densitygrid/xminmap,yminmap,zmin,zmax,
+c     $     hxmap,hymap,rhoxyz,uxyz,hpxyz,xhxyz,gxyz,pxyz,txyz
+c      integer ix,iy,iz,ip
+c      real*8 realiz,zzz,bigd,minbigd
+c      common/metals/zzz
+
+      real*8 myx,myy,myz
+      real*8 realiz
+      integer ix,iy
       
       zz=metallicity
 
-      ix=(xpos-xminmap)/hxmap+1.5d0
-      iy=(ypos-yminmap)/hymap+1.5d0
+      ix=(myx-xminmap)/hxmap+1.5d0
+      iy=(myy-yminmap)/hymap+1.5d0
       hzmap=(zmax(ix,iy)-zmin(ix,iy))/(nzmap-1)
 
-      realiz=(zpos-zmin(ix,iy))/hzmap+1.d0
+      realiz=(myz-zmin(ix,iy))/hzmap+1.d0
       iz=realiz
       if(iz.eq.nzmap) then
          iz=nzmap-1
       else if(iz.eq.0) then
          iz=1
       end if
-c      write(*,*) xpos,ypos,zpos !,zmin(ix,iy),zmax(ix,iy),hzmap
-c     write(*,*) ix,iy,iz,SIZE(rhoxyz)
-c      if((zpos.eq.zmin(ix,iy)).and.(zmin(ix,iy).eq.zmax(ix,iy))) then
-c         write(*,*) "ERROR!",ix,iy,zpos,zmin(ix,iy),zmax(ix,iy),hzmap
-c         stop
-c      end if
-c      write(*,*) realiz,zpos,zmin(ix,iy),hzmap
-c     Take a weighted average between the two nearest grid cells
-      dens=rhoxyz(ix,iy,iz)*(iz+1-realiz)
-     $     +rhoxyz(ix,iy,iz+1)*(realiz-iz)
-c      write(*,*) "#### ix,iy,iz,realiz = ", ix,iy,iz,realiz
-c      write(*,*) "#### rhoxyz(ix,iy,iz) = ", rhoxyz(ix,iy,iz)
-c      write(*,*) "#### rhoxyz(ix,iy,iz+1) = ", rhoxyz(ix,iy,iz+1)
-c      write(*,*) "#### dens = ", dens
 
-      if(dens.le.0.d0) then
+      if((rhoxyz(ix,iy,iz+1).le.0.d0).or.
+     $     (rhoxyz(ix,iy,iz).le.0.d0)) then ! One or both cells are empty
+c        Find a precise value for boundary cases
+
+         rhocgs = 0.d0
+         ucgs = 0.d0
+         xhp = 0.d0
+         xh = 0.d0
+         gcgs = 0.d0
+         pcgs = 0.d0
+         tcgs = 0.d0
+         lastpart = 0
+         if((rhoxyz(ix,iy,iz+1).le.0.d0).and.
+     $        (rhoxyz(ix,iy,iz).le.0.d0)) then ! Both are empty
+            ! There exists still the extremely rare case where part of
+            ! a particle's smoothing length is just barely visible
+            ! along the line of sight in between two empty grid cells.
+            ! This case is so negligible that it realy isn't worth
+            ! coding in. Our grid spacing is small enough to ignore cases
+            ! like this.
+            return
+         else if((rhoxyz(ix,iy,iz).le.0.d0).and.
+     $           (rhoxyz(ix,iy,iz+1).gt.0.d0)) then !Only behind is empty
+            ip = last_part(ix,iy,iz+1)
+         else if((rhoxyz(ix,iy,iz+1).le.0.d0).and.
+     $           (rhoxyz(ix,iy,iz).gt.0.d0)) then   !Only front is empty
+            ip = last_part(ix,iy,iz)
+         end if
+
+         if(a(ip).gt.0.d0) then ! Not a sink particle
+            r2 = (x(ip)-myx)**2.d0+(y(ip)-myy)**2.d0
+     $           +(z(ip)-myz)**2.d0
+            if(r2 .lt. 4.d0*hp(ip)**2.d0) then ! We're inside
+               index = int(ctab*r2/hp(ip)**2.d0)+1
+               wpc = wtab(index)/hp(ip)**3.d0
+               rhocgs = am(ip)*wpc
+               ucgs = am(ip)*wpc*a(ip)
+               xhp = am(ip)*wpc*hp(ip)
+               xhi =  -0.6d0+0.2d0*metallicity+0.8d0*1.67262158d-24/
+     $              wmeanmolecular(ip)
+               xh = am(ip)*wpc*xhi
+               gcgs = am(ip)*wpc*localg(ip)
+               pcgs = am(ip)*wpc*pp(ip)
+               tcgs = am(ip)*wpc*tempp(ip)
+               lastpart = ip
+            end if
+         end if  
+      else
+c        Take a weighted average between the two nearest grid cells
+         rhocgs=rhoxyz(ix,iy,iz)*(iz+1-realiz)
+     $        +rhoxyz(ix,iy,iz+1)*(realiz-iz)
+         xhp=hpxyz(ix,iy,iz)*(iz+1-realiz)
+     $        +hpxyz(ix,iy,iz+1)*(realiz-iz)
+         xh=xhxyz(ix,iy,iz)*(iz+1-realiz)
+     $        +xhxyz(ix,iy,iz+1)*(realiz-iz)
+         ucgs=uxyz(ix,iy,iz)*(iz+1-realiz)
+     $        +uxyz(ix,iy,iz+1)*(realiz-iz)
+         gcgs=gxyz(ix,iy,iz)*(iz+1-realiz)
+     $        +gxyz(ix,iy,iz+1)*(realiz-iz)
+         pcgs=pxyz(ix,iy,iz)*(iz+1-realiz)
+     $        +pxyz(ix,iy,iz+1)*(realiz-iz)
+         tcgs=txyz(ix,iy,iz)*(iz+1-realiz)
+     $        +txyz(ix,iy,iz+1)*(realiz-iz)
+         lastpart=last_part(ix,iy,iz)
+      end if
+
+      if(rhocgs.le.0.d0) then
          rhocgs=0.d0
          xh=0.d0
          t6=0.d0
@@ -69,71 +125,31 @@ c      write(*,*) "#### dens = ", dens
          tcgs=0.d0
          return
       end if
-c      if(dens.le.0.d0) then
-c         t6=0.d0
-c         return
-c      end if
 
-      xhp=hpxyz(ix,iy,iz)*(iz+1-realiz)
-     $   +hpxyz(ix,iy,iz+1)*(realiz-iz)
-
-      xh=xhxyz(ix,iy,iz)*(iz+1-realiz)
-     $  +xhxyz(ix,iy,iz+1)*(realiz-iz)
-         
-      rhocgs=dens
-      if(rhocgs.eq.0.d0) then
-         t6=0.
-c         write(*,*) "getLocalQuantities returned because rhocgs=0"
-         return
-      endif
-      uu=uxyz(ix,iy,iz)*(iz+1-realiz)
-     $    +uxyz(ix,iy,iz+1)*(realiz-iz)
-      if(uu.lt.0d0) uu=0d0
-
-      gg=gxyz(ix,iy,iz)*(iz+1-realiz)
-     $    +gxyz(ix,iy,iz+1)*(realiz-iz)
-
-      ppp=pxyz(ix,iy,iz)*(iz+1-realiz)
-     $    +pxyz(ix,iy,iz+1)*(realiz-iz)
-
-      tt=txyz(ix,iy,iz)*(iz+1-realiz)
-     $    +txyz(ix,iy,iz+1)*(realiz-iz)
-
-      tt=tt/dens
-      ppp=ppp/dens
-      gg=gg/dens
-      xh=xh/dens
-      uu=uu/dens
-      xhp=xhp/dens              ! now xhp is the average smoothing length
+      if(ucgs.lt.0d0) ucgs=0d0
+      
+      tcgs=tcgs/rhocgs
+      pcgs=pcgs/rhocgs
+      gcgs=gcgs/rhocgs
+      xh=xh/rhocgs
+      ucgs=ucgs/rhocgs
+      xhp=xhp/rhocgs            ! now xhp is the average smoothing length
                                 ! at this position
+      
       wmeanmu=0.8d0*1.67262158d-24/(xh+0.6d0-0.2d0*zz)
-
-      ucgs=uu
-      gcgs=gg
-      pcgs=ppp
-      tcgs=tt
-c      if(iz.eq.0) then
-c         write(*,*) ix,iy,iz,zpos,zmin(ix,iy),hzmap,realiz
-c         write(*,*) uxyz(ix,iy,1),last_part(ix,iy,1)
-c      end if
-      lastpart=last_part(ix,iy,iz)
+      
       t6=tcgs*1.e-6
-
-c      if(t6.eq.0.d0) then
-c         write(*,*) "getLocalQuantities: t6 = 0"
-c         write(*,*) "dens         = ", dens
-c         write(*,*) "t6, tt, tcgs = ", t6, tt, tcgs
-c      end if
 
       if(t6.ne.t6) then
          write(*,*) "getLocalQuantities.f: t6 = ",t6
-         write(*,*) "dens = ",dens
-         write(*,*) "tt = ", tt
+         write(*,*) "rhocgs = ",rhocgs
+         write(*,*) "tcgs = ", tcgs
          write(*,*) "ix,iy,iz,realiz = ",ix,iy,iz,realiz
          write(*,*) "txyz(ix,iy,iz) = ", txyz(ix,iy,iz)
          write(*,*) "txyz(ix,iy,iz+1) = ",txyz(ix,iy,iz+1)
+         write(*,*) ""
 c         stop
       end if
 
-      RETURN
-      END
+      return
+      end

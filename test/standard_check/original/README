@@ -9,3 +9,9 @@ Changes:
       the output to make sure that NONE of the changes I made affected
       the final output files, EXCEPT for the change to "last particle".
 
+   11/29/2018 (Roger)
+      I found a way to mostly handle integrating through empty space.
+      This made the int_at_all_pos files differ and also the teffs files
+      differ by a very small amount. This makes sense, so it is time to
+      replace the original files again.
+

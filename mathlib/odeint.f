@@ -120,44 +120,13 @@ c     I want to make sure the penultimate step (the step right before the photos
            call getLocalQuantities(posx,posy,xint)
            call getOpacitySub(posx,posy,xint,dble(t6*1d6),rhocgs,yint(1),
      $          Rform,opacit)
-
-c           lp = lastpart
            
-           ! This more accurately finds the particle with the surface
-           ! that is closest to exactly where we are it in the
-           ! integration, relative to the line of sight.
-           ! This is the "last particle entered by the integrator"
-           maxbigd = 0.d0
-           lp = 0               ! Particle 0 should be empty space
-
-           if(rhocgs.gt.0) then
-              do ip=1,n
-                 dx2 = (x(ip)-posx)**2.d0
-                 dy2 = (y(ip)-posy)**2.d0
-                 dz2 = (z(ip)-xint)**2.d0
-                 dr2 = dx2 + dy2 + dz2
-                 if(dr2.le.(4.d0*hp(ip)**2.d0)) then
-                    !write(*,*) posx,posy,dr2,4.d0*hp(ip)**2.d0,maxbigd
-                    if(xint .le. z(ip)) then !If we are past the particle
-                       bigd = (4.d0*hp(ip)**2.d0 - dy2 - dx2)**0.5d0
-     $                      + dz2**0.5d0
-                    else        ! If we haven't passed the particle
-                       bigd = (4.d0*hp(ip)**2.d0 - dy2 - dx2)**0.5d0
-     $                      - dz2**0.5d0
-                    end if
-                    if(bigd.gt.maxbigd) then
-                       lp = ip
-                       maxbigd = bigd
-                    end if
-                 end if
-              end do
-           end if
            if(dointatpos) then
  800          format(10ES22.14,I22)
               write(intout,800) xint/runit_out,xhp/runit_out,
      $             rhocgs/rhounit_out,ucgs/Eunit_out*munit_out,
      $             gcgs/gunit_out,xh/muunit_out,pcgs/punit_out,
-     $             tcgs/tempunit_out,opacit,yint(1),lp
+     $             tcgs/tempunit_out,opacit,yint(1),lastpart
            end if
            if(dointatallpos) then
               rayout1(1,nstp)  = xint/runit_out
@@ -170,7 +139,7 @@ c           lp = lastpart
               rayout1(8,nstp)  = tcgs/tempunit_out
               rayout1(9,nstp)  = opacit
               rayout1(10,nstp) = yint(1)
-              rayout2(nstp)    = lp
+              rayout2(nstp)    = lastpart
            end if
         end if
         

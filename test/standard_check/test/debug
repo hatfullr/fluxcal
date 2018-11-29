@@ -96,8 +96,8 @@
  Establishing the grid
  Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
  Writing 'teffs00000_000_000_000.dat'
- Total luminosity in enclosed area=  1.05811760399645E+38
- Average Teff=  2.93938810793937E+03
+ Total luminosity in enclosed area=  1.05811761261412E+38
+ Average Teff=  2.93937855099254E+03
  Writing to 'flux_cal.output'
  
  Finding data at integration steps at posx,posy
