@@ -20,11 +20,6 @@ c     L669 to L817
       cellcount=0
       cctherm=0
 
-      natalum = 0.d0
-      sphlum = 0.d0
-      natalumhi = 0.d0
-      natalumlo = 0.d0
-
       do ifilter=1,numfilters
          totalfluxdensity(ifilter)=0.d0
       enddo
@@ -37,16 +32,7 @@ c     L669 to L817
       DO J=1,NYMAP
          DO I=1,NXMAP
             TOTALLUM=TOTALLUM+TXY(I,J)**4.d0
-c            TOTALTpracticalXY=TpracticalXYthin(i,j)**4.d0+
-c     $           TpracticalXYthick(i,j)**4.d0
-c            if(thick_part(i,j).gt.0) then
-c               TOTALpracticalLUM=TOTALpracticalLUM
-c     $              + Avis(thick_part(i,j))
-c     $              *TOTALTpracticalXY
-c            else
-c               TOTALpracticalLUM=TOTALpracticalLUM
-c     $              + HXMAP*HYMAP*TOTALTpracticalXY
-c            end if
+
 
             ! Attenuate the luminosity from the thick particles if
             ! there is otpically thin stuff in front of it.
@@ -55,11 +41,6 @@ c            end if
             TOTALpracticalLUM=TOTALpracticalLUM
      $           + TpracticalXYthick(I,J)**4.d0 * exp(-tauthin(i,j))
      $           + TpracticalXYthin(I,J)**4.d0
-
-            natalum=natalum+nataT(I,J)**4
-            sphlum=sphlum+sphT(I,J)**4
-            natalumhi=natalumhi+nataThi(I,J)**4
-            natalumlo=natalumlo+nataTlo(I,J)**4
 
             
             if(totalpracticallum.ne.totalpracticallum)then
@@ -171,18 +152,6 @@ c     $     TOTALpracticalLUM*sigma*4d0*HXMAP*HYMAP/3.839d33
       TOTALLUM=TOTALLUM*sigma*4d0*HXMAP*HYMAP/Lunit_out
       TOTALpracticalLUM=
      $     TOTALpracticalLUM*sigma*4d0*HXMAP*HYMAP/Lunit_out
-c      TOTALpracticalLUM=TOTALpracticalLUM*sigma
-
-      natalum=natalum*sigma*4d0*HXMAP*HYMAP
-      sphlum=sphlum*sigma*4d0*HXMAP*HYMAP
-      natalumhi=natalumhi*sigma*4d0*HXMAP*HYMAP
-      natalumlo=natalumlo*sigma*4d0*HXMAP*HYMAP
-      
-      
-c      WRITE (6,*) '    TXY_max=',real(TMAX),real(log10(TMAX))
-c      write (6,*) 'Total luminosity in enclosed area=',real(TOTALLUM)
-c      write (6,*) 'Total practical luminosity in enclosed area=',
-c     $     real(TOTALpracticalLUM)
 
       sigmat=(t2avg-tavg**2)**0.5d0
       if(cellcount.le.1) then

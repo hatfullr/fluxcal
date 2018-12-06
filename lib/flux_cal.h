@@ -156,8 +156,8 @@ c     slops for envelope fitting
       integer num_g, num_t, slop_type
       common /slops/ nabla, grid_gn, grid_tn, num_g, num_t, slop_type
 
-      logical dointatpos,dointatallpos
-      common/intatpos/ dointatpos,dointatallpos
+      logical printIntegrationSteps
+      common/intatpos/ printIntegrationSteps
 
       character*255 pinfo_file
       common/infofile/ pinfo_file

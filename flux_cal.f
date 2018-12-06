@@ -22,7 +22,7 @@
       write(89,230) "start","finish","step"
       write(89,231) start,finish,step
       write(89,*) ""
-      write(89,233) "filename","Time [days]","L [Lsun]","<T^4> [K^4]"
+      write(89,233) "filename","Time","L","<T^4>"
       write(89,233) "-------------------","--------------",
      $     "--------------","--------------"
       close(89)
@@ -33,12 +33,22 @@
          call setViewingAngle
          write(*,*) ""
 
+         call init_grid
+
 
 c        ****************************************************************
          if(get_fluxes) then
-            write(*,*) "Finding the fluxes at each grid point"
-            call optical_depth
-            write(*,*) "Writing to output file"
+            ! write(*,*) "Finding the fluxes at each grid point"
+!     call optical_depth
+            call integrateTau
+            call getFlux
+            call writeTempsFile
+            write(*,'(A,ES22.14)')' Total luminosity in enclosed area=',
+     $           TOTALpracticalLUM/Lunit_out
+            !write(*,'(A,ES22.14)')' Maximum Teff=',TMAX/tempunit_out
+            write(*,'(A,ES22.14)')' Average Teff=',avgt/numcell/
+     $           tempunit_out
+            write(*,*) "Writing to '",trim(adjustl(outfile)),"'"
             open(89,file=trim(adjustl(outfile)),action='write',
      $           position='append')
             write(89,232) trim(adjustl(infname)), t,
