@@ -22,7 +22,7 @@
       write(89,230) "start","finish","step"
       write(89,231) start,finish,step
       write(89,*) ""
-      write(89,233) "filename","Time [days]","L [Lsun]","<T^4> [K^4]"
+      write(89,233) "filename","Time","L","<T^4>"
       write(89,233) "-------------------","--------------",
      $     "--------------","--------------"
       close(89)
