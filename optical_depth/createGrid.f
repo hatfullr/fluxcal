@@ -3,6 +3,8 @@
 
       integer counter
       integer i,j
+      integer lastnumcell
+      character*10 reason
       
 cc     Find boundaries of the fluid:
 c      xmin=1d30
@@ -42,20 +44,22 @@ c      NXMAPnext=3
 c      NYMAPnext=3
 
  102  format(" ",A5," ",A15  ," ",A15  ," ",A5," ",A15  ," ",A15  ," ",
-     $     A5," ",A15  )
+     $     A5," ",A15," ",A10)
  103  format(" ",i5," ",ES15.7," ",ES15.7," ",i5," ",ES15.7," ",
-     $     ES15.7," ",i5," ",ES15.7)
-      write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny","L"
+     $     ES15.7," ",i5," ",ES15.7," ",A10)
+      write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny","<F>",
+     $     "reason"
       write(*,102) repeat("-",5), repeat("-",15), repeat("-",15),
      $     repeat("-",5), repeat("-",15), repeat("-",15),
-     $     repeat("-",5), repeat("-",15)
+     $     repeat("-",5), repeat("-",15), repeat("-",10)
       
       counter = 1
-
-
+      lastnumcell = int(1.d-30)
       
+      reason = "init"
+
  41   continue
-      
+
 c     nxmap and nymap are how many grid cells to use in the X and Y
 c     directions, respectively:
       nxmap=nxmapnext
@@ -72,14 +76,13 @@ c     Compute cell widths:
       hxmap=(xmaxmap-xminmap)/dble(nxmap-1)
       hymap=(ymaxmap-yminmap)/dble(nymap-1)
 
-
       ! These are the maximum and minimum cell positions that still
       ! contribute significantly to the total luminosity. Initializing
       !iminglow = nxmap+1
       !jminglow = nymap+1
       !imaxglow = 0
       !jmaxglow = 0
-      
+
       
       ! Setup the 3D integrating grid
       prepareIntegrationCalled = .false. ! Remake the grid
@@ -91,10 +94,10 @@ c     Compute cell widths:
       ! Determine the luminosity from the grid
       call getFlux
 
-      
-      write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $     yminmap/runit_out,hymap/runit_out,nymap,
-     $     TOTALpracticalLUM
+c      write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+c     $     yminmap/runit_out,hymap/runit_out,nymap,
+cc     $     TOTALpracticalLUM/Lunit_out
+c     $     TOTALflux/numcell,reason
       
       ! integrateTau determines the glowing cells. When we find an
       ! optical depth greater than tau_thick at a cell, we reset the min
@@ -102,16 +105,28 @@ c     Compute cell widths:
 
       deltai=IMAXGLOW-IMINGLOW
       deltaj=JMAXGLOW-JMINGLOW
+      reason = ""
       if( (deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy)) .or. 
      $     deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy)) .or.
-     $     abs(TOTALpracticalLUM-lastTOTALLUM).gt.
-     $     fracaccuracy*TOTALpracticalLUM)
+c     $     abs(TOTALpracticalLUM-lastTOTALLUM).gt.
+c     $     fracaccuracy*TOTALpracticalLUM)
+     $     abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
+     $     fracaccuracy*TOTALflux/numcell)
      $     .and.(nxmap.lt.nxmapmax .or. nymap.lt.nymapmax) ) then
 !     The code gets inside this if statement if not enough of the grid
 !     has "glowing" cells, or if the total luminosity is not in
 !     sufficient agreement with the total luminosity calculated from the
 !     previous grid size.
 c     print *,'no convergence yet...try again'
+
+         if(deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy))) then
+            reason = "Nx cells"
+         else if(deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy))) then
+            reason = "Ny cells"
+         else if(abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
+     $           fracaccuracy*TOTALflux/numcell) then
+            reason = "F cnvgnce"
+         end if
          
          ! In case there are two well-separated stars, don't start
          ! making smaller grids too quickly:
@@ -143,23 +158,35 @@ c     print *,'no convergence yet...try again'
             nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,nymapmax)
          endif
          
-         counter = counter + 1
          !lasttotallum = totallum ! Record for comparison
          lasttotallum = TOTALpracticalLUM
+         lasttotalflux = TOTALflux
+         lastnumcell = numcell
+
+         if(TOTALflux.eq.0) then
+            write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,
+     $           0.d0,"Finished  "
+            goto 42
+         else
+            write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,
+     $           TOTALflux/numcell,reason
+         end if
+
+         counter = counter+1
+         
          goto 41
       end if
 
-c 100  format(A19," = ",ES25.17e3,", ",ES25.17e3)
-c 101  format(A19," = ",I25,", ",I25)
-      write(*,*) ""
-      write(*,*) "Grid details:"
-      write(*,*) "   xminmap,xmaxmap = ",xminmap/runit_out,
-     $     xmaxmap/runit_out
-      write(*,*) "   yminmap,ymaxmap = ",yminmap/runit_out,
-     $     ymaxmap/runit_out
-      write(*,*) "   hxmap,hymap     = ",hxmap/runit_out,hymap/runit_out
-      write(*,*) "   nxmap,nymap     = ",nxmap,nymap
-      write(*,*) ""
+      if(TOTALflux.eq.0) then
+         write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,
+     $        0.d0,"Finished  "
+      else
+         write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,
+     $        TOTALflux/numcell,"Finished  "
+      end if
 
-
-      end subroutine
+ 42   end subroutine

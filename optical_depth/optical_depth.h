@@ -29,14 +29,15 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
 	
       REAL*8 TXY(NXMAPMAX,NYMAPMAX),TphotoXY(NXMAPMAX,NYMAPMAX),
      $     TthermXY(NXMAPMAX,NYMAPMAX),
-     $     TpracticalXYthin(NXMAPMAX,NYMAPMAX),
-     $	   TpracticalXYthick(NXMAPMAX,NYMAPMAX)
+     $     TOTALTpracticalXY(NXMAPMAX,NYMAPMAX)
       real*8 zmin(NXMAPMAX,NYMAPMAX),zmax(NXMAPMAX,NYMAPMAX),
      $     h1(NXMAPMAX,NYMAPMAX),zmax_thick(NXMAPMAX,NYMAPMAX)
+      real*8 zintpos(NXMAPMAX,NYMAPMAX)
+      common/zintegrationpos/ zintpos
       integer closest(NXMAPMAX,NYMAPMAX)
       common/close/ closest
       CHARACTER*33 FNAME,FNAME2,fname3,fname4
-      real*8 TOTALLUM,TOTALpracticalLUM
+      real*8 TOTALLUM,TOTALpracticalLUM,TOTALflux
       INTEGER kmax,kount,nbad,nok,nrhs,k
       COMMON /countrhs/nrhs
       integer KMAXX,NVARMAX,NVAR
@@ -53,9 +54,10 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
       common/localQuantities/ rhocgs,xh,t6,xhp,ucgs,gcgs,pcgs,tcgs
       real*8 sa,sb,smid
       real*8 xmin,xmax,ymin,ymax!,xymax
+      real*8 rmap
       real*8 xold,yold,zold
       integer iminglow,imaxglow,jminglow,jmaxglow
-      real*8 lastTOTALLUM
+      real*8 lastTOTALLUM,lasttotalflux
       real*8 xminmapnext,xmaxmapnext,yminmapnext,ymaxmapnext
       real*8 hxtmp,hytmp
       integer nxmapnext,nymapnext
@@ -94,7 +96,6 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
       parameter(maxtablesize=500)
       real*8 fluxdensityXY(NXMAPMAX,NYMAPMAX,numfiltersmax),
      $     totalfluxdensity(numfiltersmax),mag(numfiltersmax)
-      logical dimenFileAlreadyExists
       real*8 rold,phi
       real*8 eexponent,denominator !,coeff
       logical resolved
@@ -103,7 +104,8 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
       integer imin,imax,jmin,jmax,izmin,izmax,iz,index
       real*8 r2,wpc,zpos,zposmin,zposmax,hzmap
       common/densitygrid/xminmap,yminmap,zmin,zmax,
-     $     hxmap,hymap,rhoxyz,uxyz,hpxyz,xhxyz,gxyz,pxyz,txyz,zmax_thick
+     $     hxmap,hymap,rhoxyz,uxyz,hpxyz,xhxyz,gxyz,pxyz,txyz,
+     $     zmax_thick,rmap
       real*8 xhi,zz,zzz
       common/metals/zzz
 
@@ -111,6 +113,7 @@ c     Things Roger Hatfull added
       common/subroutine_setviewingAngle/anglex,angley,anglez
       common/subroutine_createGrid/lastTOTALLUM, NXMAPnext, NYMAPnext,
      $     fname, fname2
+      common/subroutine_createGrid2/lasttotalflux
       common/subroutine_useDimenFile/nxmap,nymap
 
       common/universal1/ xminmapnext, xmaxmapnext, yminmapnext,
@@ -119,8 +122,7 @@ c     Things Roger Hatfull added
      $     costhetamax,vzavg,vz2avg,nphotoavg,warning
       
       common/universal2/ goodtphoto4avg,goodccphoto,ccphoto
-      common/universal3/ h1,nok,nbad,TpracticalXYthick,
-     $     TpracticalXYthin,fluxdensityXY,
+      common/universal3/ h1,nok,nbad,fluxdensityXY,TOTALTpracticalXY,
      $     TphotoXY,ilogwavelength
       common/universal4/ logwavelength
       common/universal5/ spectrum, localvx,localvy,localvz,
@@ -128,10 +130,9 @@ c     Things Roger Hatfull added
      $     TXY, TOTALLUM,tavg,t2avg,t4avg,tphoto4avg,
      $     tpractical4avg,ttherm4avg,tphotoavg,tthermavg,
      $     totalfluxdensity,TMAX,TMIN,mag,VPCygni,area,areaphoto,
-     $     areatherm,sigmat,sigmar,sigmavz,sigmavr,konstant,
-     $     dimenFileAlreadyExists
+     $     areatherm,sigmat,sigmar,sigmavz,sigmavr,konstant
       common/universal6/ xmax,xmin,ymax,ymin,Tfit,ilambdamax
-      common/foroutput/ TOTALpracticalLUM
+      common/foroutput/ TOTALpracticalLUM,TOTALflux
 	
       real*8 taus(nmax)
       common/tauparts/ taus

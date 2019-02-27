@@ -20,7 +20,7 @@ c     already exists. If so, read from it. If not, throw an error.
          write(*,*) "Could not find dimen file '",
      $        trim(adjustl(dimenfname)),"'."
          write(*,*) "Try setting get_fluxes=.true."
-         error stop "useDimenFile.f line 23"
+         error stop "useDimenFile.f"
       end if
       
       write(*,*) "Reading pre-existing dimen file '" //

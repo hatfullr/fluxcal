@@ -1,0 +1,9 @@
+#!/bin/bash
+make -C ../../ clean
+
+if [ $? -eq 0 ]; then
+    make -C ../../
+    if [ $? -eq 0 ]; then
+	../../flux_cal
+    fi
+fi

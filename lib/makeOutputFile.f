@@ -3,9 +3,9 @@
 
       write(*,*) "Initializing '",trim(adjustl(filename)),"'"
       
- 101  format(14A22)
+ 101  format(15A22)
       open(10,file=trim(adjustl(filename)),status='replace')
       write(10,101) "x","y","z","m","h","rho","u","mu","g","T_SPH",
-     $     "Teff","P","tau","ID"
+     $     "Teff","P","opacity","tau","ID"
       close(10)
       end subroutine

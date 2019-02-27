@@ -4,7 +4,7 @@
       real*8 myx,myy,myz
       real*8 realiz
       integer ix,iy
-      
+
       zz=metallicity
 
       ix=(myx-xminmap)/hxmap+1.5d0
@@ -13,17 +13,21 @@
 
       realiz=(myz-zmin(ix,iy))/hzmap+1.d0
       iz=realiz
+c      write(*,*) "hzmap = ",hzmap
       if(iz.eq.nzmap) then
          iz=nzmap-1
       else if(iz.eq.0) then
          iz=1
       end if
 
-     
-      
+c      if(iy.gt.60 .and. innit.eq.5) then
+c         write(*,*) ix,iy,iz, realiz
+c         write(*,*) hzmap, nzmap, zmax(ix,iy),zmin(ix,iy)
+c      end if
+c      write(*,*) "I am here"
       if((rhoxyz(ix,iy,iz+1).le.0.d0).or.
      $     (rhoxyz(ix,iy,iz).le.0.d0)) then ! One or both cells are empty
-c        Find a precise value for boundary cases
+c        Find a more precise value for boundary cases
 
          rhocgs = 0.d0
          ucgs = 0.d0
@@ -41,6 +45,7 @@ c        Find a precise value for boundary cases
             ! This case is so negligible that it realy isn't worth
             ! coding in. Our grid spacing is small enough to ignore cases
             ! like this.
+c            write(*,*) "I finished in spot"
             return
          else if((rhoxyz(ix,iy,iz).le.0.d0).and.
      $           (rhoxyz(ix,iy,iz+1).gt.0.d0)) then !Only behind is empty
@@ -69,7 +74,7 @@ c        Find a precise value for boundary cases
             end if
          end if
       else
-c        Take a weighted average between the two nearest grid cells
+c     Take a weighted average between the two nearest grid cells
          rhocgs=rhoxyz(ix,iy,iz)*(iz+1-realiz)
      $        +rhoxyz(ix,iy,iz+1)*(realiz-iz)
          xhp=hpxyz(ix,iy,iz)*(iz+1-realiz)
@@ -124,5 +129,6 @@ c        Take a weighted average between the two nearest grid cells
 c         stop
       end if
 
+c      write(*,*) "I finished"
       return
       end

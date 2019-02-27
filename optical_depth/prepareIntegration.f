@@ -3,7 +3,6 @@ c     L346 to L468
       include 'optical_depth.h'
 
       real*8 zmmax
-      real*8 opacit
 
       integer count, i,j
 
@@ -40,10 +39,10 @@ c     L346 to L468
       end if
 
 c     Find limits of integration:
-      count=0
+c      count=0
       DO J=1,NYMAP
          DO I=1,NXMAP
-            count = count+1
+c            count = count+1
             zmin(i,j)=1d30
             zmax(i,j)=-1d30
             zmax_thick(i,j)=-1d30
@@ -80,7 +79,9 @@ c                        count=count+1
 c                        closest(count) = IP
 c                     end if
                      zmax(i,j)=max(zmax(i,j),Z(IP)+maxdz)
-                     if(tauA(ip) .gt. tau_thick) then
+                     if(Teff(ip).gt.0.d0) then
+c                     if(envfit.and.
+c     $                    (tauA(ip) .gt. tau_thick_envfit)) then
                         if((Z(IP)+maxdz).gt.zmax_thick(i,j)) then
                            zmax_thick(i,j) = Z(IP)+maxdz
                            thick_part(i,j) = ip
@@ -106,7 +107,7 @@ c     Find 3d density grid for quick look-up later
                gxyz(i,j,k)=0.   ! local gravitational acceleration
                pxyz(i,j,k)=0.   ! pressure
                txyz(i,j,k)=0.   ! temperature
-               last_part(i,j,k)=0 ! Last particle touched
+               last_part(i,j,k)=0 ! Last particle interacted with
             enddo
          enddo
       enddo

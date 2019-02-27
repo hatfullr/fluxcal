@@ -8,13 +8,12 @@
       real*8 ta,tb,rprimex,rprimey,deltax,deltay,
      $     arcx,arcy
 
-      real*8 opacit
-
       real*8 zstop
-      real*8 TOTALTpracticalXY
       character*255 myfname
+      real*8 TpracticalXYthin,TpracticalXYthick
+      integer nan
 
-
+      nan = 0
       ! Set the visible surface areas of each particle to zero
       do ip=1,nmax
          Avis(ip)=0.d0
@@ -26,6 +25,8 @@
             nataT(I,J) = 0.d0
             sphT(I,J) = 0.d0
             tauthin(i,j) = 0.d0
+            TOTALTpracticalXY(i,j) = 0.d0
+            zintpos(i,j) = -1.d30
          end do
       end do
 
@@ -36,25 +37,36 @@
       counter3=0
       avgrpos=0.d0
       avgxhp=0.d0
-      if(dimenFileAlreadyExists) then
-         write(*,*) "Integrating through each point on the driving grid"
-      end if
-
+c      if(dimenFileAlreadyExists) then
+c         write(*,*) "Integrating through each point on the driving grid"
+c      end if
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
             YPOS=(J-1)*HYMAP+YMINMAP ! y-coordinate of line of sight
-            TpracticalXYthin(I,J)=0.d0
-            TpracticalXYthick(I,J)=0.d0
-            
+            TpracticalXYthin=0.d0
+            TpracticalXYthick=0.d0
+
             if(zmin(i,j).lt.1d30)then
 
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
-     $              TpracticalXYthin(i,j),TpracticalXYthick(i,j),
-     $              tauthin(i,j))
-               TOTALTpracticalXY=TpracticalXYthin(i,j)+
-     $              TpracticalXYthick(i,j)
+     $              TpracticalXYthin,TpracticalXYthick,
+     $              tauthin(i,j),zintpos(i,j))
+
+               TOTALTpracticalXY(i,j) = TpracticalXYthin +
+     $              TpracticalXYthick
+               
+c               if(TpracticalXYthin.gt.0)then
+c                  ! Optically thick region made by thin particles
+c                  TOTALTpracticalXY(i,j)=TpracticalXYthin
+c               else if(TpracticalXYthick.gt.0) then
+c                  ! Thick particle w/ no thick region in front
+c                  TOTALTpracticalXY(i,j)=TpracticalXYthick
+c               else
+c                  ! Optically thin everywhere
+c                  TOTALTpracticalXY(i,j)=0.d0
+c               end if
 
 c               if(tauthin(i,j).gt.0.d0) then
 c                  write(*,*) "Optically thin material at ",i,j,xpos,ypos
@@ -113,8 +125,8 @@ c     $                 arcx*arcy
                   end if
                end if
                
-               if(TOTALTpracticalXY.gt.0.d0) then ! There is detectable gas here
-                  avgt = avgt + TOTALTpracticalXY
+               if(TOTALTpracticalXY(i,j).gt.0.d0) then ! There is detectable gas here
+                  avgt = avgt + TOTALTpracticalXY(i,j)
                   numcell = numcell + 1
 c     Flux density here will be the thin stuff + the thick stuff
 c                  
@@ -139,9 +151,10 @@ c     optically thin material
                   ! If there is a photosphere:
                   ! If thick_part(i,j) > 0,
                   ! OR if tauthin >= tau_thick
-c     if(TpracticalXYthick(I,J).gt.0.d0) then !"detectable photopshere"
-                  if((thick_part(i,j) .gt. 0) .or.
-     $                 (tauthin(i,j) .ge. tau_thick)) then ! "detectable photosphere"
+                  if(TOTALTpracticalXY(I,J).gt.0.d0) then !"detectable photopshere"
+c                  if((envfit.and.(thick_part(i,j) .gt. 0)) .or. ! envfit is turned on and thick particle
+c     $                 (tauthin(i,j) .ge. tau_thick_integrator).or.
+c     $                 (tauthin(i,j) .ge. tau_thick_envfit)) then   ! "detectable photosphere"
 c                     write(*,*) thick_part(i,j), tauthin, tau_thick
                      
                      if(I.lt.IMINGLOW) IMINGLOW=I
@@ -151,7 +164,7 @@ c                     write(*,*) thick_part(i,j), tauthin, tau_thick
                     
                      
                      ccphoto=ccphoto+1
-                     TphotoXY(I,J) = TOTALTpracticalXY
+                     TphotoXY(I,J) = TOTALTpracticalXY(i,j)
 
                      ! This part of the code may not work because the main part of the code
                      ! that drove this has been removed.
@@ -215,8 +228,7 @@ c     wavelength is in centimeters
 
                   
             else
-               TpracticalXYthick(I,J)=0.d0
-               TpracticalXYthin(I,J)=0.d0
+               TOTALTpracticalXY(i,j)=0.d0
                do ifilter=1,numfilters
                   fluxdensityXY(I,J,ifilter)=0d0
                enddo
@@ -228,5 +240,4 @@ c     wavelength is in centimeters
          end do
       end do
 
-      
       end subroutine

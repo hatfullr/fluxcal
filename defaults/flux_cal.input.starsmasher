@@ -25,6 +25,9 @@
       !### Runtime options
       ! Calculate the flux at each grid cell and record the data.
       get_fluxes=.false.
+
+      ! Calculate the true luminosity
+      get_true_luminosity=.false.
       
       ! Set this to true to create a data file containing all the
       ! particles whose surfaces are closest to the observer  along each

@@ -30,29 +30,32 @@ lib_obj = $(llib)/usekappatable.o      \
           $(llib)/quicksort.o          \
           $(llib)/makeOutputFile.o     \
           $(llib)/output.o             \
+          $(llib)/getLocalAngle.o      \
 
 # Math objects
-math_obj = $(mathlib)/odeint.o \
-           $(mathlib)/rkck.o   \
-           $(mathlib)/rkqs.o   \
+math_obj = $(mathlib)/odeint.o        \
+           $(mathlib)/rkck.o          \
+           $(mathlib)/rkqs.o          \
+           $(mathlib)/fourPointArea.o \
 
 # Optical depth objects
-opdep_obj = $(opdeplib)/optical_depth.o        \
-            $(opdeplib)/createGrid.o           \
-            $(opdeplib)/getFlux.o              \
-            $(opdeplib)/prepareIntegration.o   \
-            $(opdeplib)/integrateTau.o         \
-            $(opdeplib)/peakWavelengths.o      \
-            $(opdeplib)/setViewingAngle.o      \
-            $(opdeplib)/useDimenFile.o         \
-            $(opdeplib)/writeDimenFile.o       \
-            $(opdeplib)/particlesAtPos.o       \
-            $(opdeplib)/integrationAtPos.o     \
-            $(opdeplib)/getTpractical.o        \
-            $(opdeplib)/getClosestParticles.o  \
-            $(opdeplib)/integrationAtAllPos.o  \
-            $(opdeplib)/writeTempsFile.o       \
-            $(opdeplib)/init_grid.o            \
+opdep_obj = $(opdeplib)/optical_depth.o            \
+            $(opdeplib)/createGrid.o               \
+            $(opdeplib)/getFlux.o                  \
+            $(opdeplib)/prepareIntegration.o       \
+            $(opdeplib)/integrateTau.o             \
+            $(opdeplib)/peakWavelengths.o          \
+            $(opdeplib)/setViewingAngle.o          \
+            $(opdeplib)/useDimenFile.o             \
+            $(opdeplib)/writeDimenFile.o           \
+            $(opdeplib)/particlesAtPos.o           \
+            $(opdeplib)/integrationAtPos.o         \
+            $(opdeplib)/getTpractical.o            \
+            $(opdeplib)/getClosestParticles.o      \
+            $(opdeplib)/integrationAtAllPos.o      \
+            $(opdeplib)/writeTempsFile.o           \
+            $(opdeplib)/init_grid.o                \
+	    $(opdeplib)/integrateSpherical.o	   \
 
 # find_teff objects
 findTeff_obj = $(findTefflib)/get_slop.o                \

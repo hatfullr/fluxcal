@@ -30,8 +30,8 @@
 
       real*8 zmaxx(nxmapmax,nymapmax)
       
-      call createGrid
-      call useDimenFile
+c      call createGrid
+c      call useDimenFile
 c      call prepareIntegration
 
       count=0
@@ -117,13 +117,16 @@ c     Reverse the order
          surfaces(i) = holder2(m-i+1)
       end do
       
+
+ 35   format ('closest',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
+ 36   format ('closest',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
       
-      if(innit.le.9999) then
-         write(filename,"('closest_particles_',i4.4,'.dat')") innit
-      else if(innit.le.99999) then
-         write(filename,"('closest_particles_',i5.5,'.dat')") innit
+      if(innit.le.99999) then
+         write (filename,35) innit,nint(anglez*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
       else
-         write(filename,"('closest_particles_',i6.6,'.dat')") innit
+         write (fname2,36) innit,nint(anglez*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
       end if
 
       call makeOutputFile(filename)

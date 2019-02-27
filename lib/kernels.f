@@ -13,7 +13,7 @@ c     compute tabulations of w(u):
          if(u.lt.0 .or. u.gt.2.d0) then
             write(*,*) "u=r/h is out of range"
             write(*,*) "u=",u
-            error stop "kernels.f line 14"
+            error stop "kernels.f"
          endif
 
          if (nkernel.eq.0) then
@@ -38,7 +38,7 @@ c     Wendland C4 kernel
          rlow=rhigh
       enddo
       taucoef=taucoef/ctab**0.5d0 !  where ctab=dble(ntab-1)/4.d0
-      
+
       return
       end
 

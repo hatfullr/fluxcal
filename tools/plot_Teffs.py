@@ -15,7 +15,7 @@ files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):
         if ((i[:5] != "teffs") or (i[-4:] != ".dat")):
-            print "ERROR: You must provide fluxes files from flux_cal output."
+            print "ERROR: You must provide teffs files from FluxCal output."
             print "Error on file",i
             sys.exit()
         files.append(i)
@@ -26,7 +26,7 @@ if user_input == "y":
 elif user_input == "n":
     adaptivelimits = False
 else:
-    "ERROR: Please respond with 'y' or 'n'."
+    print "ERROR: Please respond with 'y' or 'n'."
     sys.exit()
 
 user_input = raw_input("Paper friendly? (y/n): ")
@@ -272,7 +272,9 @@ for datafile in files:
             
         #Tmax = min(np.amax(data[np.isfinite(data)]),vmax)
         #Tmin = max(np.amin(data[np.isfinite(data)]),vmin)
+        im = plt.imshow([[0],[0]],cmap=my_cm)
         plt.clim(Tmin,Tmax)
+        ax.clear()
         
     else:
         ax.set_xlim(xminn,xmaxx)
@@ -289,7 +291,7 @@ for datafile in files:
     # Plot the data
     #data = np.flip(data,0)
     im = ax.imshow(data,cmap=my_cm,vmin=Tmin,vmax=Tmax,
-                    aspect='equal',extent=(xmin,xmax,ymin,ymax))
+                    aspect='equal',extent=(xmin,xmax,ymin,ymax),norm=norm)
         
     # Re-plot the axis labels
 
