@@ -37,7 +37,7 @@ You can find a premade input file to test with in <fluxcal-directory>/test/stand
 
 
 
-# Testing
+# Troubleshooting
 
 When running the "standard_check" test, you may get files that differ
 from the original. This could be due to a difference in precision, which
