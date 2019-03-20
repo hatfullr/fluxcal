@@ -35,7 +35,7 @@ You can find a premade input file to test with in `<fluxcal-directory>/test/stan
 
 # Troubleshooting
 
-## Failing Compilation
+## Failing compilation on install
 
 There is a known bug with `gfortran` version 7.3.0 in that compilation will
 fail upon trying to build `mathlib/odeint.o`. The error appears as,
@@ -54,13 +54,16 @@ make: *** [mathlib/odeint.o] Error 1
 
 Failed
 ```
-If you encounter this error, try compiling again. It may fail several times
-before finally succeeding, and may take 10 or more attempts. Hopefully this
-error disappears with future `gfortran` releases. We do not recommend
-downgrading your GNU compiler suite, as this is generally harmful.
+If you encounter this error, try compiling again,
+```
+./install
+```
+This may fail up to 10 times before finally succeeding. Hopefully this error
+disappears with future `gfortran` releases. We do not recommend downgrading
+your GNU compiler suite, as this is generally harmful.
 
 
-## Failing standard_check Test
+## Failing standard_check test
 
 When running the "standard_check" test, you may get files that differ
 from the original. This could be due to a difference in precision, which
