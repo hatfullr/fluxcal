@@ -1,4 +1,6 @@
-# Installation
+# Using FluxCal
+
+## Installation
 
 To install FluxCal, run the following commands from the terminal
 ```
@@ -11,8 +13,7 @@ and perform a test to ensure file integrity. If you run into issues here,
 a solution may be available in the "Troubleshooting" section below.
 
 
-
-# Using FluxCal
+## Running FluxCal
 
 To run FluxCal, try the following
 ```
