@@ -23,7 +23,7 @@ with
 ```
 ./flux_cal
 ```
-You can find a premade input file to test with in `<fluxcal-directory>/test/standard_check/test/fluxcal_0000.dat`.
+You can find a premade input file to test with in `<fluxcal-directory>/test/standard_check/original/fluxcal_0000.dat`. Do not move this file.
 
 
 
