@@ -10,7 +10,7 @@ cd fluxcal
 
 # Using FluxCal
 
-To run FluxCal, try the following:
+To run FluxCal, try the following
 ```
 mkdir fluxcaltest
 cd fluxcaltest
@@ -34,6 +34,7 @@ When running the "standard_check" test, you may get files that differ
 from the original. This could be due to a difference in precision, which
 is controlled by the compiler. Check to make sure you have the same
 version compiler installed when running the test. The version of GNU
-Fortran used to run the "original" directory can be found in the file
-"GNUFortran.txt" there.
+Fortran used to run the original test is located at
+`<fluxcal-directory>/test/standard_check/original/GNUFortran.txt`.
+
 
