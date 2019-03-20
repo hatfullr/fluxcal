@@ -7,14 +7,14 @@
 curdir=$(pwd)
 
 \cd test
-echo "Running test in 'test' directory"
+echo "Running 'test/standard_check/run_test'"
 ./run
 if [ $? -ne 0 ]; then
     exit 1
 fi
 \cd ..
 echo "Test complete"
-echo "Checking for differences between test and original"
+echo "Checking for differences between test/standard_check/test and test/standard_test/original"
 ./check
 echo "Done"
 
