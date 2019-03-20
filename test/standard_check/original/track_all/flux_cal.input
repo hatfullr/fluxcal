@@ -58,7 +58,7 @@
       track_particles=.true.
       track_all=.true.
       trackfile='fluxcal.particles'
-      binary_tracking_file=.false.
+      binary_tracking_file=.true.
 
       ! Get the information of one particle printed to the standard
       ! output
