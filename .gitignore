@@ -2,5 +2,12 @@
 **/*.orig
 **/*~
 **/*#
-defaults/flux_cal.input.Roger
+defaults/filters.dat
+defaults/kP_h2001.dat
+defaults/kR_h2001.dat
+defaults/lowT_fa05_gs98_z0.02_x0.7.data
+defaults/sph.eos
+defaults/sph.opacities_ferguson_yes_grains_and_molecules
+defaults/sph.opacities_yes_grains_and_molecules_ncooling2
+defaults/table_nabla.dat
 flux_cal

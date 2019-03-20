@@ -54,7 +54,11 @@ c     xpos=posx and ypos=posy in its calculations.
 c      write(intout,801) posx/runit_out, posy/runit_out
 c      write(intout,802)"z","h","rho","u","g","mu","P","T","kappa","tau",
 c     $     "particle"
-
+ 101  format(13A22)
+      write(intout,101) "posx","posy","posz","<h>","<rho>",
+     $     "<u>","<mu>","<g>","<T_SPH>","<P>","opacity","sumtau",
+     $     "lastpart"
+      
       printIntegrationSteps=.true.
       call integrateTau
       printIntegrationSteps=.false.

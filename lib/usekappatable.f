@@ -17,7 +17,7 @@
 c      inquire(file=opacityfile,exist=fileexists)
 c      if(.not.fileexists) then
 c         write(*,*) "Opacity file not found"
-c         error stop "usekappatable.f line 18"
+c         error stop "usekappatable.f"
 c      end if
       write(*,*) "Reading opacity file"
       open (43,file=trim(adjustl(filename)))
@@ -70,7 +70,7 @@ c      end if
 c      inquire(file=opacitydustfile,exist=fileexists)
 c      if(.not.fileexists) then
 c         write(*,*) "Opacity file for dust not found"
-c         error stop "usekappatable.f line 70"
+c         error stop "usekappatable.f"
 c      end if
       write(*,*) "Reading opacity file for dust"
       open (44,file=trim(adjustl(filename)))

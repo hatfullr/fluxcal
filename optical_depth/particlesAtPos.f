@@ -48,7 +48,7 @@
       end if
       call makeOutputFile(filename)
       do i=1,nid
-         call output(filename,pid(i))
+         call output(filename,pid(i),.false.)
       end do
       
       return

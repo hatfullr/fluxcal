@@ -19,7 +19,6 @@
       write(*,*)"|   Roger Hatfull      [University of Alberta]      | "
       write(*,*)"|   Natasha Ivanova    [University of Alberta]      | "
       write(*,*)"|   James C. Lombardi  [Allegheny College]          | "
-c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       write(*,*)"|                                                   | "
       write(*,*)"|  This program comes with ABSOLUTELY NO WARRANTY.  | "
       write(*,*)"|  This is free software, and you are welcome to    | "
@@ -28,7 +27,7 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       write(*,*)"|  https://www.gnu.org/licenses                     | "
       write(*,*)"\___________________________________________________/ "
       write(*,*)"|                   |                                 "
-      write(*,*)"|   Version 0.0.1   |                                 "
+      write(*,*)"|   Version 1.0.0   |                                 "
       write(*,*)"\___________________/                                 "
       write(*,*)"                                                      "
 
@@ -60,7 +59,10 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       
       !### Runtime options
       ! Calculate the flux at each grid cell and record the data.
-      get_fluxes=.true.
+      get_fluxes=.false.
+
+      ! Calculate the true luminosity
+      get_true_luminosity=.false.
       
       ! Set this to true to create a data file containing all the
       ! particles whose surfaces are closest to the observer  along each
@@ -70,8 +72,7 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       get_closest_particles=.false.
 
       ! Finds all the particles the ray-tracer comes in contact with at
-      ! posx, posy. Make sure this is in the same units as the rest of
-      ! your input data.
+      ! posx, posy. Units must be in cgs.
       get_particles_at_pos=.false.
       posx=0.d0
       posy=0.d0
@@ -91,7 +92,10 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       ! the resulting output file should be in binary format or in
       ! human readable format by setting 'binary_tracking_file' to
       ! '.true.' or '.false.', respectively.
+      ! 'track_all' set to '.true.' tracks all particles without reading
+      ! the trackfile.
       track_particles=.false.
+      track_all=.false.
       trackfile='fluxcal.particles'
       binary_tracking_file=.false.
 
@@ -133,13 +137,21 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       ! get_fluxes and get_integration_at_pos.
       taulimit=1.d0
 
+      ! Optical depth by which the integrator will detect that a region
+      ! is optically thick.
+      tau_thick_integrator=1.d0
+
+      ! The value of optical depth that a particle must exceed to be
+      ! handled by the envelope fitting routine. 1.d1 by default.
+      tau_thick_envfit=1.d1
+      
       ! Optical depth value that signifies optically thick material. If
       ! the integrator finds a region where tau is equal to this value,
       ! it will tell flux_cal to use the envelope fitting routine.
       ! Otherwise, flux_cal will use the SPH temperature. Set to 10.d0 by
       ! default, because the envelope fitting routine works mostly for
-      ! tau > 10.
-      tau_thick=1.d1
+      ! tau > 10. (LEGACY)
+      tau_thick=-1.d30
       
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
@@ -173,17 +185,19 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       ! you desire the output units to be in. Internal (cgs) values will
       ! be divided by these to produce your output.
       ! These values are affected by the flux_cal.baseunits file.
-      runit_out=1.d0
-      munit_out=1.d0
-      tunit_out=1.d0
-      vunit_out=1.d0
-      Eunit_out=1.d0
-      rhounit_out=1.d0
-      muunit_out=1.d0
-      gunit_out=1.d0
-      tempunit_out=1.d0
-      punit_out=1.d0
-      Lunit_out=1.d0
+      runit_out=1.d0            ! distance
+      munit_out=1.d0            ! mass
+      tunit_out=1.d0            ! time
+      vunit_out=1.d0            ! velocity
+      Eunit_out=1.d0            ! energy
+      rhounit_out=1.d0          ! density
+      muunit_out=1.d0           ! mean molecular weight
+      gunit_out=1.d0            ! gravitational acceleration
+      tempunit_out=1.d0         ! temperature
+      punit_out=1.d0            ! pressure
+      Lunit_out=1.d0            ! luminosity
+      kunit_out=1.d0            ! opacity
+      sunit_out=1.d0            ! specific entropy
       
       
       
@@ -254,8 +268,14 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
          close(44)
       else
          write(*,*) "No 'flux_cal.input' file found."
-         error stop "init.f line 241"
+         error stop "init.f"
       end if
+
+      if(tau_thick.ne.-1.d30) then
+         tau_thick_integrator = taulimit
+         tau_thick_envfit = tau_thick
+      end if
+      
       
       ! Base units (cgs). These are 
       gram=1.d0
@@ -326,21 +346,23 @@ c      write(*,*)"|   Jose Nandez        [Uni. of West. Ontario]      | "
       gunit_out=gunit_out*cm/sec**2.d0
       tempunit_out=tempunit_out*kelvin
       Lunit_out=Lunit_out*gram*cm**2.d0/sec**2.d0
+      kunit_out=kunit_out*cm**2.d0/gram
+      sunit_out=sunit_out*cm**2.d0/sec**2.d0/kelvin
 
       
  97   format(A7," = ",I6,"   ",A10," = ",g10.4)
  98   format(A10," = ",I10,"   ",A10," = ",I10)
  99   format(A13," = ",E10.4,"   ",A11," = ",E10.4)
- 999  format(A10," = ",E10.4)
- 100  format(A13," = ",E10.4)
- 101  format(A13," = ",I10)
+ 999  format(A13," = ",E10.4)
+ 100  format(A21," = ",E10.4)
+ 101  format(A21," = ",I10)
  102  format(A27," = ",L1)
  103  format(A16," = '",A,"'")
  104  format("   ",A," = ",L1)
  105  format("   ",A," = ",E10.4)
  106  format("   ",A," = '",A,"'")
  107  format("   ",A," = ",I8)
- 108  format(A13," = ",L1)
+ 108  format(A21," = ",L10)
  109  format(A13," = '",A,"'")
 
 c     Write everything to the terminal
@@ -353,17 +375,18 @@ c     Write everything to the terminal
       write(*,99) "crad  ",crad  ,"planck     ",planck
       write(*,99) "sigma ",sigma
       write(*,*) ""
-      write(*,99) "runit ",runit ,"munit      ",munit
-      write(*,99) "tunit ",tunit ,"vunit      ",vunit
-      write(*,99) "Eunit ",Eunit ,"rhounit    ",rhounit
-      write(*,99) "muunit",muunit,"gunit      ",gunit
+      write(*,99) "runit       ",runit       ,"munit      ",munit
+      write(*,99) "tunit       ",tunit       ,"vunit      ",vunit
+      write(*,99) "Eunit       ",Eunit       ,"rhounit    ",rhounit
+      write(*,99) "muunit      ",muunit      ,"gunit      ",gunit
       write(*,*) ""
       write(*,99) "runit_out   ",runit_out   ,"munit_out  ",munit_out
       write(*,99) "tunit_out   ",tunit_out   ,"vunit_out  ",vunit_out
       write(*,99) "Eunit_out   ",Eunit_out   ,"rhounit_out",rhounit_out
       write(*,99) "muunit_out  ",muunit_out  ,"gunit_out  ",gunit_out
       write(*,99) "tempunit_out",tempunit_out,"punit_out  ",punit_out
-      write(*,99) "Lunit_out   ",Lunit_out
+      write(*,99) "Lunit_out   ",Lunit_out   ,"kunit_out  ",kunit_out
+      write(*,999)"sunit_out   ",sunit_out
       write(*,*) ""
       
       write(*,97) "start ",start ,"anglexdeg",anglexdeg
@@ -373,23 +396,25 @@ c     Write everything to the terminal
       write(*,109) "flux_cal_dir",trim(adjustl(flux_cal_dir))
       
       write(*,*) ""
-      write(*,101) "nkernel     ",nkernel
-      write(*,100) "yscalconst  ",yscalconst
-      write(*,100) "fracaccuracy",fracaccuracy
-      write(*,100) "step1       ",step1
-      write(*,100) "step2       ",step2
-      write(*,100) "step3       ",step3
-      write(*,100) "step4       ",step4
-      write(*,100) "taulimit    ",taulimit
-      write(*,100) "tau_thick   ",tau_thick
-      write(*,108) "envfit      ",envfit
+      write(*,101) "nkernel             ",nkernel
+      write(*,100) "yscalconst          ",yscalconst
+      write(*,100) "fracaccuracy        ",fracaccuracy
+      write(*,100) "step1               ",step1
+      write(*,100) "step2               ",step2
+      write(*,100) "step3               ",step3
+      write(*,100) "step4               ",step4
+      write(*,100) "taulimit            ",taulimit
+      write(*,100) "tau_thick_integrator",tau_thick_integrator
+      write(*,100) "tau_thick_envfit    ",tau_thick_envfit
+      write(*,108) "envfit              ",envfit
       write(*,*) ""
 c      write(*,102) "rossonly    ",rossonly
-      write(*,100) "metallicity ",metallicity
-      write(*,100) "Rform       ",Rform
+      write(*,100) "metallicity         ",metallicity
+      write(*,100) "Rform               ",Rform
       
       write(*,*) ""
       write(*,102) "get_fluxes                ",get_fluxes
+      write(*,102) "get_true_luminosity       ",get_true_luminosity
       write(*,102) "get_particles_at_pos      ",get_particles_at_pos
       write(*,102) "get_integration_at_pos    ",get_integration_at_pos
       write(*,102) "get_integration_at_all_pos",
@@ -404,6 +429,7 @@ c      write(*,102) "rossonly    ",rossonly
       write(*,102) "track_particles           ",track_particles
       
       if(track_particles) then
+         write(*,104) "track_all           ",track_all
          write(*,104) "binary_tracking_file",binary_tracking_file
          write(*,106) "trackfile           ",trim(adjustl(trackfile))
       end if
@@ -423,22 +449,69 @@ c      write(*,102) "rossonly    ",rossonly
       write(*,103) "outfile        ",trim(adjustl(outfile))
       write(*,*) ""
 
+
+c     Catch some runtime errors
+      if(tau_thick_integrator .gt. taulimit) then
+         write(*,*) "tau_thick_integrator > taulimit, integrator "//
+     $        "will always stop before reaching"
+         write(*,*) "optically thick material."
+         error stop "init.f"
+      end if
+
+      if((tau_thick_integrator .gt. tau_thick_envfit).and.
+     $     (envfit)) then
+         write(*,*) "tau_thick_integrator > tau_thick_envfit."
+         write(*,*) "Integrator will not return physical values."
+         error stop "init.f"
+      end if
+      
+      if((.not.envfit).and.(taulimit.lt.tau_thick).and.
+     $     (tau_thick.ne.-1.d30)) then ! LEGACY
+         write(*,*) "envfit is off and taulimit < tau_thick."
+         write(*,*) "Integration stops before reaching optically "//
+     $        "thick material always."
+         error stop "init.f"
+      end if
+      
+      if ((start.gt.finish).and.(step.gt.0)) then
+         write(*,*) "Must have start < finish when step > 0."
+         write(*,*) "start=",start,"finish=",finish
+         error stop "init.f"
+      end if
+      if ((start.lt.finish).and.(step.lt.0)) then
+         write(*,*) "Must have start > finish when step < 0."
+         write(*,*) "start=",start,"finish=",finish
+         error stop "init.f"
+      end if
+
+      if(start.lt.0) then
+         write(*,*) "Starting file index must be > 0."
+         write(*,*) "start=",start
+         error stop "init.f"
+      end if
+
+      if((step.eq.0).or.(start.eq.finish)) then
+         finish=start
+         step=1
+      end if
+
+      
       ! Check for conflicting flags
 c      if(get_integration_at_pos .and. get_fluxes) then
 c         write(*,*) "Do not use get_integration_at_pos and get_fluxes"
 c         write(*,*) "at the same time."
-c         error stop "init.f line 410"
+c         error stop "init.f"
 c      end if
       
 c      if(get_integration_at_all_pos.and..not.get_fluxes) then
 c         write(*,*) "get_integration_at_all_pos should not be called"
 c         write(*,*) "without setting get_fluxes to .true."
-c         error stop "init.f line 409"
+c         error stop "init.f"
 c      end if
 
 c      if(get_integration_at_all_pos.and.get_integration_at_pos) then
 c         write(*,*) "Do not use both of these at the same time."
-c         error stop "init.f line 415"
+c         error stop "init.f"
 c      end if
 
       
@@ -450,7 +523,7 @@ c      end if
       if(.not. fileexists) then
          write(*,*) "Could not find EOS file '",
      $        trim(adjustl(eosfile)),"' in flux_cal_dir/defaults."
-         error stop "init.f line 427"
+         error stop "init.f"
       end if
       call readineostable(inputfile)
 
@@ -464,7 +537,7 @@ c      end if
      $        trim(adjustl(opacityfile)),"'"
          write(*,*) "in flux_cal_dir/defaults. Make sure flux_cal_dir"
          write(*,*)"is correct, and if flux_cal was properly installed."
-         error stop "init.f line 441"
+         error stop "init.f"
       end if
       
       call readinkappatable(inputfile)
@@ -492,7 +565,7 @@ c      end if
          write(*,*)"Could not find 'kR_h2001.dat' in"
          write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
          write(*,*)"correct, and if flux_cal was properly installed."
-         error stop "init.f line 469"
+         error stop "init.f"
       end if
       
       write(file2,200) trim(adjustl(flux_cal_dir)),"kP_h2001.dat"
@@ -501,7 +574,7 @@ c      end if
          write(*,*)"Could not find 'kP_h2001.dat' in"
          write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
          write(*,*)"correct, and if flux_cal was properly installed."
-         error stop "init.f line 478"
+         error stop "init.f"
       end if
       
       ! cold T opacities initialization
@@ -517,7 +590,7 @@ c      end if
      $           "' in"
             write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
             write(*,*)"correct, and if flux_cal was properly installed."
-            error stop "init.f line 491"
+            error stop "init.f"
          end if
          
          call ini_opacity_photospehre_lowT(inputfile)
@@ -531,7 +604,7 @@ c      end if
      $           "' in"
             write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
             write(*,*)"correct, and if flux_cal was properly installed."
-            error stop "init.f line 503"
+            error stop "init.f"
          end if
       
          call ini_slops(inputfile)
@@ -545,7 +618,7 @@ c     Check to see if the filtersfile exists and read it if it does
          write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' in"
          write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
          write(*,*) "correct, and if flux_cal was properly installed."
-         error stop "init.f line 516"
+         error stop "init.f"
       end if
       
       write(*,*) "Reading filtersfile"
@@ -560,44 +633,14 @@ c     Check to see if the filtersfile exists and read it if it does
 
       
       if(track_particles) then
-         inquire(file=trim(adjustl(trackfile)),exist=fileexists)
-         if(.not.fileexists) then
-            write(*,*) "Could not find trackfile '",
-     $           trim(adjustl(trackfile)),"'."
-            error stop "init.f line 535"
-         end if
-         
-         write(*,*) "Reading trackfile"
-         open(17,file=trim(adjustl(trackfile)),status='old')
-         do i=1,nmax
-            read(17,*,end=120) track(i)
-         enddo
- 120     close(17)
-      end if
-
-      
-      
-c     Catch some runtime errors
-      if ((start.gt.finish).and.(step.gt.0)) then
-         write(*,*) "Must have start < finish when step > 0."
-         write(*,*) "start=",start,"finish=",finish
-         error stop "init.f line 552"
-      end if
-      if ((start.lt.finish).and.(step.lt.0)) then
-         write(*,*) "Must have start > finish when step < 0."
-         write(*,*) "start=",start,"finish=",finish
-         error stop "init.f line 557"
-      end if
-
-      if(start.lt.0) then
-         write(*,*) "Starting file index must be > 0."
-         write(*,*) "start=",start
-         error stop "init.f line 563"
-      end if
-
-      if((step.eq.0).or.(start.eq.finish)) then
-         finish=start
-         step=1
+         if(.not.track_all) then ! Use trackfile
+            inquire(file=trim(adjustl(trackfile)),exist=fileexists)
+            if(.not.fileexists) then
+               write(*,*) "Could not find trackfile '",
+     $              trim(adjustl(trackfile)),"'."
+               error stop "init.f"
+            end if
+         end if                 ! If track_all, don't use trackfile
       end if
 
 c      if(taulimit.lt.tau_thick) then
@@ -608,8 +651,8 @@ c         write(*,*) "expected to be physical."
 c      end if
 
 c     Initialize some variables
-      posx = posx*runit
-      posy = posy*runit
+      !posx = posx*runit
+      !posy = posy*runit
       printIntegrationSteps = .false.
 
       if(get_info_of_particle) then

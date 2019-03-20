@@ -25,6 +25,9 @@ c     which=6 gives Grad_ad
      $     rholow,rhohigh,ulow,uhigh
       integer which
 
+      rhooutsideTEOS = 0.d0
+      aoutsideTEOS = 0.d0
+      
 c     utable(iu)=utable(1)+(iu-1)*stepu
 c     so, iu= (utable(iu)-utable(1))/stepu + 1
 
@@ -38,12 +41,10 @@ c      irho = min(max(1,int((log10rho-rhotable1)/steprho +1)),numrho-1)
       if(irho.ge.1 .and. irho.le.numrho-1 .and. iu.ge.1 .and.
      $     iu.le.numu-1) then
 c      if(irho.ge.1 .and. irho.le.numrho-1) then
-
          rholow=log10rho-(rhotable1+(irho-1)*steprho)
          rhohigh=rhotable1+irho*steprho-log10rho
 
          if(iu.ge.1 .and. iu.le.numu-1) then
-            
             ulow=log10u-(utable1+(iu-1)*stepu)
             uhigh=utable1+iu*stepu-log10u
             
@@ -132,7 +133,9 @@ c     At extreme densities we will use ideal gas + radiation pressure
          endif
          call getTemperature(3.d0*boltz*rhocgs/meanmu/arad/2.0d0,
      $        -ucgs*rhocgs/arad,temperature)
-
+         rhooutsideTEOS = rhocgs
+         aoutsideTEOS = ucgs
+         
          if(which.eq.1) then
             useeostable=temperature
             return

@@ -31,6 +31,7 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       common/dust/ Rform
       integer intout
       common/intoutput/ intout
+      real*8 getLocalAngle
 
       integer mymax
       parameter(mymax=420000)
@@ -50,8 +51,8 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       integer lastpart
       common/lastparticle/ lastpart
 
-      real*8 tau_thick
-      common/tauthick/ tau_thick
+      real*8 tau_thick_integrator
+      common/tauthick/ tau_thick_integrator
 
       real*8 rayout1(10,maxstp)
       integer rayout2(maxstp),nstp
@@ -87,7 +88,6 @@ c      kount2=0
         yint(i)=ystart(i)
  11   continue
 
-
       do 16 nstp=1,MAXSTP
 c        print *,'looping',x,y(1)
         call derivs(xint,yint,dydx)
@@ -114,6 +114,7 @@ c     I want to make sure the penultimate step (the step right before the photos
         enddo
 
         if((xint+h-x2)*(xint+h-x1).gt.0.d0) h=x2-xint
+c        write(*,*) xpos/runit,ypos/runit
         call rkqs(yint,dydx,nvar,xint,h,eps,yscal,hdid,hnext,derivs)
 
         if(printIntegrationSteps) then
@@ -121,10 +122,10 @@ c     I want to make sure the penultimate step (the step right before the photos
            call getOpacitySub(xpos,ypos,xint,dble(t6*1d6),rhocgs,
      $          yint(1),Rform,opacit)
            write(intout,'(12ES22.14,I22)')xpos/runit_out,ypos/runit_out,
-     $             xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
-     $             ucgs/Eunit_out*munit_out,gcgs/gunit_out,
-     $             xh/muunit_out,pcgs/punit_out,tcgs/tempunit_out,
-     $             opacit,yint(1),lastpart
+     $          xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
+     $          ucgs/Eunit_out*munit_out,xh/muunit_out,
+     $          gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
+     $          opacit,yint(1),lastpart
         end if
         
         if(hdid.eq.h)then
@@ -148,10 +149,11 @@ c        print *,'ok,bad',nok,nbad,h,hdid,yint(1)
 c        if((yint(1).ge.1.d0 .and. kount1.eq.0) .or.
 c     $       (yint(1)*yint(2).ge.1.d0/3.d0 .and. kount2.eq.0))then
 c     write(*,*) yint(1)
-        if(yint(1).ge.tau_thick .and. kount1.eq.0) then
+        if(yint(1).ge.tau_thick_integrator .and. kount1.eq.0) then
 c           print *,'ok,bad',nok,nbad,h,hdid,yint(1)
            kount=kount+1
-           if(yint(1).ge.tau_thick .and. kount1.eq.0) kount1=kount
+           if(yint(1).ge.tau_thick_integrator .and. kount1.eq.0)
+     $          kount1=kount
 c           if(yint(1)*yint(2).ge.1.d0/3.d0 .and. kount2.eq.0) kount2=kount
            xp(kount)=xint
            do i=1,nvar

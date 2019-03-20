@@ -1,0 +1,270 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib.cm as cm
+import matplotlib.colors as cols
+import glob
+import sys
+import matplotlib as mpl
+
+# This allows the program to be used by both python2 and python3
+try:
+    input = raw_input
+except NameError:
+    pass
+
+user_input = input("Enter file name(s) or patterns: ").split(" ")
+files = []
+for pattern in user_input:
+    for i in sorted(glob.glob(pattern)):
+        files.append(i)
+
+if len(files) <= 0:
+    print("ERROR: Could not find files.")
+    sys.exit()
+    
+
+user_input = input("Use adaptive plot limits? (y/n): ")
+if user_input == "y":
+    adaptivelimits = True
+elif user_input == "n":
+    adaptivelimits = False
+else:
+    print("ERROR: Please respond with 'y' or 'n'.")
+    sys.exit()
+
+
+user_input = input("Paper friendly? (y/n): ")
+if user_input == "y":
+    # This format is appropriate for ApJ style papers that have
+    # two columns of text per page. Each column has a width of
+    # 3.5225 inches.
+    paperfriendly=True
+    mpl.rcParams['font.size'] = 10
+    mpl.rcParams['figure.figsize'] = (3.35225,2.5)
+    mpl.rcParams['text.color'] = 'black'
+    mpl.rcParams['axes.facecolor'] = '0.95'
+    mpl.rcParams['axes.edgecolor'] = 'black'
+    mpl.rcParams['axes.labelcolor'] = 'black'
+    mpl.rcParams['xtick.color'] = 'black'
+    mpl.rcParams['ytick.color'] = 'black'
+    mpl.rcParams['figure.facecolor'] = 'white'
+    mpl.rcParams['figure.edgecolor'] = 'white'
+    mpl.rcParams['figure.subplot.left'] = 0.15
+    mpl.rcParams['figure.subplot.right'] = 0.80
+    mpl.rcParams['figure.subplot.bottom'] = 0.12
+    mpl.rcParams['figure.subplot.top'] = 1.0
+    mpl.rcParams['axes.titlepad'] = 0.0
+elif user_input == "n":
+    paperfriendly=False
+    mpl.rcParams['font.size'] = 12
+    mpl.rcParams['figure.figsize'] = (8.0,8.0)
+    mpl.rcParams['text.color'] = 'white'
+    mpl.rcParams['axes.facecolor'] = 'black'
+    mpl.rcParams['axes.edgecolor'] = 'white'
+    mpl.rcParams['axes.labelcolor'] = 'white'
+    mpl.rcParams['xtick.color'] = 'white'
+    mpl.rcParams['ytick.color'] = 'white'
+    mpl.rcParams['figure.facecolor'] = 'black'
+    mpl.rcParams['figure.edgecolor'] = 'black'
+    mpl.rcParams['figure.subplot.right'] = 0.85
+    mpl.rcParams['figure.subplot.bottom'] = 0.10
+    mpl.rcParams['figure.subplot.top'] = 0.9
+    mpl.rcParams['figure.titleweight'] = 300
+else:
+    print("ERROR: Please respond with 'y' or 'n'.")
+    sys.exit()
+    
+fmt = "(%d) %s"
+with open(files[0]) as f:
+    header = f.readline().strip().split()
+
+if len(header) == 0:
+    print("ERROR: Data file had no header!")
+    sys.exit()
+    
+for i in range(0,len(header)):
+    print(str("("+str(i+1)+")").rjust(4)+" "+header[i])
+
+user_input = input("Select a quantity for the colorbar (1-"+str(len(header)+1)+"): ")
+if int(user_input) in range(1,len(header)+1):
+    column = int(user_input)-1
+else:
+    print("ERROR: Please respond with a value between 1 and "+str(len(header)+1)+".")
+    sys.exit()
+
+
+# Setup the matplotlib rcParams
+mpl.rcParams['lines.linewidth'] = 1
+mpl.rcParams['font.family'] = 'monospace'
+mpl.rcParams['font.weight'] = 300
+mpl.rcParams['font.monospace'] = 'DejaVu Sans'
+mpl.rcParams['mathtext.default'] = 'regular'
+
+mpl.rcParams['xtick.top'] = True
+mpl.rcParams['xtick.major.size'] = 9
+mpl.rcParams['xtick.minor.size'] = 4
+mpl.rcParams['xtick.major.width'] = 0.5
+mpl.rcParams['xtick.minor.width'] = 0.5
+mpl.rcParams['xtick.labelsize'] = 'medium'
+mpl.rcParams['xtick.direction'] = 'in'
+mpl.rcParams['xtick.minor.visible'] = True
+
+mpl.rcParams['ytick.right'] = True
+mpl.rcParams['ytick.major.size'] = 9
+mpl.rcParams['ytick.minor.size'] = 4
+mpl.rcParams['ytick.major.width'] = 0.5
+mpl.rcParams['ytick.minor.width'] = 0.5
+mpl.rcParams['ytick.labelsize'] = 'medium'
+mpl.rcParams['ytick.direction'] = 'in'
+mpl.rcParams['ytick.minor.visible'] = True
+
+
+titleheight=0.878
+titleoffset=0.205
+buff = 0.05 #%
+
+# Create the plot
+
+fig = plt.figure()
+ax = plt.gca()
+ax.set_aspect('equal','datalim')
+        
+# Create the colorbar
+    
+my_cm = cm.get_cmap('inferno')
+
+if not adaptivelimits:
+    # Read all the datafiles and find the maximum viewport
+    xmaxx = -1e30
+    ymaxx = -1e30
+    xminn = 1e30
+    yminn = 1e30
+    vminn = 1e30
+    vmaxx = 1e-30
+    for datafile in files:
+        data = np.loadtxt(datafile,skiprows=1)
+        x = data[:,0]
+        y = data[:,1]
+        hp = data[:,4]
+        quantity = data[:,column]
+        
+        xminn = min(xminn,min(x-2.*hp))
+        xmaxx = max(xmaxx,max(x+2.*hp))
+        yminn = min(yminn,min(y-2.*hp))
+        ymaxx = max(ymaxx,max(y+2.*hp))
+        vminn = min(vminn,min(quantity))
+        vmaxx = max(vmaxx,max(quantity))
+        
+    dx = xmaxx - xminn
+    dy = ymaxx - yminn
+    if dx > dy:
+        ymaxx = yminn + (dy+dx)/2.
+        yminn = yminn + (dy-dx)/2.
+        #ax.set_ylim(ymin + (dy-dx)/2., ymin + (dy+dx)/2.)
+    elif dx < dy:
+        xmaxx = xminn + (dx+dy)/2.
+        xminn = xminn + (dx-dy)/2.
+        #ax.set_xlim(xmin + (dx-dy)/2., xmin + (dx+dy)/2.)
+
+
+for datafile in files:
+
+    # Get the grid data
+
+    data = np.loadtxt(datafile,skiprows=1)
+    x = data[:,0]
+    y = data[:,1]
+    z = data[:,2]
+    hp = data[:,4]
+    quantity = data[:,column]
+
+    
+    if adaptivelimits:
+        xmax = max(x+2.*hp)
+        xmin = min(x-2.*hp)
+        ymax = max(y+2.*hp)
+        ymin = min(y-2.*hp)
+        vmin = min(quantity)
+        vmax = max(quantity)
+    else:
+        xmax = xmaxx
+        xmin = xminn
+        ymax = ymaxx
+        ymin = yminn
+        vmin = vminn
+        vmax = vmaxx
+
+
+    xmin = xmin*(1.+buff)
+    xmax = xmax*(1.+buff)
+    ymin = ymin*(1.+buff)
+    ymax = ymax*(1.+buff)
+
+    ax.set_xlim(xmin,xmax)
+    ax.set_ylim(ymin,ymax)
+    
+    dx = (xmax - xmin)
+    dy = (ymax - ymin)
+    #dx = dx - dx*buff
+    #dy = dy - dy*buff
+    
+    if dx > dy:
+        ax.set_ylim(ymin + (dy-dx)/2., ymin + (dy+dx)/2.)
+    elif dx < dy:
+        ax.set_xlim(xmin + (dx-dy)/2., xmin + (dx+dy)/2.)
+
+        
+
+    norm = cols.Normalize(vmin,vmax)
+    for a,b,c,color,zorder in zip(x,y,2.*hp,quantity,z):
+        ax.add_artist(plt.Circle((a,b),c,fill=True,color=my_cm(norm(color)),zorder=zorder))
+
+    sc = plt.scatter(x,y,s=0,c=norm(quantity),cmap=my_cm,norm=norm,vmin=vmin,vmax=vmax)
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right",size="5%",pad=0.05)
+
+    cbar = plt.colorbar(sc,cax=cax)
+
+    cbar.set_label(header[column])
+    
+    # Re-plot the axis labels
+
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+
+    # Update the plot title
+    
+    rotations = datafile.split("/")[-1].split("_")
+    zdeg = int(rotations[1])
+    ydeg = int(rotations[2])
+    xdeg = int(rotations[3][:-4])
+    if not paperfriendly:
+        #ax.set_title("t = "+str(("%- 15.7E" % (t)))+" [days]\n")
+        ax.annotate("x-axis=",(0+titleoffset,titleheight),xycoords='figure fraction',ha='left')
+        ax.annotate(str(xdeg)+"$^o$",(0.128+titleoffset,titleheight),xycoords='figure fraction',ha='right')
+        ax.annotate("y-axis=",(0.2+titleoffset,titleheight),xycoords='figure fraction',ha='left')
+        ax.annotate(str(ydeg)+"$^o$",(0.328+titleoffset,titleheight),xycoords='figure fraction',ha='right')
+        ax.annotate("z-axis=",(0.4+titleoffset,titleheight),xycoords='figure fraction',ha='left')
+        ax.annotate(str(zdeg)+"$^o$",(0.528+titleoffset,titleheight),xycoords='figure fraction',ha='right')
+
+    # Save the image
+
+    savename = "closest_"+header[column]+"_"+datafile.split("/")[-1].split("_")[0][-5:]+"_"+"_".join(datafile.split("/")[-1].split("_")[1:])[:-4]
+    if paperfriendly:
+        savename = savename+".eps"
+    else:
+        savename = savename+".png"
+    print("Saving", savename)
+    plt.savefig(savename,facecolor=fig.get_facecolor())
+
+    #plt.show()
+    
+    # Clear the axis
+    ax.clear()
+
+print("Finished.")
+if len(files) > 1:
+    print("")
+    print("Use this command to make a movie:")
+    print("convert -delay 10 -loop 0 teffs*.png teffs.gif")

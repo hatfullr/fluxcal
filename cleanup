@@ -1,5 +1,4 @@
 #!/bin/bash
 
-\rm -f **/*~ **/*#
-\rm -f ./*~ ./*#
+\rm -f $(find . -name "*~" -or -name "*#")
 make clean

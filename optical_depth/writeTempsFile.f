@@ -9,9 +9,8 @@
       write(72,103)xminmap/runit_out,hxmap/runit_out,nxmap,
      $     yminmap/runit_out,hymap/runit_out,nymap,t/tunit_out
       do j=1,nymap
-         write (72,'(2001f8.3)') (log10((TpracticalXYthick(i,j)**4.d0
-     $        + TpracticalXYthin(i,j)**4.d0)**0.25d0 / tempunit_out),
-     $        i=1,nxmap)
+         write (72,'(2001f8.3)') (log10(TOTALTpracticalXY(i,j)/
+     $        tempunit_out),i=1,nxmap)
       enddo
 c      do ifilter=1,numfilters
 c         write(72,*)real(mag(ifilter)),'= ',filtername(ifilter),

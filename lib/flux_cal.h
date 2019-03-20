@@ -11,9 +11,9 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common/out/ nout,nit
       real*8 x(nmax),y(nmax),z(nmax),am(nmax),hp(nmax),rho(nmax),
      $      vx(nmax),vy(nmax),vz(nmax),a(nmax),wmeanmolecular(nmax),
-     $      localg(nmax),metal(nmax),tempp(nmax),pp(nmax)
+     $      localg(nmax),metal(nmax),tempp(nmax),pp(nmax),entropy(nmax)
       common/part/ x,y,z,am,hp,rho,vx,vy,vz,a,wmeanmolecular,localg,
-     $      metal,tempp,pp
+     $      metal,tempp,pp,entropy
 	   
       real*8 pi,kelvin,gram,sec,cm,erg,boltz,crad,planck,crad2,
      $      sigma,arad,qconst,coeff,pc,distance,gravconst
@@ -25,6 +25,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 wtab(ntab),ctab
       common/wtabul/ wtab,ctab
 
+      real*8 mu
+      common/surfaceangle/ mu
 	
       CHARACTER*12 outfilename
       integer outfilenum,iform,iout,ni1,ni2,ni3,innit,nnit
@@ -47,11 +49,11 @@ c      integer i
       real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out
+     $      Lunit_out,kunit_out,sunit_out
       common/units/ munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out
+     $      Lunit_out,kunit_out,sunit_out
 
       real*8 Rform
       common/dust/Rform
@@ -60,13 +62,15 @@ c      integer i
       logical rossonly,get_particles_at_pos,
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_integration_at_pos,get_info_of_particle,
-     $      get_closest_particles,get_integration_at_all_pos
+     $      get_closest_particles,get_integration_at_all_pos,
+     $      get_true_luminosity
+      common/truelum/ get_true_luminosity
       common/opacitytype/ rossonly
       real*8 step1,step2,step3,step4
       common/steps/ step1,step2,step3,step4
       real*8 taulimit,posx,posy
-      real*8 tau_thick
-      common/tauthick/ tau_thick
+      real*8 tau_thick_envfit,tau_thick_integrator,tau_thick
+      common/tauthick/ tau_thick_integrator,tau_thick_envfit,tau_thick
       integer info_particle
       logical envfit
       common/whatever/ info_particle
@@ -83,6 +87,8 @@ c      integer i
       character*3 dust_model
       character*1 dust_topology, dust_shape
       common/colddust/ dust_model,dust_topology,dust_shape
+      logical track_all
+      common/trackall/ track_all
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
@@ -95,8 +101,9 @@ c      integer i
      $      binary_tracking_file,get_fluxes,envfit,
      $      get_integration_at_pos,get_integration_at_all_pos,
      $      get_info_of_particle,info_particle,
-     $      outfile,tau_thick,eosfile,
-     $      get_closest_particles,flux_cal_dir
+     $      outfile,tau_thick_envfit,eosfile,get_true_luminosity,
+     $      get_closest_particles,flux_cal_dir,tau_thick_integrator,
+     $      tau_thick,track_all,kunit_out,sunit_out
       common/inputfilenames/ opacityfile,opacitydustfile,filtersfile,
      $      trackfile,eosfile
 
@@ -121,7 +128,8 @@ c      integer i
       external usetable,usetabledust
       external usetable2,usetabledust2
 
-      real*8 get_teff
+      real*8 get_teff,getLocalAngle
+      real*8 fourPointArea, fourPointArea2
 
       real*8 taucoef
       common/taucoefficient/ taucoef
@@ -161,3 +169,22 @@ c     slops for envelope fitting
 
       character*255 pinfo_file
       common/infofile/ pinfo_file
+
+      logical isInitGrid
+      common/isgridinit/ isInitGrid
+
+      logical dimenFileAlreadyExists
+      common/dimenfilecheck/ dimenFileAlreadyExists
+
+      real*8 Atot
+      common/totalarea/ Atot
+
+      real*8 table_nabla_Tmin,table_nabla_Tmax,
+     $      table_nabla_gmin,table_nabla_gmax
+
+      common/tablerange/ table_nabla_Tmin,table_nabla_Tmax,
+     $      table_nabla_gmin,table_nabla_gmax
+
+      real*8 rhooutsideTEOS,aoutsideTEOS
+      common/outsideTEOS/ rhooutsideTEOS,aoutsideTEOS
+

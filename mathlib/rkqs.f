@@ -52,8 +52,16 @@ c11    continue
         xnew=x+h
 
         if(xnew.eq.x)then
-           write(6,*) 'stepsize underflow in rkqs',x,y(1)
-           stop
+           write(6,*) 'stepsize underflow in rkqs'
+           write(6,*) 'z    = ',x
+           write(6,*) 'znew = ',xnew
+           write(6,*) 'tau  = ',y(1)
+           write(6,*) 'yscal(1)=',yscal(1)
+           write(6,*) 'yscal(2)=',yscal(2)
+           write(6,*) 'yscal(3)=',yscal(3)
+           write(6,*) 'yscal(4)=',yscal(4)
+           write(6,*) "Try increasing some of your step variables"
+           error stop "rkqs.f"
         endif
         goto 1
 

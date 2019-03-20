@@ -13,7 +13,7 @@ c     along the z-axis.  The effect is the same.
 c     The following rotation is done the same way as in SPLASH
       do ip=1,N
 c     Rotate position vector of particle i:
-         if(anglez.ne.0) then   ! rotate about z
+         if (anglez.ne.0d0) then ! rotate about z
             rold = sqrt(x(ip)**2 + y(ip)**2)
             phi = ATAN2(y(ip),x(ip))
             phi = phi - anglez
