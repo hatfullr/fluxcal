@@ -191,7 +191,7 @@
       !    dust_topology='h' AND dust_shape='5'
       !    dust_topology='p' AND dust_shape='a'
       dust_model='nrm'
-      dust_topology='p'
+      dust_topology='c'
       dust_shape='s'
 
 
