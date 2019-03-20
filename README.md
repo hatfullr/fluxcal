@@ -37,8 +37,8 @@ You can find a premade input file to test with in `<fluxcal-directory>/test/stan
 
 ## Failing compilation on install
 
-There is a known bug with `gfortran` version 7.3.0 in that compilation will
-fail upon trying to build `mathlib/odeint.o`. The error appears as,
+There is a known bug with `gfortran-7.3.0` where compilation fails upon trying
+to build `mathlib/odeint.o`,
 ```
 /usr/bin/gfortran -O4 -ffixed-line-length-132 -mcmodel=large  -c -o mathlib/odeint.o mathlib/odeint.f
 mathlib/odeint.f:186:0:
