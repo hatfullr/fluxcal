@@ -10,4 +10,5 @@ defaults/sph.eos
 defaults/sph.opacities_ferguson_yes_grains_and_molecules
 defaults/sph.opacities_yes_grains_and_molecules_ncooling2
 defaults/table_nabla.dat
-flux_cal
+defaults/._kP_h2001.dat
+defaults/._kR_h2001.dat

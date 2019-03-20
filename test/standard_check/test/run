@@ -15,12 +15,14 @@ dirlist=( $(find . -name flux_cal | rev | cut -d'/' -f2- | rev) )
 check
 
 ./clean
-
+count=0
 for i in ${dirlist[@]}; do
-    echo "Running $i"
+    prcnt=$(( $count*100 / ${#dirlist[@]} ))
+    printf "%02.1d%% %s\n" $prcnt "Running $i"
     \cd $curdir/$i
     ./flux_cal > debug
     check
+    count=$(( $count + 1 ))
 done
 
 \cd $curdir

@@ -15,7 +15,7 @@ echo "Removing old files"
 rm -f GNUFortran.txt
 check
 for i in ${dirlist[@]}; do
-    rmfilelist=( $(find $i -type f ! -name 'fluxcal_0000.dat' -and ! -name 'dimen00000_000_000_000.dat' -and ! -name 'flux_cal' -and ! -name 'flux_cal.input' -and ! -name 'fluxcal.particles') )
+    rmfilelist=( $(find $i -type f ! -name 'fluxcal_0000.dat' -and ! -name 'dimen*.dat' -and ! -name 'flux_cal' -and ! -name 'flux_cal.input' -and ! -name 'fluxcal.particles') )
     rm -f ${rmfilelist[@]}
     check
 done

@@ -32,15 +32,15 @@
        crad   = 0.2998E+11   planck      = 0.6626E-26
        sigma  = 0.5671E-04   
  
- runit        = 0.1000E+01   munit       = 0.1000E+01
- tunit        = 0.1000E+01   vunit       = 0.1000E+01
- Eunit        = 0.1000E+01   rhounit     = 0.1000E+01
- muunit       = 0.1000E+01   gunit       = 0.1000E+01
+ runit        = 0.3480E+11   munit       = 0.9946E+33
+ tunit        = 0.7968E+03   vunit       = 0.2184E+08
+ Eunit        = 0.1897E+49   rhounit     = 0.2950E+01
+ muunit       = 0.5000E+00   gunit       = 0.1370E+05
  
- runit_out    = 0.1437E-10   munit_out   = 0.5027E-33
- tunit_out    = 0.6275E-03   vunit_out   = 0.2290E-07
- Eunit_out    = 0.2635E-48   rhounit_out = 0.1695E+00
- muunit_out   = 0.1000E+01   gunit_out   = 0.3649E-04
+ runit_out    = 0.5000E+00   munit_out   = 0.5000E+00
+ tunit_out    = 0.5000E+00   vunit_out   = 0.5000E+00
+ Eunit_out    = 0.5000E+00   rhounit_out = 0.5000E+00
+ muunit_out   = 0.5000E+00   gunit_out   = 0.5000E+00
  tempunit_out = 0.1000E+01   punit_out   = 0.1000E+01
  Lunit_out    = 0.1000E+01   kunit_out   = 0.1000E+01
  sunit_out    = 0.1000E+01
@@ -97,28 +97,28 @@
  Creating 'flux_cal.output'
  Reading 'fluxcal_0000.dat'
  WARNING: Some particles are outside the TEOS. Their cumulative properties are:
-          Mass =    2.9681941099401851E+033
-          Internal energy =    6.3997352472994863E+047
-          min(rho,T) = (   1.3579172138892461E-011 ,   2.6000446292507828E-012 )
-          max(rho,T) = (   91062.442310583778      ,   1.5073612385884668E-006 )
+          Mass =    1.0379600748966231E+030
+          Internal energy =    1.3555730833110886E+045
+          min(rho,T) = (   13044.763522586933      ,   155801496.86872759      )
+          max(rho,T) = (   91063.812363240824      ,   492811074.47450483      )
  
  Establishing the grid
-  iter            xmin              hx    Nx            ymin              hy    Ny             <F>     reason
- ----- --------------- --------------- ----- --------------- --------------- ----- --------------- ----------
-     1  -1.9214761E+13   1.6874819E+13     3  -1.6646307E+13   1.6124895E+13     3   0.0000000E+00 Finished  
- Writing dimen file
+ Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
+ Creating the driving grid
+ Creating the integrating grid
  
  Grid details (cgs):
-    xminmap,xmaxmap =   -276.07769007201910        208.83711073135396     
-    yminmap,ymaxmap =   -239.17413234635632        224.19084729922207     
-    hxmap,hymap     =    242.45740040168653        231.68248982278919     
-    nxmap,nymap     =            3           3
+    xminmap,xmaxmap =   -19214455073632.387        14534645232680.773     
+    yminmap,ymaxmap =   -16646041263041.707        15603234590331.262     
+    hxmap,hymap     =    544340327521.17999        520149610538.27368     
+    nxmap,nymap     =           63          63
  
+ Calculating the flux at each grid point
  Writing 'teffs00000_000_000_000.dat'
  
- Luminosity =  0.00000000000000E+00
- Average Teff =  0.00000000000000E+00
- Effective visible area =  0.00000000000000E+00
+ Luminosity =  1.87715785917572E+37
+ Average Teff =  3.39989410012360E+03
+ Effective visible area =  7.78064348922434E+26
  
  Writing to 'flux_cal.output'
  
