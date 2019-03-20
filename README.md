@@ -26,14 +26,14 @@ cd fluxcaltest
 ln -s <fluxcal-directory>/flux_cal .
 cp <fluxcal-directory>/defaults/flux_cal.input .
 cp <datafile> .
+```
+Now edit `flux_cal.input` appropriately, save the file, and run `flux_cal`
+with
+```
 ./flux_cal
 ```
-This will run the basic functionality of `flux_cal`. You can edit
-`flux_cal.input` as desired to achieve different results. You can find a
-premade input file to test with in
-```
-<fluxcal-directory>/test/standard_check/test/fluxcal_0000.dat
-```
+You can find a premade input file to test with in <fluxcal-directory>/test/standard_check/test/fluxcal_0000.dat`.
+
 
 
 
