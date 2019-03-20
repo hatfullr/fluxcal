@@ -304,7 +304,7 @@ for datafile in files:
     # Plot the data
     #data = np.flip(data,0)
     im = ax.imshow(data,cmap=my_cm,vmin=Tmin,vmax=Tmax,
-                    aspect='equal',extent=(xmin,xmax,ymin,ymax),norm=norm)
+                    aspect='equal',extent=(xmin,xmax,ymin,ymax),norm=norm,origin='lower')
         
     # Re-plot the axis labels
 
