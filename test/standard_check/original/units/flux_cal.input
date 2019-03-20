@@ -125,27 +125,27 @@
       !
       ! Be sure to give these in cgs. If you want to use other units,
       ! edit the flux_cal.baseunits file.
-      runit=1.d0                ! distance [cm]
-      munit=1.d0                ! mass [grams]
-      tunit=1.d0                ! time [s]
-      vunit=1.d0                ! velocity [cm/s]
-      Eunit=1.d0                ! energy [ergs]
-      rhounit=1.d0              ! density [grams/cm^3]
-      muunit=1.d0               ! mean molecular weight [grams]
-      gunit=1.d0                ! local g [cm/s^2]
+      runit=3.4799d10                ! distance [cm]
+      munit=9.946d32                ! mass [grams]
+      tunit=7.96765d2                ! time [s]
+      vunit=2.18377d7                ! velocity [cm/s]
+      Eunit=1.897235d48                ! energy [ergs]
+      rhounit=2.950245d0              ! density [grams/cm^3]
+      muunit=0.5d0               ! mean molecular weight [grams]
+      gunit=1.370395d4                ! local g [cm/s^2]
 
       ! Give the conversion factor from your input data units to what
       ! you desire the output units to be in. Internal (cgs) values will
       ! be divided by these to produce your output.
       ! These values are affected by the flux_cal.baseunits file.
-      runit_out=1.4368d-11            ! distance
-      munit_out=5.0271d-34            ! mass
-      tunit_out=6.2754d-4             ! time
-      vunit_out=2.2896d-8             ! velocity
-      Eunit_out=2.6354d-49            ! energy
-      rhounit_out=1.6948d-1          ! density
-      muunit_out=1.d0           ! mean molecular weight
-      gunit_out=3.6486d-5            ! gravitational acceleration
+      runit_out=0.5d0            ! distance
+      munit_out=0.5d0            ! mass
+      tunit_out=0.5d0            ! time
+      vunit_out=0.5d0            ! velocity
+      Eunit_out=0.5d0            ! energy
+      rhounit_out=0.5d0          ! density
+      muunit_out=0.5d0           ! mean molecular weight
+      gunit_out=0.5d0            ! gravitational acceleration
       tempunit_out=1.d0         ! temperature
       punit_out=1.d0            ! pressure
       Lunit_out=1.d0            ! luminosity

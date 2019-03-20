@@ -107,8 +107,8 @@
  Grid details (cgs):
     xminmap,xmaxmap =   -19214455073632.387        14534645232680.773     
     yminmap,ymaxmap =   -16646041263041.707        15603234590331.262     
-    hxmap,hymap     =    132870473646.90221        126965652966.03531     
-    nxmap,nymap     =          255         255
+    hxmap,hymap     =    544340327521.17999        520149610538.27368     
+    nxmap,nymap     =           63          63
  
  Finding information on the closest particles
  Initializing 'closest00000_000_000_000.dat'

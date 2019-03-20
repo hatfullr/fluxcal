@@ -73,7 +73,7 @@
  get_closest_particles      = F
  track_particles            = T
    track_all            = T
-   binary_tracking_file = F
+   binary_tracking_file = T
    trackfile            = 'fluxcal.particles'
  get_info_of_particle       = F
  rossonly                   = F
