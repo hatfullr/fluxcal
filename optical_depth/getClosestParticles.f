@@ -133,7 +133,7 @@ c     Reverse the order
       do i=1,m
         ! write(*,*) holder1(i)
          if(closest1D(i).ge.0) then
-            call output(filename,closest1D(i))
+            call output(filename,closest1D(i),.false.)
          end if
       end do
 

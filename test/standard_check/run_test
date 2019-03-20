@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# This script will run flux_cal in all the test directories after cleaning out
+# all old output files. It will then check for differences between test and
+# original. If you want to only check for differences, simply run ./check
+
+curdir=$(pwd)
+
+\cd ${curdir}/test
+echo "Running test in 'test' directory"
+./run
+\cd ${curdir}
+echo "Test complete"
+echo "Checking for differences between test and original"
+./check
+echo "Done"
+

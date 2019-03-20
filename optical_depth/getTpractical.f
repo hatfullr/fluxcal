@@ -1,5 +1,5 @@
       subroutine getTpractical(z0,z1,zthick,thick_p,myh1,
-     $     Tthin, Tthick, tau_thin, sphoto)
+     $     Tpractical, tau_thin, sphoto)
 c     Start at z1 and integrate to max(z0,zthick) to find Teff
 c     Input: z0 = z location of last visible gas on LOS
 c            z1 = z location of first visible gas on LOS
@@ -18,16 +18,18 @@ c
 c     tau_thin = Attenuation factor, as in e^(-tau_thin)
 c     sphoto   = z-location of the 
       include 'optical_depth.h'
-      real*8 zstop,z0,z1,zthick,tau_thin,myh1,Tthin,Tthick
+      real*8 zstop,z0,z1,zthick,tau_thin,myh1,Tthin4,Tthick4
       integer i,thick_p
       integer outerid
       real*8 rn,mymaxdz,maxz,rv,rc,deltar2
+      real*8 Tpractical
 
-      Tthick = 0.d0
-      Tthin = 0.d0
+      Tthick4 = 0.d0
+      Tthin4 = 0.d0
       sphoto = 0.d0
       tau_thin = 0.d0
-
+      Tpractical = 0.d0
+      
       zstop = max(zthick,z0)
       
 c     Integrate down to the optically thick particle or until
@@ -65,7 +67,7 @@ c      end if
      $     eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
      $     rkqs)
 
-      Tthin=taustart(4)**0.25d0 ! 1/mu int_0^tau T^4 e^(-tau'/mu) dtau'/mu
+      Tthin4=taustart(4) ! int_0^tau T^4 e^(-tau') dtau'
       tau_thin = taustart(1)    ! Attenuation factor
 
       if(kount1.gt.1) then      ! Integrator didn't reach an optically thick particle
@@ -78,10 +80,10 @@ c      end if
      $        (tau(1,kount1)-tau(1,kount1-1))
       else if (thick_p.gt.0) then ! Integrator reached an optically thick particle
          sphoto=zthick
-         Tthick = Teff(thick_p)*exp(-tau_thin*0.25d0)
+         Tthick4 = Teff(thick_p)**4.d0 * exp(-tau_thin)
       end if
 
-      
+      Tpractical = (Tthick4 + Tthin4)**0.25d0
       
 cc     zstop = max(z0,zthick)
 cc     write(*,*) "zthick,z0,z1 = ",zthick,z0,z1
@@ -199,8 +201,8 @@ c
          write(*,*) "tauthin < 0! Something went wrong in"//
      $        " getTpractical.f"
          write(*,*) "tau_thin = ",tau_thin
-         write(*,*) "Tthin = ",Tthin
-         write(*,*) "Tthick = ",Tthick
+         write(*,*) "Tthin4 = ",Tthin4
+         write(*,*) "Tthick4 = ",Tthick4
          error stop
       end if
       

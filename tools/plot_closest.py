@@ -7,23 +7,34 @@ import glob
 import sys
 import matplotlib as mpl
 
-user_input = raw_input("Enter file name(s) or patterns: ").split(" ")
+# This allows the program to be used by both python2 and python3
+try:
+    input = raw_input
+except NameError:
+    pass
+
+user_input = input("Enter file name(s) or patterns: ").split(" ")
 files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):
         files.append(i)
 
-user_input = raw_input("Use adaptive plot limits? (y/n): ")
+if len(files) <= 0:
+    print("ERROR: Could not find files.")
+    sys.exit()
+    
+
+user_input = input("Use adaptive plot limits? (y/n): ")
 if user_input == "y":
     adaptivelimits = True
 elif user_input == "n":
     adaptivelimits = False
 else:
-    print "ERROR: Please respond with 'y' or 'n'."
+    print("ERROR: Please respond with 'y' or 'n'.")
     sys.exit()
 
 
-user_input = raw_input("Paper friendly? (y/n): ")
+user_input = input("Paper friendly? (y/n): ")
 if user_input == "y":
     # This format is appropriate for ApJ style papers that have
     # two columns of text per page. Each column has a width of
@@ -61,7 +72,7 @@ elif user_input == "n":
     mpl.rcParams['figure.subplot.top'] = 0.9
     mpl.rcParams['figure.titleweight'] = 300
 else:
-    print "ERROR: Please respond with 'y' or 'n'."
+    print("ERROR: Please respond with 'y' or 'n'.")
     sys.exit()
     
 fmt = "(%d) %s"
@@ -69,17 +80,17 @@ with open(files[0]) as f:
     header = f.readline().strip().split()
 
 if len(header) == 0:
-    print "ERROR: Data file had no header!"
+    print("ERROR: Data file had no header!")
     sys.exit()
     
 for i in range(0,len(header)):
-    print str("("+str(i+1)+")").rjust(4)+" "+header[i]
+    print(str("("+str(i+1)+")").rjust(4)+" "+header[i])
 
-user_input = raw_input("Select a quantity for the colorbar (1-"+str(len(header)+1)+"): ")
+user_input = input("Select a quantity for the colorbar (1-"+str(len(header)+1)+"): ")
 if int(user_input) in range(1,len(header)+1):
     column = int(user_input)-1
 else:
-    print "ERROR: Please respond with a value between 1 and "+str(len(header)+1)+"."
+    print("ERROR: Please respond with a value between 1 and "+str(len(header)+1)+".")
     sys.exit()
 
 
@@ -244,7 +255,7 @@ for datafile in files:
         savename = savename+".eps"
     else:
         savename = savename+".png"
-    print "Saving", savename
+    print("Saving", savename)
     plt.savefig(savename,facecolor=fig.get_facecolor())
 
     #plt.show()
@@ -252,8 +263,8 @@ for datafile in files:
     # Clear the axis
     ax.clear()
 
-print "Finished."
+print("Finished.")
 if len(files) > 1:
-    print ""
-    print "Use this command to make a movie:"
-    print "convert -delay 10 -loop 0 teffs*.png teffs.gif"
+    print("")
+    print("Use this command to make a movie:")
+    print("convert -delay 10 -loop 0 teffs*.png teffs.gif")

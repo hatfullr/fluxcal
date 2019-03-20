@@ -1,0 +1,129 @@
+  ___________________________________________________  
+ /         ___  _              ___        _          \ 
+ |        | __|| | _  _ __ __ / __| __ _ | |         | 
+ |        | _| | || || |\ \ /| (__ / _` || |         | 
+ |        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | 
+ \___________________________________________________/ 
+ |                                                   | 
+ |  FluxCal Copyright (C) 2018. Written by,          | 
+ |                                                   | 
+ |   Roger Hatfull      [University of Alberta]      | 
+ |   Natasha Ivanova    [University of Alberta]      | 
+ |   James C. Lombardi  [Allegheny College]          | 
+ |                                                   | 
+ |  This program comes with ABSOLUTELY NO WARRANTY.  | 
+ |  This is free software, and you are welcome to    | 
+ |  redistribute it under certain conditions. See    | 
+ |  LICENSE file for details, or visit               | 
+ |  https://www.gnu.org/licenses                     | 
+ \___________________________________________________/ 
+ |                   |                                 
+ |   Version 1.0.0   |                                 
+ \___________________/                                 
+                                                       
+ ** Initializing **
+ Using default baseunits file '../../../../..//defaults/flux_cal.baseunits'.
+ 
+       gram   = 0.1000E+01   arad        = 0.7566E-14
+       sec    = 0.1000E+01   gravconst   = 0.6674E-07
+       cm     = 0.1000E+01   pc          = 0.3086E+19
+       kelvin = 0.1000E+01   distance    = 0.3086E+20
+       erg    = 0.1000E+01   boltz       = 0.1381E-15
+       crad   = 0.2998E+11   planck      = 0.6626E-26
+       sigma  = 0.5671E-04   
+ 
+ runit        = 0.6960E+11   munit       = 0.1989E+34
+ tunit        = 0.1594E+04   vunit       = 0.4368E+08
+ Eunit        = 0.3794E+49   rhounit     = 0.5900E+01
+ muunit       = 0.1000E+01   gunit       = 0.2741E+05
+ 
+ runit_out    = 0.1000E+01   munit_out   = 0.1000E+01
+ tunit_out    = 0.1000E+01   vunit_out   = 0.1000E+01
+ Eunit_out    = 0.1000E+01   rhounit_out = 0.1000E+01
+ muunit_out   = 0.1000E+01   gunit_out   = 0.1000E+01
+ tempunit_out = 0.1000E+01   punit_out   = 0.1000E+01
+ Lunit_out    = 0.1000E+01   kunit_out   = 0.1000E+01
+ sunit_out    = 0.1000E+01
+ 
+ start  =      0    anglexdeg =  0.000    
+ finish =      0    angleydeg =  0.000    
+ step   =      0    anglezdeg =  0.000    
+ flux_cal_dir = '../../../../../'
+ 
+ nkernel              =          0
+ yscalconst           = 0.6000E-01
+ fracaccuracy         = 0.1000E-01
+ step1                = 0.1000E+01
+ step2                = 0.1000E+31
+ step3                = 0.1000E+05
+ step4                = 0.1000E+16
+ taulimit             = 0.1000E+02
+ tau_thick_integrator = 0.1000E+02
+ tau_thick_envfit     = 0.1000E+02
+ envfit               =          T
+ 
+ metallicity          = 0.2000E-01
+ Rform                = 0.1000E+31
+ 
+ get_fluxes                 = T
+ get_true_luminosity        = F
+ get_particles_at_pos       = F
+ get_integration_at_pos     = F
+ get_integration_at_all_pos = F
+ get_closest_particles      = F
+ track_particles            = F
+ get_info_of_particle       = F
+ rossonly                   = F
+ 
+ eosfile         = 'sph.eos'
+ opacityfile     = 'sph.opacities_ferguson_yes_grains_and_molecules'
+ opacitydustfile = 'sph.opacities_yes_grains_and_molecules_ncooling2'
+ filtersfile     = 'filters.dat'
+ outfile         = 'flux_cal.output'
+ 
+ Reading SPH eos file
+ Reading opacity file
+ Reading opacity file for dust
+ Dust model: "iron-rich" silicates; homogeneous spheres
+ Reading cold opacity file
+ Reading envfit cold opacity file
+ Creating envfit density lookup table
+ Reading envfit nabla file
+ Reading filtersfile
+ ** Complete **
+ 
+ ** Main loop **
+
+ Creating 'flux_cal.output'
+ Reading 'fluxcal_0000.dat'
+ WARNING: Some particles are outside the TEOS. Their cumulative properties are:
+          Mass =    2.1785809124877634E+030
+          Internal energy =    1.3555730833110886E+045
+          min(rho,T) = (   6353.2589829857006      ,   105812519.65035529      )
+          max(rho,T) = (   91063.812363240824      ,   512948559.60340023      )
+ 
+ Establishing the grid
+ Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
+ Creating the driving grid
+ Creating the integrating grid
+ 
+ Grid details (cgs):
+    xminmap,xmaxmap =   -19214455073632.387        14534645232680.773     
+    yminmap,ymaxmap =   -16646041263041.707        15603234590331.262     
+    hxmap,hymap     =    544340327521.17999        520149610538.27368     
+    nxmap,nymap     =           63          63
+ 
+ Calculating the flux at each grid point
+ Writing 'teffs00000_000_000_000.dat'
+ 
+ Luminosity =  8.29795575675587E+37
+ Average Teff =  3.52324368512416E+03
+ Effective visible area =  7.78630625741142E+26
+ 
+ Writing to 'flux_cal.output'
+ 
+ 
+ **************************************************
+ 
+ ** Complete **
+ 

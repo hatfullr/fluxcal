@@ -7,29 +7,39 @@ import glob
 import sys
 import matplotlib as mpl
 
+# This allows the program to be used by both python2 and python3
+try:
+    input = raw_input
+except NameError:
+    pass
+
 #runit=6.9598e10
 runit=1.e0
 
-user_input = raw_input("Enter file name(s) or patterns: ").split(" ")
+user_input = input("Enter file name(s) or patterns: ").split(" ")
 files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):
         if ((i[:5] != "teffs") or (i[-4:] != ".dat")):
-            print "ERROR: You must provide teffs files from FluxCal output."
-            print "Error on file",i
+            print("ERROR: You must provide teffs files from FluxCal output.")
+            print("Error on file",i)
             sys.exit()
         files.append(i)
 
-user_input = raw_input("Use adaptive plot limits? (y/n): ")
+if len(files) <= 0:
+    print("ERROR: Could not find files.")
+    sys.exit()
+
+user_input = input("Use adaptive plot limits? (y/n): ")
 if user_input == "y":
     adaptivelimits = True
 elif user_input == "n":
     adaptivelimits = False
 else:
-    print "ERROR: Please respond with 'y' or 'n'."
+    print("ERROR: Please respond with 'y' or 'n'.")
     sys.exit()
 
-user_input = raw_input("Paper friendly? (y/n): ")
+user_input = input("Paper friendly? (y/n): ")
 if user_input == "y":
     # This format is appropriate for ApJ style papers that have
     # two columns of text per page. Each column has a width of
@@ -67,7 +77,7 @@ elif user_input == "n":
     mpl.rcParams['figure.subplot.top'] = 0.95
     mpl.rcParams['figure.titleweight'] = 300
 else:
-    print "ERROR: Please respond with 'y' or 'n'."
+    print("ERROR: Please respond with 'y' or 'n'.")
     sys.exit()
 
 # Setup the matplotlib rcParams
@@ -119,13 +129,13 @@ norm = cols.Normalize(vmin,vmax)
 
 mlibcolorbar=False
 try:
-    print "Getting live website data for blackbody spectrum colors..."
+    print("Getting live website data for blackbody spectrum colors...")
     import urllib2
     website = 'http://www.vendian.org/mncharity/dir3/blackbody/UnstableURLs/bbr_color.html'
-        
+    
     page = urllib2.urlopen(website)
     for i in range(0,20): page.readline() # Skip the header
-        
+    
     content = page.readlines()[1:-4][::2]
     content = np.asarray(content)
     
@@ -137,32 +147,35 @@ try:
         bbcols[i][1] = float(content[i][44:50])
         bbcols[i][2] = float(content[i][51:57])
         bbcols[i][3] = float(content[i][58:64])
-        
+    
     Nbbcols = len(bbcols)
     colors = np.reshape(bbcols[:,1:],(Nbbcols,3))
     colors = colors[np.where((bbcols[:,0] > vmin) & (bbcols[:,0] < vmax))[0]]
     my_cm = cols.LinearSegmentedColormap.from_list(
         'blackbody', colors, N=Nbbcols)
-    print "SUCCESS"
-except:
-    print "FAILED"
+    print("SUCCESS")
+
+except Exception as e:
+    print("FAILED:", e)
     try:
-        print ""
-        print "Getting blackbody spectrum colors from blackbody_temps.dat in the working directory..."
+        print("Getting blackbody spectrum colors from blackbody_temps.dat in the working directory...")
         bbcols = np.genfromtxt("blackbody_temps.dat",usecols=(0,6,7,8))
         Nbbcols = len(bbcols)
         colors = np.reshape(bbcols[:,1:],(Nbbcols,3))
         colors = colors[np.where((bbcols[:,0] > vmin) & (bbcols[:,0] < vmax))[0]]
         my_cm = cols.LinearSegmentedColormap.from_list(
             'blackbody', colors, N=Nbbcols)
-        print "SUCCESS"
-    except:
-        print "FAILED"
-        print ""
-        print "Using a standard matplotlib 'inferno' colorbar..."
-        mlibcolorbar = True
-        my_cm = plt.cm.get_cmap('inferno')
-        print "SUCCESS"
+        print("SUCCESS")
+    except Exception as e:
+        print("FAILED:",e)
+        print("Using a standard matplotlib 'inferno' colorbar...")
+        try:
+            mlibcolorbar = True
+            my_cm = plt.cm.get_cmap('inferno')
+            print("SUCCESS")
+        except Exception as e:
+            print("FAILED:",e)
+            print("ERROR: Please fix any of the above and try again")
 
 
 im = plt.imshow([[0],[0]],cmap=my_cm)
@@ -315,22 +328,22 @@ for datafile in files:
     
     # Save the image
 
-    print "Average Teff =", np.mean(data[~np.isnan(data)]), "K"
+    print("Average Teff =", np.mean(data[~np.isnan(data)]), "K")
 
     savename = "teffs"+datafile.split("/")[-1][5:-4]
     if paperfriendly:
         savename = savename+".eps"
     else:
         savename = savename+".png"
-    print "Saving", savename
+    print("Saving", savename)
     plt.savefig(savename,facecolor=fig.get_facecolor())
 
     # Clear the axis
     ax.clear()
 
-print "Finished."
+print("Finished.")
 if len(files) > 1:
-    print ""
-    print "Use this command to make a movie:"
-    print "convert -delay 10 -loop 0 teffs*.png teffs.gif"
+    print("")
+    print("Use this command to make a movie:")
+    print("convert -delay 10 -loop 0 teffs*.png teffs.gif")
 

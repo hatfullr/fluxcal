@@ -1,0 +1,45 @@
+#!/bin/bash
+
+mycheck () {
+    if [ $? -ne 0 ]; then
+	echo ""
+	echo "Installation failed"
+	exit 1
+    fi
+}
+
+curdir=$(pwd)
+mycheck
+
+\cd $curdir/defaults
+mycheck
+tar -xvzpf tables.tar.gz
+mycheck
+#\cd $curdir/test/standard_check
+#mycheck
+#tar -xvzpf original.tar.gz
+#mycheck
+#tar -xvzpf test.tar.gz
+#mycheck
+\cd $curdir
+mycheck
+
+./make
+mycheck
+
+echo ""
+echo "Checking integrity of installation"
+echo ""
+
+\cd $curdir/test/standard_check
+mycheck
+./run_test
+mycheck
+\cd $curdir
+mycheck
+
+
+echo ""
+echo "Installation completed successfully"
+
+

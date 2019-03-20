@@ -1,6 +1,10 @@
 # Makefile for flux_cal
 # Use gfortran because it's more standard
 FC = $(shell which gfortran)
+ifeq (, $(shell which gfortran))
+$(error ERROR: gfortran is not installed. Try 'sudo apt install gfortran')
+endif
+
 FFLAGS = -O4 -ffixed-line-length-132 -mcmodel=large
 
 LIB = -L/usr/lib

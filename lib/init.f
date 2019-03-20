@@ -197,6 +197,7 @@
       punit_out=1.d0            ! pressure
       Lunit_out=1.d0            ! luminosity
       kunit_out=1.d0            ! opacity
+      sunit_out=1.d0            ! specific entropy
       
       
       
@@ -346,12 +347,13 @@
       tempunit_out=tempunit_out*kelvin
       Lunit_out=Lunit_out*gram*cm**2.d0/sec**2.d0
       kunit_out=kunit_out*cm**2.d0/gram
+      sunit_out=sunit_out*cm**2.d0/sec**2.d0/kelvin
 
       
  97   format(A7," = ",I6,"   ",A10," = ",g10.4)
  98   format(A10," = ",I10,"   ",A10," = ",I10)
  99   format(A13," = ",E10.4,"   ",A11," = ",E10.4)
- 999  format(A10," = ",E10.4)
+ 999  format(A13," = ",E10.4)
  100  format(A21," = ",E10.4)
  101  format(A21," = ",I10)
  102  format(A27," = ",L1)
@@ -384,6 +386,7 @@ c     Write everything to the terminal
       write(*,99) "muunit_out  ",muunit_out  ,"gunit_out  ",gunit_out
       write(*,99) "tempunit_out",tempunit_out,"punit_out  ",punit_out
       write(*,99) "Lunit_out   ",Lunit_out   ,"kunit_out  ",kunit_out
+      write(*,999)"sunit_out   ",sunit_out
       write(*,*) ""
       
       write(*,97) "start ",start ,"anglexdeg",anglexdeg

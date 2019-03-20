@@ -1,5 +1,4 @@
 &input
-      ! Input file for flux_cal.
 !-----------------------------------------------------------------------
 
 
@@ -16,7 +15,7 @@
       ! The directory flux_cal was installed to. This is used to find the
       ! included tabulated equation of state 'sph.eos' and other data
       ! tables required for flux_cal to run.
-      flux_cal_dir = ''
+      flux_cal_dir = '../'
 
       
 
@@ -26,9 +25,6 @@
       ! Calculate the flux at each grid cell and record the data.
       get_fluxes=.false.
 
-      ! Calculate the true luminosity
-      get_true_luminosity=.false.
-      
       ! Set this to true to create a data file containing all the
       ! particles whose surfaces are closest to the observer  along each
       ! driving grid cell. In other words, the particles that flux_cal
@@ -100,23 +96,15 @@
 
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
-      taulimit=1.d0
+      taulimit=1.d1
 
       ! Optical depth by which the integrator will detect that a region
       ! is optically thick.
-      tau_thick_integrator=1.d0
+      tau_thick_integrator=1.d1
 
       ! The value of optical depth that a particle must exceed to be
       ! handled by the envelope fitting routine. 1.d1 by default.
       tau_thick_envfit=1.d1
-      
-      ! Optical depth value that signifies optically thick material. If
-      ! the integrator finds a region where tau is equal to this value,
-      ! it will tell flux_cal to use the envelope fitting routine.
-      ! Otherwise, flux_cal will use the SPH temperature. Set to 10.d0 by
-      ! default, because the envelope fitting routine works mostly for
-      ! tau > 10. (LEGACY)
-      tau_thick=-1.d30
       
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
@@ -162,13 +150,14 @@
       punit_out=1.d0            ! pressure
       Lunit_out=1.d0            ! luminosity
       kunit_out=1.d0            ! opacity
+      sunit_out=1.d0		! specific entropy
       
       
       
       !### Physics
       ! If true, use Rosseland opacities only. If false, will use
       ! Rosseland and Planck opacities with a smoothing function.
-      rossonly=.true.
+      rossonly=.false.
       
       ! Solar metallicity
       metallicity=0.02d0

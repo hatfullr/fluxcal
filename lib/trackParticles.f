@@ -35,7 +35,7 @@
       write(*,*) "Writing to '",trim(adjustl(trackingfile)),"'"
       do i=1,n
          if(track(i).gt.0) then
-            call output(trackingfile,i)
+            call output(trackingfile,i,binary_tracking_file)
          end if
       end do
       

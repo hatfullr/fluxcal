@@ -51,11 +51,11 @@ c      end if
 
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
-     $              TpracticalXYthin,TpracticalXYthick,
+     $              TOTALTpracticalXY(i,j),
      $              tauthin(i,j),zintpos(i,j))
 
-               TOTALTpracticalXY(i,j) = TpracticalXYthin +
-     $              TpracticalXYthick
+c               TOTALTpracticalXY(i,j) = TpracticalXYthin +
+c     $              TpracticalXYthick
                
 c               if(TpracticalXYthin.gt.0)then
 c                  ! Optically thick region made by thin particles

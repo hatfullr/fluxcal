@@ -1,34 +1,32 @@
 #!/bin/bash
 
-error=0
-\cd ../../
-./make
-if [ $? -eq 0 ]; then
-    \cd test/standard_check/test
-    \rm -f *~ *# debug flux_cal.output int_at_all_pos_0000.dat dimen*.dat fluxes*.dat
-    \cp ../original/dimen*.dat .
+errors=0
+originaldirs=( $(find original -name flux_cal | rev | cut -d'/' -f2- | rev) )
+testdirs=( $(find test -name flux_cal | rev | cut -d'/' -f2- | rev) )
+
+for i in $(seq 0 $(( ${#originaldirs[@]} - 1 ))); do
+    for j in $(find ${originaldirs[i]}/ -type f ! -name 'flux_cal'); do
+	diff --brief ${testdirs[i]}/$(basename $j) $j
+	if [ $? -ne 0 ]; then
+	    errors=$(( $errors + 1 ))
+	fi
+    done
+done
+
+if [[ "$errors" > "0" ]]; then
     echo ""
-    echo "Running flux_cal..."
-    ../../../flux_cal > debug
-
-    DIFF=$(diff ../original/int_at_all_pos_0000.dat ./int_at_all_pos_0000.dat)
-    if [ "$DIFF" != "" ]; then
-	echo "'int_at_all_pos_0000.dat'    differ"
-	error=1
+    echo "*** $errors differences detected. FluxCal is NOT stable. ***"
+    echo ""
+    diff --brief original/GNUFortran.txt test/GNUFortran.txt
+    if [ $? -eq 0 ]; then
+	echo "Your version of flux_cal may be corrupted. Please try re-installing."
     else
-	echo "'int_at_all_pos_0000.dat'    identical"
+	echo "Your GNU Fortran version differs. Your version is:"
+	head -n1 test/GNUFortran.txt
+	echo ""
+	echo "The GNU Fortran version used to create 'original' is:"
+	head -n1 original/GNUFortran.txt
+	echo ""
+	echo "Please try installing this version and try again."
     fi
-    DIFF=$(diff ../original/teffs00000_000_000_000.dat ./teffs00000_000_000_000.dat)
-    if [ "$DIFF" != "" ]; then
-	echo "'teffs00000_000_000_000.dat' differ"
-	error=1
-    else
-	echo "'teffs00000_000_000_000.dat' identical"
-    fi
-fi
-
-if [ $error == 1 ]; then
-    exit 1
-else
-    exit 0
 fi

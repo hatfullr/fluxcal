@@ -4,6 +4,12 @@ import sys
 import matplotlib as mpl
 import glob
 
+# This allows the program to be used by both python2 and python3
+try:
+    input = raw_input
+except NameError:
+    pass
+
 # Setup the matplotlib rcParams
 mpl.rcParams['lines.linewidth'] = 1
 mpl.rcParams['font.family'] = 'monospace'
@@ -67,21 +73,30 @@ def read_file(filename):
             linenum += 1
     return data
 
-user_input = raw_input("Enter file name(s) or patterns: ").split(" ")
+user_input = input("Enter file name(s) or patterns: ").split(" ")
 
 files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):
         files.append(i)
 
-filenum = np.array([])
-L = np.array([])
-for filename in files:
-    data = np.genfromtxt(filename,skip_header=5,usecols=(1,2,3))
-    #data = read_file(filename)
-    #filenum = np.append(filenum,data[:,0])
-    time = data[:,0]
-    L = np.append(L,data[:,1])
+if len(files) <= 0:
+    print("ERROR: Could not find files.")
+    sys.exit()
+
+try:
+    filenum = np.array([])
+    L = np.array([])
+    for filename in files:
+        data = np.genfromtxt(filename,skip_header=5,usecols=(1,2,3))
+        #data = read_file(filename)
+        #filenum = np.append(filenum,data[:,0])
+        time = data[:,0]
+        L = np.append(L,data[:,1])
+except Exception as e:
+    print("ERROR:",e)
+    print("Make sure the files you specified are of the correct format.")
+    sys.exit()
     
 
 #time = time * np.sqrt(runit**3./Gunit/munit) * days * 0.5
@@ -92,8 +107,8 @@ plt.xlabel("Time")
 plt.ylabel("$L$")
 plt.tight_layout()
 
-print "Maximum luminosity =",max(L)
-print "Occurs at time =",time[np.where(max(L)==L)[0][0]]
+print("Maximum luminosity =",max(L))
+print("Occurs at time =",time[np.where(max(L)==L)[0][0]])
 
 plt.savefig("light_curve.png")
 plt.show()

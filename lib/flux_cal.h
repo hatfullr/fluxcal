@@ -11,9 +11,9 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common/out/ nout,nit
       real*8 x(nmax),y(nmax),z(nmax),am(nmax),hp(nmax),rho(nmax),
      $      vx(nmax),vy(nmax),vz(nmax),a(nmax),wmeanmolecular(nmax),
-     $      localg(nmax),metal(nmax),tempp(nmax),pp(nmax)
+     $      localg(nmax),metal(nmax),tempp(nmax),pp(nmax),entropy(nmax)
       common/part/ x,y,z,am,hp,rho,vx,vy,vz,a,wmeanmolecular,localg,
-     $      metal,tempp,pp
+     $      metal,tempp,pp,entropy
 	   
       real*8 pi,kelvin,gram,sec,cm,erg,boltz,crad,planck,crad2,
      $      sigma,arad,qconst,coeff,pc,distance,gravconst
@@ -49,11 +49,11 @@ c      integer i
       real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out,kunit_out
+     $      Lunit_out,kunit_out,sunit_out
       common/units/ munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $      Lunit_out,kunit_out
+     $      Lunit_out,kunit_out,sunit_out
 
       real*8 Rform
       common/dust/Rform
@@ -103,7 +103,7 @@ c      integer i
      $      get_info_of_particle,info_particle,
      $      outfile,tau_thick_envfit,eosfile,get_true_luminosity,
      $      get_closest_particles,flux_cal_dir,tau_thick_integrator,
-     $      tau_thick,track_all,kunit_out
+     $      tau_thick,track_all,kunit_out,sunit_out
       common/inputfilenames/ opacityfile,opacitydustfile,filtersfile,
      $      trackfile,eosfile
 

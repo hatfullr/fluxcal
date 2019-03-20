@@ -81,9 +81,11 @@ c      character*255 fname
                eoutsideTEOS = aoutsideTEOS + a(i)*am(i)
             end if
             pp(i) = useeostable(a(i),rho(i),3) * gram/cm/sec**2.d0
+            entropy(i) = useeostable(a(i),rho(i),4)/boltz/6.0221409d23
          else
             tempp(i) = 0.d0
             pp(i) = 0.d0
+            entropy(i) = 0.d0
          end if
 
          call getOpacitySub(x(i),y(i),z(i),tempp(i),

@@ -170,7 +170,7 @@ c        ****************************************************************
 c        ****************************************************************
          if(get_info_of_particle) then
             write(*,*) "Finding data of particle ",info_particle
-            call output(pinfo_file,info_particle)
+            call output(pinfo_file,info_particle,.false.)
          end if
 c        ****************************************************************
 

@@ -15,15 +15,15 @@ c     Initialize the file names for this iteration
  35   format ('teffs',i5.5,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
  36   format ('teffs',i6.6,'_',i3.3,'_',i3.3,'_',i3.3,'.dat')
       if(innit.le.99999) then
-         write (fname2,33) innit,nint(anglez*180.d0/pi),
-     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-         write (fname,35) innit,nint(anglez*180.d0/pi),
-     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
+         write (fname2,33) innit,nint(anglex*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglez*180.d0/pi)
+         write (fname,35) innit,nint(anglex*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglez*180.d0/pi)
       else
-         write (fname2,34) innit,nint(anglez*180.d0/pi),
-     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
-         write (fname,36) innit,nint(anglez*180.d0/pi),
-     $        nint(angley*180.d0/pi),nint(anglex*180.d0/pi)
+         write (fname2,34) innit,nint(anglex*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglez*180.d0/pi)
+         write (fname,36) innit,nint(anglex*180.d0/pi),
+     $        nint(angley*180.d0/pi),nint(anglez*180.d0/pi)
       end if
 
 c     Use a 3x3 grid for starters:
