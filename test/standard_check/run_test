@@ -6,10 +6,13 @@
 
 curdir=$(pwd)
 
-\cd ${curdir}/test
+\cd test
 echo "Running test in 'test' directory"
 ./run
-\cd ${curdir}
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+\cd ..
 echo "Test complete"
 echo "Checking for differences between test and original"
 ./check

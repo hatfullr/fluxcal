@@ -11,7 +11,7 @@ mycheck () {
 curdir=$(pwd)
 mycheck
 
-\cd $curdir/defaults
+\cd defaults
 mycheck
 tar -xvzpf tables.tar.gz
 mycheck
@@ -21,7 +21,7 @@ mycheck
 #mycheck
 #tar -xvzpf test.tar.gz
 #mycheck
-\cd $curdir
+\cd ..
 mycheck
 
 ./make
@@ -31,11 +31,11 @@ echo ""
 echo "Checking integrity of installation"
 echo ""
 
-\cd $curdir/test/standard_check
+\cd test/standard_check
 mycheck
 ./run_test
 mycheck
-\cd $curdir
+\cd ../../
 mycheck
 
 

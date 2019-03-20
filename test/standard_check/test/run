@@ -6,7 +6,7 @@
 check () {
     if [ $? -ne 0 ]; then
 	echo "ERROR"
-	exit
+	exit 1
     fi
 }
 
@@ -14,14 +14,7 @@ curdir=$(pwd)
 dirlist=( $(find . -name flux_cal | rev | cut -d'/' -f2- | rev) )
 check
 
-echo "Removing old files"
-rm -f $curdir/GNUFortran.txt
-check
-for i in ${dirlist[@]}; do
-    rmfilelist=( $(find $i -type f ! -name 'fluxcal_0000.dat' -and ! -name 'dimen00000_000_000_000.dat' -and ! -name 'flux_cal' -and ! -name 'flux_cal.input' -and ! -name 'fluxcal.particles') )
-    rm -f ${rmfilelist[@]}
-    check
-done
+./clean
 
 for i in ${dirlist[@]}; do
     echo "Running $i"
