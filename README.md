@@ -9,8 +9,9 @@ cd fluxcal
 ./install
 ```
 This script will unzip the required included data files, build `flux_cal`,
-and perform a test to ensure file integrity. If you run into issues here,
-a solution may be available in the "Troubleshooting" section below.
+and perform a test to ensure file integrity. This may take up to 10 minutes or
+so depending on your system. If you run into issues here, a solution may be
+available in the "Troubleshooting" section below.
 
 
 ## Running FluxCal
