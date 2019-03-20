@@ -1,4 +1,6 @@
-# Installation
+# Using FluxCal
+
+## Installation
 
 To install FluxCal, run the following commands from the terminal
 ```
@@ -11,8 +13,7 @@ and perform a test to ensure file integrity. If you run into issues here,
 a solution may be available in the "Troubleshooting" section below.
 
 
-
-# Using FluxCal
+## Running FluxCal
 
 To run FluxCal, try the following
 ```
@@ -34,10 +35,10 @@ You can find a premade input file to test with in `<fluxcal-directory>/test/stan
 
 # Troubleshooting
 
-## Failing Compilation
+## Failing compilation on install
 
-There is a known bug with `gfortran` version 7.3.0 in that compilation will
-fail upon trying to build `mathlib/odeint.o`. The error appears as,
+There is a known bug with `gfortran-7.3.0` where compilation fails upon trying
+to build `mathlib/odeint.o`,
 ```
 /usr/bin/gfortran -O4 -ffixed-line-length-132 -mcmodel=large  -c -o mathlib/odeint.o mathlib/odeint.f
 mathlib/odeint.f:186:0:
@@ -53,13 +54,16 @@ make: *** [mathlib/odeint.o] Error 1
 
 Failed
 ```
-If you encounter this error, try compiling again. It may fail several times
-before finally succeeding, and may take 10 or more attempts. Hopefully this
-error disappears with future `gfortran` releases. We do not recommend
-downgrading your GNU compiler suite, as this is generally harmful.
+If you encounter this error, try compiling again,
+```
+./install
+```
+This may fail up to 10 times before finally succeeding. Hopefully this error
+disappears with future `gfortran` releases. We do not recommend downgrading
+your GNU compiler suite, as this is generally harmful.
 
 
-## Failing standard_check Test
+## Failing standard_check test
 
 When running the "standard_check" test, you may get files that differ
 from the original. This could be due to a difference in precision, which
