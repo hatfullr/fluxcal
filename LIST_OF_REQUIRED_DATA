@@ -1,5 +1,4 @@
-This is a list of the data flux_cal will require. It should be considered
-a complete list once dependencies on StarSmasher have been removed.
+This is a list of the data flux_cal requires.
 
 data files:
 Header (all in one line):
@@ -17,3 +16,5 @@ vz(i)             !z velocity (real*8)
 a(i)              !specific internal energy (real*8)
 wmeanmolecular(i) !mean molecular weight (real*8)
 g(i)              !local g magnitude (real*8)
+
+See lib/read_fluxcal.f for hints about formatting.
