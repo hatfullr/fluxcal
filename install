@@ -15,12 +15,6 @@ mycheck
 mycheck
 tar -xvzpf tables.tar.gz
 mycheck
-#\cd $curdir/test/standard_check
-#mycheck
-#tar -xvzpf original.tar.gz
-#mycheck
-#tar -xvzpf test.tar.gz
-#mycheck
 \cd ..
 mycheck
 
@@ -38,6 +32,24 @@ mycheck
 \cd ../../
 mycheck
 
+if [ ! -d $HOME/bin ];
+   echo "Creating directory $HOME/bin"
+   mkdir $HOME/bin
+   mycheck
+   echo "We recommend you add the line 'export PATH=\"$HOME/bin:$PATH\"' to $HOME/.profile or $HOME/.bashrc."
+fi
+
+echo ""
+echo "Linking plotting tools to $HOME/bin/."
+echo "\ln -s tools/plot_Teff $HOME/bin/."
+\ln -s $(pwd)/tools/plot_Teff $HOME/bin/.
+mycheck
+echo "\ln -s tools/plot_closest $HOME/bin/."
+\ln -s $(pwd)/tools/plot_closest $HOME/bin/.
+mycheck
+echo "\ln -s tools/plot_lc $HOME/bin/."
+\ln -s $(pwd)/tools/plot_lc $HOME/bin/.
+mycheck
 
 echo ""
 echo "Installation completed successfully"

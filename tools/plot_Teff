@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+from __future__ import print_function # Allows python2 and python3 functionality
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable, Divider, Size
@@ -8,6 +11,7 @@ import glob
 import sys
 import matplotlib as mpl
 import os.path
+import importlib
 
 # This allows the program to be used by both python2 and python3
 try:
@@ -15,9 +19,11 @@ try:
 except NameError:
     pass
 
+
 #runit=6.9598e10
 runit=1.e0
 tunit=1.e0
+tempunit=1.e0
 xlim = (None,None)
 ylim = (None,None)
 Tefflim = (None,None)
@@ -26,8 +32,8 @@ cmapname = 'nipy_spectral'
 usebb = None
 spatialaxesadapt = None
 colorbaradapt = None
-filepattern = ""
-paperfriendly = False
+filepattern = None
+paperfriendly = None
 
 fontsize = 12
 figsize = (8.0,8.0)
@@ -37,27 +43,35 @@ cbarlabel = "$T_{\\mathrm{eff}}\\ \\left[K\\right]$"
 timelabel = "t = {:15.3f}"
 rotationslabel = "Rotations (x,y,z) = ({:06.2f}$^o$,{:06.2f}$^o$,{:06.2f}$^o$)"
 
+defaultdir = os.path.dirname(os.path.realpath(__file__))
+defaultfile = defaultdir+"/settings_plot_Teff.py"
+
+print(defaultfile)
 if os.path.isfile('settings_plot_Teff.py'):
-    print("Importing settings_plot_Teff.py")
+    print("Importing local settings_plot_Teff.py")
+    from settings_plot_Teff import *
+elif os.path.isfile(defaultfile):
+    print("Importing default settings")
     from settings_plot_Teff import *
 
 files = []
 while len(files) == 0:
-    if filepattern == "":
+    if filepattern is None:
         filepattern = input("Enter file name(s) or patterns: ")
-    filepattern = filepattern.split(" ")
-    #if not isinstance(filepattern,list): filepattern = [filepattern]
+    try:
+        filepattern = filepattern.split()
+    except AttributeError:
+        pass
     for pattern in filepattern:
         fs = sorted(glob.glob(pattern))
         if len(fs) > 0:
             for i in fs:
-                if ((i[:5] != "teffs") or (i[-4:] != ".dat") or (len(i)<=0)):
-                    print("ERROR: You must provide teffs files from FluxCal output.")
-                    print("Error on file",i)
-                else:
-                    files.append(i)
+                files.append(i)
         else:
-            print("ERROR: File pattern '"+pattern+"' not found")
+            print("ERROR: One or more file pattern not found")
+            files = []
+            filepattern = None
+            break
     
 
 if usebb == None:
@@ -87,7 +101,7 @@ if((spatialaxesadapt == None) and (colorbaradapt == None)):
                 else:
                     print("ERROR: Please respond with 'y' or 'n'.")
             loop2 = True
-            while loop2:
+            while loop2 and not usebb:
                 user_input = input("On colorbar? (y/n): ")
                 if user_input == "y":
                     colorbaradapt = True
@@ -97,14 +111,20 @@ if((spatialaxesadapt == None) and (colorbaradapt == None)):
                 else:
                     print("ERROR: Please respond with 'y' or 'n'.")
             loop = False
-        elif user_input != "n":
+            if usebb:
+                print("[adaptive limits not available for blackbody spectrum]")
+        elif user_input == "n":
+            spatialaxesadapt = False
+            colorbaradapt = False
+            loop = False
+        else:
             print("ERROR: Please respond with 'y' or 'n'.")
 
 if paperfriendly == None:
     loop = True
     paperfriendly = False
     while loop:
-        user_input = input("Paper friendly? (y/n): ")
+        user_input = input("Paper friendly? [Experimental] (y/n): ")
         if user_input == "y":
             paperfriendly = True
             loop = False
@@ -329,7 +349,7 @@ if not spatialaxesadapt or not colorbaradapt:
             xminn = xminn + (dx-dy)/2.
         ax.set_aspect(aspect=(xmaxx-xminn)/(ymaxx-yminn))
 
-    if not colorbaradapt:
+    if not colorbaradapt and not usebb:
         if Tefflim[0] != None:
             Tmin = Tefflim[0]
         else:
