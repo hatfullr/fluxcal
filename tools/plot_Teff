@@ -20,7 +20,6 @@ except NameError:
     pass
 
 
-usedefault=False
 #runit=6.9598e10
 runit=1.e0
 tunit=1.e0
@@ -33,7 +32,7 @@ cmapname = 'nipy_spectral'
 usebb = None
 spatialaxesadapt = None
 colorbaradapt = None
-filepattern = ""
+filepattern = None
 paperfriendly = None
 
 fontsize = 12
@@ -45,43 +44,34 @@ timelabel = "t = {:15.3f}"
 rotationslabel = "Rotations (x,y,z) = ({:06.2f}$^o$,{:06.2f}$^o$,{:06.2f}$^o$)"
 
 defaultdir = os.path.dirname(os.path.realpath(__file__))
-defaultfile = defaultdir+"/settings_default_plot_Teff.py"
-if os.path.isfile(defaultfile):
-    sys.path.insert(0,defaultdir)
-    from settings_default_plot_Teff import *
+defaultfile = defaultdir+"/settings_plot_Teff.py"
 
-    if not usedefault:
-        if os.path.isfile('settings_plot_Teff.py'):
-            print("Importing settings_plot_Teff.py")
-            from settings_plot_Teff import *
+print(defaultfile)
+if os.path.isfile('settings_plot_Teff.py'):
+    print("Importing local settings_plot_Teff.py")
+    from settings_plot_Teff import *
+elif os.path.isfile(defaultfile):
+    print("Importing default settings")
+    from settings_plot_Teff import *
 
 files = []
 while len(files) == 0:
-    if filepattern == "":
+    if filepattern is None:
         filepattern = input("Enter file name(s) or patterns: ")
     try:
-        filepattern = filepattern.split(" ")
+        filepattern = filepattern.split()
     except AttributeError:
         pass
-    #if not isinstance(filepattern,list): filepattern = [filepattern]
     for pattern in filepattern:
         fs = sorted(glob.glob(pattern))
         if len(fs) > 0:
             for i in fs:
-                """
-                if ((i[:5] != "teffs") or (i[-4:] != ".dat") or (len(i)<=0)):
-                    try:
-                        print i.split("/")
-                    except AttributeError:
-                        print("ERROR: Unrecognized file type. File must begin with  teffs files from FluxCal output.")
-                        print("Error on file",i)
-                else:
-                    files.append(i)
-                """
                 files.append(i)
         else:
-            print("ERROR: File pattern '"+pattern+"' not found")
-            sys.exit()
+            print("ERROR: One or more file pattern not found")
+            files = []
+            filepattern = None
+            break
     
 
 if usebb == None:
@@ -111,7 +101,7 @@ if((spatialaxesadapt == None) and (colorbaradapt == None)):
                 else:
                     print("ERROR: Please respond with 'y' or 'n'.")
             loop2 = True
-            while loop2:
+            while loop2 and not usebb:
                 user_input = input("On colorbar? (y/n): ")
                 if user_input == "y":
                     colorbaradapt = True
@@ -121,6 +111,8 @@ if((spatialaxesadapt == None) and (colorbaradapt == None)):
                 else:
                     print("ERROR: Please respond with 'y' or 'n'.")
             loop = False
+            if usebb:
+                print("[adaptive limits not available for blackbody spectrum]")
         elif user_input == "n":
             spatialaxesadapt = False
             colorbaradapt = False
@@ -357,7 +349,7 @@ if not spatialaxesadapt or not colorbaradapt:
             xminn = xminn + (dx-dy)/2.
         ax.set_aspect(aspect=(xmaxx-xminn)/(ymaxx-yminn))
 
-    if not colorbaradapt:
+    if not colorbaradapt and not usebb:
         if Tefflim[0] != None:
             Tmin = Tefflim[0]
         else:

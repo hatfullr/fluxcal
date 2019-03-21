@@ -32,17 +32,25 @@ mycheck
 \cd ../../
 mycheck
 
+if [ ! -d $HOME/bin ];
+   echo "Creating directory $HOME/bin"
+   mkdir $HOME/bin
+   mycheck
+   echo "We recommend you add the line 'export PATH=\"$HOME/bin:$PATH\"' to $HOME/.profile or $HOME/.bashrc."
+fi
 
 echo ""
-echo "Linking plotting tools to /usr/local/bin/"
-echo "\ln -s tools/plot_Teff /usr/local/bin/."
-\ln -s tools/plot_Teff /usr/local/bin/.
+echo "Linking plotting tools to $HOME/bin/."
+echo "\ln -s tools/plot_Teff $HOME/bin/."
+\ln -s $(pwd)/tools/plot_Teff $HOME/bin/.
 mycheck
-echo "\ln -s tools/plot_closest /usr/local/bin/."
-\ln -s tools/plot_closest /usr/local/bin/.
+echo "\ln -s tools/plot_closest $HOME/bin/."
+\ln -s $(pwd)/tools/plot_closest $HOME/bin/.
 mycheck
-echo "\ln -s tools/plot_lc /usr/local/bin/."
-\ln -s tools/plot_lc /usr/local/bin/.
+echo "\ln -s tools/plot_lc $HOME/bin/."
+\ln -s $(pwd)/tools/plot_lc $HOME/bin/.
+mycheck
+
 echo ""
 echo "Installation completed successfully"
 

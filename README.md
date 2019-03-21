@@ -8,10 +8,10 @@ git clone https://github.com/hatfullr/fluxcal.git
 cd fluxcal
 ./install
 ```
-This script will unzip the required included data files, build `flux_cal`,
-and perform a test to ensure file integrity. This may take up to 10 minutes or
-so depending on your system. If you run into issues here, a solution may be
-available in the "Troubleshooting" section below.
+DO NOT RUN AS ROOT. This script will unzip the required included data files,
+build `flux_cal`, and perform a test to ensure file integrity. This may take up
+to 10 minutes or so depending on your system. If you run into issues here, a
+solution may be available in the "Troubleshooting" section below.
 
 
 ## Running FluxCal
@@ -32,6 +32,16 @@ with
 You can find a premade input file to test with in `<fluxcal-directory>/test/standard_check/original/fluxcal_0000.dat`. Do not move this file.
 
 
+## Plotting utilities
+
+FluxCal comes prepackaged with a suite of plotting utilities which can be found
+at `<fluxcal-directory>/tools/`,
+```
+plot_Teff
+plot_closest
+plot_lc
+```
+Upon installation, these are linked to `/usr/local/bin/` 
 
 
 # Troubleshooting
