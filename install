@@ -8,6 +8,12 @@ mycheck () {
     fi
 }
 
+if ! [ -x "$(command -v gfortran)" ]; then
+    echo "gfortran is not installed or is not in your PATH variable. Try"
+    echo "sudo apt install gfortran"
+    exit 1
+fi
+
 curdir=$(pwd)
 mycheck
 
@@ -21,7 +27,7 @@ mycheck
 ./make
 mycheck
 
-if [ ! -d $HOME/bin ];
+if [ ! -d $HOME/bin ]; then
    echo ""
    echo "Creating directory $HOME/bin"
    mkdir $HOME/bin
