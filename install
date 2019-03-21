@@ -15,12 +15,6 @@ mycheck
 mycheck
 tar -xvzpf tables.tar.gz
 mycheck
-#\cd $curdir/test/standard_check
-#mycheck
-#tar -xvzpf original.tar.gz
-#mycheck
-#tar -xvzpf test.tar.gz
-#mycheck
 \cd ..
 mycheck
 
@@ -39,6 +33,16 @@ mycheck
 mycheck
 
 
+echo ""
+echo "Linking plotting tools to /usr/local/bin/"
+echo "\ln -s tools/plot_Teff /usr/local/bin/."
+\ln -s tools/plot_Teff /usr/local/bin/.
+mycheck
+echo "\ln -s tools/plot_closest /usr/local/bin/."
+\ln -s tools/plot_closest /usr/local/bin/.
+mycheck
+echo "\ln -s tools/plot_lc /usr/local/bin/."
+\ln -s tools/plot_lc /usr/local/bin/.
 echo ""
 echo "Installation completed successfully"
 
