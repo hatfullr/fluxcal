@@ -1,4 +1,8 @@
-# settings_plot_Teff.py
+# default settings_plot_Teff.py
+# DO NOT MOVE THIS FILE.
+# Setting usedefault = True will only work when running plot_Teff.py from this directory.
+
+usedefault = True # Set to True to use this file. All other settings files will be omitted.
 
 runit=6.9598e10
 #runit = 1.e0
@@ -16,7 +20,7 @@ cmapname = 'nipy_spectral' # Ignored when usebb is False
 usebb = False              # Use blackbody spectrum
 spatialaxesadapt = False    # Use adaptive spatial limits
 colorbaradapt = False      # Use adaptive colorbar limits
-filepattern = "teffs*.dat" # Search pattern for data files
+filepattern = "" # Search pattern for data files. Set to "" to prompt every time
 paperfriendly = False      # Paper friendly plot [Experimental]
 
 fontsize = 12
