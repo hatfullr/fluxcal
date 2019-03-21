@@ -46,9 +46,8 @@ rotationslabel = "Rotations (x,y,z) = ({:06.2f}$^o$,{:06.2f}$^o$,{:06.2f}$^o$)"
 defaultdir = os.path.dirname(os.path.realpath(__file__))
 defaultfile = defaultdir+"/settings_plot_Teff.py"
 
-print(defaultfile)
 if os.path.isfile('settings_plot_Teff.py'):
-    print("Importing local settings_plot_Teff.py")
+    print("Importing local settings")
     from settings_plot_Teff import *
 elif os.path.isfile(defaultfile):
     print("Importing default settings")
