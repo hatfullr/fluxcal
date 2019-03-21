@@ -8,6 +8,12 @@ mycheck () {
     fi
 }
 
+if ! [ -x "$(command -v gfortran)" ]; then
+    echo "gfortran is not installed or is not in your PATH variable. Try"
+    echo "sudo apt install gfortran"
+    exit 1
+fi
+
 curdir=$(pwd)
 mycheck
 
@@ -21,18 +27,8 @@ mycheck
 ./make
 mycheck
 
-echo ""
-echo "Checking integrity of installation"
-echo ""
-
-\cd test/standard_check
-mycheck
-./run_test
-mycheck
-\cd ../../
-mycheck
-
-if [ ! -d $HOME/bin ];
+if [ ! -d $HOME/bin ]; then
+   echo ""
    echo "Creating directory $HOME/bin"
    mkdir $HOME/bin
    mycheck
@@ -54,4 +50,5 @@ mycheck
 echo ""
 echo "Installation completed successfully"
 
-
+echo ""
+echo "You should check the integrity of the installation (recommended) by running ./integrity_check"

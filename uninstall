@@ -19,7 +19,8 @@ echo "\rm $HOME/bin/plot_lc"
 \rm $HOME/bin/plot_lc
 mycheck
 echo ""
-echo "Uninstallation completed successfully. Perform the following actions to remove fluxcal from your system:"
+echo "Uninstallation completed successfully."
+echo "Issue the following commands to remove fluxcal from your system:"
 echo "cd .."
 echo "rm -rf fluxcal"
 
