@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.axes_grid1 import make_axes_locatable, Divider, Size
+from mpl_toolkits.axes_grid1.mpl_axes import Axes
 import matplotlib.cm as cm
 import matplotlib.colors as cols
 import glob
@@ -20,12 +21,21 @@ tunit=1.e0
 xlim = (None,None)
 ylim = (None,None)
 Tefflim = (None,None)
-cmapdefault = 'nipy_spectral'
+logteff = False
+cmapname = 'nipy_spectral'
 usebb = None
 spatialaxesadapt = None
 colorbaradapt = None
 filepattern = ""
 paperfriendly = False
+
+fontsize = 12
+figsize = (8.0,8.0)
+xlabel = "$x$"
+ylabel = "$y$"
+cbarlabel = "$T_{\\mathrm{eff}}\\ \\left[K\\right]$"
+timelabel = "t = {:15.3f}"
+rotationslabel = "Rotations (x,y,z) = ({:06.2f}$^o$,{:06.2f}$^o$,{:06.2f}$^o$)"
 
 if os.path.isfile('settings_plot_Teff.py'):
     print("Importing settings_plot_Teff.py")
@@ -103,8 +113,8 @@ if paperfriendly == None:
         else:
             print("ERROR: Please respond with 'y' or 'n'.")
 
-mpl.rcParams['font.size'] = 12
-mpl.rcParams['figure.figsize'] = (8.0,8.0)
+mpl.rcParams['font.size'] = fontsize
+mpl.rcParams['figure.figsize'] = figsize
 if paperfriendly:
     # This format is appropriate for ApJ style papers that have
     # two columns of text per page. Each column has a width of
@@ -174,23 +184,19 @@ mpl.rcParams['ytick.minor.visible'] = True
 #mpl.rcParams['figure.subplot.top'] = 0.95
 
 x0win = 0.125
-y0win = 0.18273809523809526
+y0win = 0.18273809523809526 - 0.04
 x1win = 0.8095238095238095
-y1win = 0.8672619047619047
-
+y1win = 0.8672619047619047 -0.04
         
 # Create the plot
 
 fig = plt.figure()
 ax = plt.gca()
 ax.set_position([x0win,y0win,x1win-x0win,y1win-y0win])
+pos = ax.get_position()
 
-        
+
 # Create the colorbar
-
-vmin = 0.
-vmax = 10000.
-norm = cols.Normalize(vmin,vmax)
 
 if Tefflim[0] != None:
     vmin = Tefflim[0]
@@ -199,6 +205,8 @@ if Tefflim[1] != None:
 
 mlibcolorbar=False
 if usebb:
+    Tmin = 0.
+    Tmax = 10000.
     try:
         print("Getting live website data for blackbody spectrum colors.")
         import urllib2
@@ -221,11 +229,9 @@ if usebb:
     
         Nbbcols = len(bbcols)
         colors = np.reshape(bbcols[:,1:],(Nbbcols,3))
-        colors = colors[np.where((bbcols[:,0] > vmin) & (bbcols[:,0] < vmax))[0]]
+        colors = colors[np.where((bbcols[:,0] > Tmin) & (bbcols[:,0] < Tmax))[0]]
         my_cm = cols.LinearSegmentedColormap.from_list(
             'blackbody', colors, N=Nbbcols)
-        print("SUCCESS")
-
     except Exception as e:
         print("FAILED:", e)
         try:
@@ -233,134 +239,139 @@ if usebb:
             bbcols = np.genfromtxt("blackbody_temps.dat",usecols=(0,6,7,8))
             Nbbcols = len(bbcols)
             colors = np.reshape(bbcols[:,1:],(Nbbcols,3))
-            colors = colors[np.where((bbcols[:,0] > vmin) & (bbcols[:,0] < vmax))[0]]
+            colors = colors[np.where((bbcols[:,0] > Tmin) & (bbcols[:,0] < Tmax))[0]]
             my_cm = cols.LinearSegmentedColormap.from_list(
                 'blackbody', colors, N=Nbbcols)
-            print("SUCCESS")
         except Exception as e:
             print("FAILED:",e)
             print("Cannot use the blackbody color spectrum. Please fix one of the above errors or choose 'n' at the blackbody color spectrum prompt.")
             sys.exit()
 else:
-    print("Using the default colorbar '"+cmapdefault+"'.")
+    Tmin = 0.
+    Tmax = 0.
+    print("Using the colorbar '"+cmapname+"'.")
     try:
         mlibcolorbar = True
-        my_cm = plt.cm.get_cmap(cmapdefault)
-        print("SUCCESS")
+        my_cm = plt.cm.get_cmap(cmapname)
     except Exception as e:
         print("FAILED:",e)
         print("ERROR: Please fix the above error and try again.")
         sys.exit()
 
+if usebb and colorbaradapt:
+    print("ERROR: It does not make sense to have usebb=True and colorbaradapt=True. The blackbody color spectrum is fixed for given temperatures.")
+    sys.exit()
+        
 if paperfriendly:
     my_cm.set_bad('white',1.)
 else:
     my_cm.set_bad('black',1.)
     
+#im = plt.imshow([[np.nan],[np.nan]],extent=(ax.get_xlim()[0],ax.get_xlim()[1],ax.get_ylim()[0],ax.get_ylim()[1]),cmap=my_cm)
+#pos = ax.get_position()
+#cbwidth = 0.03
+#cax = fig.add_axes([pos.xmax+0.01,pos.ymin,cbwidth,(pos.ymax-pos.ymin)])
+#caxposorig = cax.get_position()
+#cb = plt.colorbar(im,cax=cax)
+#plt.clim(Tmin,Tmax)
+#cb.ax.minorticks_off()
+
+if not spatialaxesadapt or not colorbaradapt:
+    # Read all the datafiles and find the maximum viewport
+    if not spatialaxesadapt:
+        xmaxx = -1e30
+        ymaxx = -1e30
+        xminn = 1e30
+        yminn = 1e30
+    if not colorbaradapt:
+        aminn = 1.e30
+        amaxx = 0.
+    for datafile in files:
+        grid = np.genfromtxt(datafile,max_rows=1)
+
+        xmin = grid[0]/runit
+        hxmap = grid[1]/runit
+        nx = int(grid[2])
+        ymin = grid[3]/runit
+        hymap = grid[4]/runit
+        ny = int(grid[5])
+
+        if not spatialaxesadapt:
+            xmax = xmin + hxmap * nx
+            ymax = ymin + hymap * ny
+
+            xminn = min(xminn,xmin)
+            xmaxx = max(xmaxx,xmax)
+            yminn = min(yminn,ymin)
+            ymaxx = max(ymaxx,ymax)
+
+        if not colorbaradapt:
+            if logteff:
+                data = np.genfromtxt(datafile,skip_header=1,max_rows=ny)/tempunit
+            else:
+                data = 10.**(np.genfromtxt(datafile,skip_header=1,max_rows=ny))/tempunit
+                data[np.where(data == 0)] = np.nan # Set all T=0 to NaN
+
+            data[np.isinf(data)] = np.nan # Set all inf to NaN
+            data[np.isneginf(data)] = np.nan # Set all -inf to NaN
+
+            aminn = min(np.amin(data[np.isfinite(data)]),aminn)
+            amaxx = max(np.amax(data[np.isfinite(data)]),amaxx)
+        
+    if not spatialaxesadapt:
+        dx = xmaxx - xminn
+        dy = ymaxx - yminn
+        if dx > dy:
+            ymaxx = yminn + (dy+dx)/2.
+            yminn = yminn + (dy-dx)/2.
+        elif dx < dy:
+            xmaxx = xminn + (dx+dy)/2.
+            xminn = xminn + (dx-dy)/2.
+        ax.set_aspect(aspect=(xmaxx-xminn)/(ymaxx-yminn))
+
+    if not colorbaradapt:
+        if Tefflim[0] != None:
+            Tmin = Tefflim[0]
+        else:
+            Tmin = aminn
+
+        if Tefflim[1] != None:
+            Tmax = Tefflim[1]
+        else:
+            Tmax = amaxx
+
 im = plt.imshow([[np.nan],[np.nan]],extent=(ax.get_xlim()[0],ax.get_xlim()[1],ax.get_ylim()[0],ax.get_ylim()[1]),cmap=my_cm)
 pos = ax.get_position()
 cbwidth = 0.03
 cax = fig.add_axes([pos.xmax+0.01,pos.ymin,cbwidth,(pos.ymax-pos.ymin)])
 caxposorig = cax.get_position()
 cb = plt.colorbar(im,cax=cax)
-plt.clim(vmin,vmax)
+plt.clim(Tmin,Tmax)
 cb.ax.minorticks_off()
 
-cbar_label = "$T_{\\mathrm{eff}}\\ \\left[K\\right]$"
-cbstate=0
-
-if not spatialaxesadapt or not colorbaradapt:
-    # Read all the datafiles and find the maximum viewport
-    xmaxx = -1e30
-    ymaxx = -1e30
-    xminn = 1e30
-    yminn = 1e30
-    aminn = 1.e30
-    amaxx = 0.
-    for datafile in files:
-        grid = np.genfromtxt(datafile,max_rows=1)
-
-        xmin = grid[0]*runit
-        hxmap = grid[1]*runit
-        nx = int(grid[2])
-        ymin = grid[3]*runit
-        hymap = grid[4]*runit
-        ny = int(grid[5])
-        
-        data = 10.**(np.genfromtxt(datafile,skip_header=1,max_rows=ny))
-        data[np.isinf(data)] = np.nan # Set all inf to NaN
-        data[np.isneginf(data)] = np.nan # Set all -inf to NaN
-        data[np.where(data == 0)] = np.nan # Set all T=0 to NaN
-
-        aminn = min(np.amin(data[np.isfinite(data)]),aminn)
-        amaxx = max(np.amax(data[np.isfinite(data)]),amaxx)
-        
-        xmax = xmin + hxmap * nx
-        ymax = ymin + hymap * ny
-
-        if xmin < xminn: xminn = xmin
-        if ymin < yminn: yminn = ymin
-        if xmax > xmaxx: xmaxx = xmax
-        if ymax > ymaxx: ymaxx = ymax
-
-
-    dx = xmaxx - xminn
-    dy = ymaxx - yminn
-    if dx > dy:
-        ymaxx = yminn + (dy+dx)/2.
-        yminn = yminn + (dy-dx)/2.
-    elif dx < dy:
-        xmaxx = xminn + (dx+dy)/2.
-        xminn = xminn + (dx-dy)/2.
-
+cbstate = 0
 triggered = [ False, False, False ]
-pos=[]
+count = 0
 for datafile in files:
-    
     # Get the grid data
 
     hdr = np.genfromtxt(datafile,max_rows=1)
     
-    xmin = hdr[0]*runit
-    hxmap = hdr[1]*runit
+    xmin = hdr[0]/runit
+    hxmap = hdr[1]/runit
     nx = int(hdr[2])
-    ymin = hdr[3]*runit
-    hymap = hdr[4]*runit
+    ymin = hdr[3]/runit
+    hymap = hdr[4]/runit
     ny = int(hdr[5])
-    t = hdr[6] #in seconds
-    t = t*tunit # in days
+    t = hdr[6]/tunit
     
     xmax = xmin + hxmap * nx
     ymax = ymin + hymap * ny
-    
-    # Get the Teff data
-    
-    data = 10.**(np.genfromtxt(datafile,skip_header=1,max_rows=ny))
 
-    data[np.isinf(data)] = np.nan # Set all inf to NaN
-    data[np.isneginf(data)] = np.nan # Set all -inf to NaN
-    data[np.where(data == 0.)] = np.nan # Set all T=0 to NaN
+    dx = xmax - xmin
+    dy = ymax - ymin
 
-    # Maintain plot axis dimensions
-    if type(pos) == 'matplotlib.transforms.Bbox':
-        ax.set_position([pos.x0,pos.y0,pos.width,pos.height])
-        
-    amax = np.amax(data[np.isfinite(data)])
-    amin = np.amin(data[np.isfinite(data)])
-    if spatialaxesadapt:
-    
-        # Center and square the plotted region
-    
-        dx = xmax - xmin
-        dy = ymax - ymin
-        
-        if dx > dy:
-            ax.set_ylim(ymin + (dy-dx)/2., ymin + (dy+dx)/2.)
-        elif dx < dy:
-            ax.set_xlim(xmin + (dx-dy)/2., xmin + (dx+dy)/2.)
-
-        # Set temperature bounds
-    else:
+    if not spatialaxesadapt:
         myxmin = xminn
         myxmax = xmaxx
         if xlim[0] != None:
@@ -374,36 +385,64 @@ for datafile in files:
             myymin = ylim[0]
         if ylim[1] != None:
             myymax = ylim[1]
-            
-        ax.set_xlim(myxmin,myxmax)
-        ax.set_ylim(myymin,myymax)
-
-        
-    if colorbaradapt:
-        Tmax = amax
-        Tmin = amin
-    else:
-        if Tefflim[0] != None:
-            Tmin = Tefflim[0]
-        else:
-            Tmin = aminn
-
-        if Tefflim[1] != None:
-            Tmax = Tefflim[1]
-        else:
-            Tmax = amaxx
-
-    # Plot the data
-    im = ax.imshow(data,cmap=my_cm,vmin=Tmin,vmax=Tmax,
-                    aspect='equal',extent=(xmin,xmax,ymin,ymax),norm=norm,origin='lower')
     
-    if type(pos) != 'matplotlib.transforms.Bbox':
-        pos = ax.get_position()
+    # Get the Teff data
 
+    if logteff:
+        data = np.genfromtxt(datafile,skip_header=1,max_rows=ny)/tempunit
+    else:
+        data = 10.**(np.genfromtxt(datafile,skip_header=1,max_rows=ny))/tempunit
+        data[np.where(data == 0.)] = np.nan # Set all T=0 to NaN
+
+    data[np.isinf(data)] = np.nan # Set all inf to NaN
+    data[np.isneginf(data)] = np.nan # Set all -inf to NaN
+
+    amax = np.amax(data[np.isfinite(data)])
+    amin = np.amin(data[np.isfinite(data)])
+
+    # Set temperature bounds
     if colorbaradapt:
+        #Tmax = amax
+        #Tmin = amin
+        xlocs = np.zeros(shape=np.shape(data))
+        ylocs = np.zeros(shape=np.shape(data))
+        for i in range(0,len(xlocs[0])):
+            xlocs[:,i] = xmin + hxmap*i
+        for i in range(0,len(ylocs)):
+            ylocs[i] = ymin + hymap*i
+
+        idx = np.isfinite(data)
+        xlocs = xlocs[idx].flatten()
+        ylocs = ylocs[idx].flatten()
+        flatdata = data[idx].flatten()
+        if not spatialaxesadapt:
+            idx = np.where(np.logical_and(np.logical_and(xlocs >= myxmin, xlocs <= myxmax),
+                                          np.logical_and(ylocs >= myymin, ylocs <= myymax)))[0]
+            Tmin = min(flatdata[idx])
+            Tmax = max(flatdata[idx])
+        else:
+            Tmin = amin
+            Tmax = amax
         cb.set_clim(Tmin,Tmax)
         cb.update_normal(cax)
 
+    # Plot the data
+    im = ax.imshow(data,cmap=my_cm,vmin=Tmin,vmax=Tmax,
+                    aspect='equal',extent=(xmin,xmax,ymin,ymax),origin='lower')
+            
+    if spatialaxesadapt:
+        # Center and square the plotted region
+    
+        if dx > dy:
+            ax.set_ylim(ymin + (dy-dx)/2., ymin + (dy+dx)/2.)
+        elif dx < dy:
+            ax.set_xlim(xmin + (dx-dy)/2., xmin + (dx+dy)/2.)
+    else:
+        ax.set_xlim(myxmin,myxmax)
+        ax.set_ylim(myymin,myymax)
+        ax.set_aspect(aspect=(myxmax-myxmin)/(myymax-myymin))
+
+    
     # Resize colorbar and put arrow on it for stuff out of bounds
     if not colorbaradapt:
         cbstateold = cbstate
@@ -440,19 +479,17 @@ for datafile in files:
         elif cbstate == 3:
             cb.extend = 'both'
 
-        if cbstateold != cbstate:
+        if (cbstateold != cbstate) or (count==0):
             cax.set_position([x0,y0,width,height])
             cb._inside = cb._slice_dict[cb.extend]
             cb.update_normal(cax)
 
 
-                
-
     # Re-plot the axis labels
 
-    ax.annotate("$x$",((pos.x0+pos.x1)/2.,0.05),xycoords='figure fraction', ha='center')
-    ax.annotate("$y$",(0.0,(pos.y1+pos.y0)/2.),xycoords='figure fraction', ha='left',va='center',rotation='vertical')
-    ax.annotate(cbar_label,(1.0,(pos.y1+pos.y0)/2.),xycoords='figure fraction', va='center',ha='right',rotation='vertical')
+    ax.annotate(xlabel,((pos.x0+pos.x1)/2.,0.05),xycoords='figure fraction', ha='center')
+    ax.annotate(ylabel,(0.0,(pos.y1+pos.y0)/2.),xycoords='figure fraction', ha='left',va='center',rotation='vertical')
+    ax.annotate(cbarlabel,(1.0,(pos.y1+pos.y0)/2.),xycoords='figure fraction', va='center',ha='right',rotation='vertical')
 
     
     # Update the plot title
@@ -462,13 +499,9 @@ for datafile in files:
     ydeg = int(rotations[1])
     xdeg = int(rotations[2])
     if not paperfriendly:
-        pos = ax.get_position()
-        ax.annotate("t = {:15.3f}".format(t),(pos.x0,0.95),xycoords='figure fraction',ha='left')
-        ax.annotate("Rotations (x,y,z) = ({:06.2f}$^o$,{:06.2f}$^o$,{:06.2f}$^o$)".format(xdeg,ydeg,zdeg),(pos.x0,0.92),xycoords='figure fraction', ha='left')
+        ax.annotate(timelabel.format(t),(pos.x0,(1.+pos.y1)/2.+0.015),xycoords='figure fraction',ha='left')
+        ax.annotate(rotationslabel.format(xdeg,ydeg,zdeg),(pos.x0,(1.+pos.y1)/2.-0.015),xycoords='figure fraction', ha='left')
 
-    # Maintain plot axis dimensions
-    if type(pos) == 'matplotlib.transforms.Bbox':
-        ax.set_position([pos.x0,pos.y0,pos.width,pos.height])
 
     # Save the image
 
@@ -480,11 +513,9 @@ for datafile in files:
     print("Saving", savename)
     plt.savefig(savename,facecolor=fig.get_facecolor())
 
-    # Maintain the same axis size no matter what
-    pos = ax.get_position()
-    
     # Clear the axis
     ax.clear()
+    count+=1
 
 print("Finished.")
 if len(files) > 1:
