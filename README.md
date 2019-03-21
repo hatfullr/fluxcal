@@ -9,9 +9,13 @@ cd fluxcal
 ./install
 ```
 DO NOT RUN AS ROOT. This script will unzip the required included data files,
-build `flux_cal`, and perform a test to ensure file integrity. This may take up
-to 10 minutes or so depending on your system. If you run into issues here, a
-solution may be available in the "Troubleshooting" section below.
+build `flux_cal`, and link the plotting suite to your home directory. We strongly
+recommend you perform a file integrity check by running
+```
+./integrity_check
+```
+This may take up to 10 minutes or so depending on your system. If you run into
+issues here, a solution may be available in the "Troubleshooting" section below.
 
 
 ## Running FluxCal
@@ -41,7 +45,10 @@ plot_Teff
 plot_closest
 plot_lc
 ```
-Upon installation, these are linked to `/usr/local/bin/` 
+Upon installation, these are linked to `$HOME/bin/.` and thus, as long as this
+directory is in your `PATH` variable, you can run any of these simply as
+`plot_Teff`, `plot_closest`, and `plot_lc`. Please note that `plot_closest` and
+`plot_lc` are not as sophisticated as `plot_Teff`.
 
 
 # Troubleshooting
