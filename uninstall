@@ -1,0 +1,25 @@
+#!/bin/bash
+
+mycheck () {
+    if [ $? -ne 0 ]; then
+	echo ""
+	echo "Uninstallation failed"
+	exit 1
+    fi
+}
+
+echo "Removing linked plotting tools"
+echo "\rm /usr/local/bin/plot_Teff"
+\rm /usr/local/bin/plot_Teff
+mycheck
+echo "\rm /usr/local/bin/plot_closest"
+\rm /usr/local/bin/plot_closest
+mycheck
+echo "\rm /usr/local/bin/plot_lc"
+\rm /usr/local/bin/plot_lc
+mycheck
+echo ""
+echo "Uninstallation completed successfully. Perform the following actions to remove fluxcal from your system:"
+echo "cd .."
+echo "rm -rf fluxcal"
+
