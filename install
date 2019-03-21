@@ -21,18 +21,8 @@ mycheck
 ./make
 mycheck
 
-echo ""
-echo "Checking integrity of installation"
-echo ""
-
-\cd test/standard_check
-mycheck
-./run_test
-mycheck
-\cd ../../
-mycheck
-
 if [ ! -d $HOME/bin ];
+   echo ""
    echo "Creating directory $HOME/bin"
    mkdir $HOME/bin
    mycheck
@@ -54,4 +44,5 @@ mycheck
 echo ""
 echo "Installation completed successfully"
 
-
+echo ""
+echo "You should check the integrity of the installation (recommended) by running ./integrity_check"
