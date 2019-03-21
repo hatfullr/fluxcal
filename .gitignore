@@ -12,3 +12,4 @@ defaults/sph.opacities_yes_grains_and_molecules_ncooling2
 defaults/table_nabla.dat
 defaults/._kP_h2001.dat
 defaults/._kR_h2001.dat
+**/*.pyc
