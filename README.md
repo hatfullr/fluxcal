@@ -2,7 +2,8 @@
 
 ## Installation
 
-To install FluxCal, run the following commands from the terminal
+### Linux
+To install FluxCal on Linux, run the following commands from the terminal
 ```
 git clone https://github.com/hatfullr/fluxcal.git
 cd fluxcal
@@ -16,6 +17,21 @@ recommend you perform a file integrity check by running
 ```
 This may take up to 10 minutes or so depending on your system. If you run into
 issues here, a solution may be available in the "Troubleshooting" section below.
+
+### Windows
+FluxCal has not been tested on Windows machines, but it might still work. Try
+[installing the Ubuntu terminal on Windows 10](https://tutorials.ubuntu.com/tutorial/tutorial-ubuntu-on-windows#0), then continue installation as though you were using
+Linux.
+
+## Uninstallation
+To uninstall FluxCal, run the script `uninstall`, then do
+```
+echo "cd .."
+echo "rm -rf fluxcal"
+```
+The `uninstall` script only removes the links to the plotting utilities in your
+`$HOME/bin` directory. All other files pertaining to FluxCal are located in the
+directory `fluxcal`.
 
 
 ## Running FluxCal
