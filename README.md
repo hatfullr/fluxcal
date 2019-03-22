@@ -23,6 +23,16 @@ FluxCal has not been tested on Windows machines, but it might still work. Try
 [installing the Ubuntu terminal on Windows 10](https://tutorials.ubuntu.com/tutorial/tutorial-ubuntu-on-windows#0), then continue installation as though you were using
 Linux.
 
+## Uninstallation
+To uninstall FluxCal, run the script `uninstall`, then do
+```
+echo "cd .."
+echo "rm -rf fluxcal"
+```
+The `uninstall` script only removes the links to the plotting utilities in your
+`$HOME/bin` directory. All other files pertaining to FluxCal are located in the
+directory `fluxcal`.
+
 
 ## Running FluxCal
 
