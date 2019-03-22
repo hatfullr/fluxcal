@@ -17,34 +17,43 @@ fi
 curdir=$(pwd)
 mycheck
 
+echo "\cd defaults"
 \cd defaults
 mycheck
+echo "tar -xvzpf tables.tar.gz"
 tar -xvzpf tables.tar.gz
 mycheck
+echo "\cd .."
 \cd ..
 mycheck
 
+echo "./make"
 ./make
 mycheck
 
 if [ ! -d $HOME/bin ]; then
    echo ""
    echo "Creating directory $HOME/bin"
+   echo "mkdir $HOME/bin"
    mkdir $HOME/bin
    mycheck
-   echo "We recommend you add the line 'export PATH=\"$HOME/bin:$PATH\"' to $HOME/.profile or $HOME/.bashrc."
+   echo "We recommend you add the line 'export PATH=\"$HOME/bin:$PATH\"' to $HOME/.profile or $HOME/.bashrc if you haven't done so already."
 fi
 
 echo ""
 echo "Linking plotting tools to $HOME/bin/."
 echo "\ln -s tools/plot_Teff $HOME/bin/."
-\ln -s $(pwd)/tools/plot_Teff $HOME/bin/.
+\ln -s $curdir/tools/plot_Teff $HOME/bin/.
 mycheck
 echo "\ln -s tools/plot_closest $HOME/bin/."
-\ln -s $(pwd)/tools/plot_closest $HOME/bin/.
+\ln -s $curdir/tools/plot_closest $HOME/bin/.
 mycheck
 echo "\ln -s tools/plot_lc $HOME/bin/."
-\ln -s $(pwd)/tools/plot_lc $HOME/bin/.
+\ln -s $curdir/tools/plot_lc $HOME/bin/.
+mycheck
+
+echo "\mv tools/settings_original_plot_Teff.py tools/settings_plot_Teff.py"
+\mv tools/settings_original_plot_Teff.py tools/settings_plot_Teff.py
 mycheck
 
 echo ""

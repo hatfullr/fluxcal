@@ -252,17 +252,24 @@ if usebb:
         my_cm = cols.LinearSegmentedColormap.from_list(
             'blackbody', colors, N=Nbbcols)
     except Exception as e:
-        print("FAILED:", e)
-        try:
-            print("Getting blackbody spectrum colors from blackbody_temps.dat in the working directory.")
-            bbcols = np.genfromtxt("blackbody_temps.dat",usecols=(0,6,7,8))
-            Nbbcols = len(bbcols)
-            colors = np.reshape(bbcols[:,1:],(Nbbcols,3))
-            colors = colors[np.where((bbcols[:,0] > Tmin) & (bbcols[:,0] < Tmax))[0]]
-            my_cm = cols.LinearSegmentedColormap.from_list(
-                'blackbody', colors, N=Nbbcols)
-        except Exception as e:
-            print("FAILED:",e)
+        print("ERROR:", e)
+        print("Getting blackbody spectrum colors from blackbody_temps.dat in the tools directory.")
+        success = False
+        if not os.path.isfile(defaultdir+"/blackbody_temps.dat"):
+            print("ERROR: Could not find file 'blackbody_temps.dat' in the tools directory. Please check your fluxcal installation.")
+        else:
+            try:
+                bbcols = np.genfromtxt(defaultdir+"/blackbody_temps.dat",usecols=(0,6,7,8))
+                Nbbcols = len(bbcols)
+                colors = np.reshape(bbcols[:,1:],(Nbbcols,3))
+                colors = colors[np.where((bbcols[:,0] > Tmin) & (bbcols[:,0] < Tmax))[0]]
+                my_cm = cols.LinearSegmentedColormap.from_list(
+                    'blackbody', colors, N=Nbbcols)
+                success = True
+            except Exception as e:
+                print("ERROR:",e)
+                success = False
+        if not success:
             print("Cannot use the blackbody color spectrum. Please fix one of the above errors or choose 'n' at the blackbody color spectrum prompt.")
             sys.exit()
 else:
