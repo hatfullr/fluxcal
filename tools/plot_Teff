@@ -82,7 +82,37 @@ if usebb == None:
             loop = False
         elif user_input == "n":
             loop = False
-            
+
+if spatialaxesadapt == None:
+    loop = True
+    while loop:
+        user_input = input("Use adaptive limits on spatial axes? (y/n): ")
+        if user_input == "y":
+            spatialaxesadapt = True
+            loop = False
+        elif user_input == "n":
+            spatialaxesadapt = False
+            loop = False
+        else:
+            print("ERROR: Please respond with 'y' or 'n'.")
+
+if colorbaradapt == None:
+    if usebb:
+        print("[adaptive limits not available for blackbody spectrum]")
+    else:
+        loop = True
+        while loop:
+            user_input = input("Use adaptive limits on colorbar? (y/n): ")
+            if user_input == "y":
+                colorbaradapt = True
+                loop = False
+            elif user_input == "n":
+                colorbaradapt = False
+                loop = False
+            else:
+                print("ERROR: Please respond with 'y' or 'n'.")
+
+"""            
 if((spatialaxesadapt == None) and (colorbaradapt == None)):
     loop = True
     while loop:
@@ -118,7 +148,7 @@ if((spatialaxesadapt == None) and (colorbaradapt == None)):
             loop = False
         else:
             print("ERROR: Please respond with 'y' or 'n'.")
-
+"""
 if paperfriendly == None:
     loop = True
     paperfriendly = False
@@ -521,9 +551,9 @@ for datafile in files:
     # Update the plot title
     
     rotations = datafile.split("/")[-1][12:-4].split("_")
-    zdeg = int(rotations[0])
+    xdeg = int(rotations[0])
     ydeg = int(rotations[1])
-    xdeg = int(rotations[2])
+    zdeg = int(rotations[2])
     if not paperfriendly:
         ax.annotate(timelabel.format(t),(pos.x0,(1.+pos.y1)/2.+0.015),xycoords='figure fraction',ha='left')
         ax.annotate(rotationslabel.format(xdeg,ydeg,zdeg),(pos.x0,(1.+pos.y1)/2.-0.015),xycoords='figure fraction', ha='left')
