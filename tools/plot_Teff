@@ -576,6 +576,8 @@ for datafile in files:
 print("Finished.")
 if len(files) > 1:
     print("")
-    print("Use this command to make a movie:")
-    print("convert -delay 10 -loop 0 teffs*.png teffs.gif")
+    print("Try some of these commands to make a movie:")
+    print(".avi: mencoder mf://teffs*.png -mf w=800:h=800:fps=25:type=png -ovc copy -oac copy -o teffs.avi")
+    print(".mpg: mencoder mf://teffs*.png -mf w=800:h=800:fps=25:type=png -of mpeg -ovc lavc -lavcopts vcodec=mpeg1video -o teffs.mpg")
+    print(".gif: convert -delay 10 -loop 0 teffs*.png teffs.gif")
 
