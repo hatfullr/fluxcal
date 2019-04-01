@@ -82,7 +82,37 @@ if usebb == None:
             loop = False
         elif user_input == "n":
             loop = False
-            
+
+if spatialaxesadapt == None:
+    loop = True
+    while loop:
+        user_input = input("Use adaptive limits on spatial axes? (y/n): ")
+        if user_input == "y":
+            spatialaxesadapt = True
+            loop = False
+        elif user_input == "n":
+            spatialaxesadapt = False
+            loop = False
+        else:
+            print("ERROR: Please respond with 'y' or 'n'.")
+
+if colorbaradapt == None:
+    if usebb:
+        print("[adaptive limits not available for blackbody spectrum]")
+    else:
+        loop = True
+        while loop:
+            user_input = input("Use adaptive limits on colorbar? (y/n): ")
+            if user_input == "y":
+                colorbaradapt = True
+                loop = False
+            elif user_input == "n":
+                colorbaradapt = False
+                loop = False
+            else:
+                print("ERROR: Please respond with 'y' or 'n'.")
+
+"""            
 if((spatialaxesadapt == None) and (colorbaradapt == None)):
     loop = True
     while loop:
@@ -118,7 +148,7 @@ if((spatialaxesadapt == None) and (colorbaradapt == None)):
             loop = False
         else:
             print("ERROR: Please respond with 'y' or 'n'.")
-
+"""
 if paperfriendly == None:
     loop = True
     paperfriendly = False
@@ -521,9 +551,9 @@ for datafile in files:
     # Update the plot title
     
     rotations = datafile.split("/")[-1][12:-4].split("_")
-    zdeg = int(rotations[0])
+    xdeg = int(rotations[0])
     ydeg = int(rotations[1])
-    xdeg = int(rotations[2])
+    zdeg = int(rotations[2])
     if not paperfriendly:
         ax.annotate(timelabel.format(t),(pos.x0,(1.+pos.y1)/2.+0.015),xycoords='figure fraction',ha='left')
         ax.annotate(rotationslabel.format(xdeg,ydeg,zdeg),(pos.x0,(1.+pos.y1)/2.-0.015),xycoords='figure fraction', ha='left')
@@ -546,6 +576,8 @@ for datafile in files:
 print("Finished.")
 if len(files) > 1:
     print("")
-    print("Use this command to make a movie:")
-    print("convert -delay 10 -loop 0 teffs*.png teffs.gif")
+    print("Try some of these commands to make a movie:")
+    print(".avi: mencoder mf://teffs*.png -mf w=800:h=800:fps=25:type=png -ovc copy -oac copy -o teffs.avi")
+    print(".mpg: mencoder mf://teffs*.png -mf w=800:h=800:fps=25:type=png -of mpeg -ovc lavc -lavcopts vcodec=mpeg1video -o teffs.mpg")
+    print(".gif: convert -delay 10 -loop 0 teffs*.png teffs.gif")
 

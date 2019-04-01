@@ -14,22 +14,22 @@ tempunit = 1e0
 # min and max of all data fed to the program.
 xlim = (None,None)
 ylim = (None,None)
-Tefflim = (None,None)
+Tefflim = (0.,10000.)
 
 # Set the following to None to prompt the user
-usebb = None              # Use blackbody spectrum.
+usebb = False              # Use blackbody spectrum.
 spatialaxesadapt = None   # Use adaptive spatial limits.
-colorbaradapt = None      # Use adaptive colorbar limits.
+colorbaradapt = False      # Use adaptive colorbar limits.
 filepattern = None        # Search pattern for data files.
-paperfriendly = None      # Paper friendly plot [Experimental].
+paperfriendly = False      # Paper friendly plot [Experimental].
 
 # Miscellaneous plotting options
 logteff = False
 cmapname = 'nipy_spectral' # Ignored when usebb is False
-fontsize = 12
+fontsize = 16
 figsize = (8.0,8.0) # In inches
-xlabel = "$x$"
-ylabel = "$y$"
+xlabel = "$x\\ \\left[R_\\odot\\right]$"
+ylabel = "$y\\ \\left[R_\\odot\\right]$"
 cbarlabel = "$T_{\\mathrm{eff}}\\ \\left[K\\right]$"
-timelabel = "t = {:15.3f}"
+timelabel = "t = {:15.3f} days"
 rotationslabel = "Rotations (x,y,z) = ({:06.2f}$^o$,{:06.2f}$^o$,{:06.2f}$^o$)"
