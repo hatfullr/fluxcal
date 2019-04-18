@@ -3,7 +3,7 @@
 ## Installation
 
 ### Dependencies
-FLuxCal uses `gfortran` to compile its code. Install using,
+FluxCal uses `gfortran` to compile its code. Install using,
 ```
 sudo apt install gfortran
 ```
