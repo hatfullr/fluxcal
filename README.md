@@ -37,7 +37,11 @@ echo "rm -rf fluxcal"
 ```
 The `uninstall` script only removes the links to the plotting utilities in your
 `$HOME/bin` directory. All other files pertaining to FluxCal are located in the
-directory `fluxcal`.
+directory `fluxcal`. Thus, to finish installation,
+```
+cd ..
+rm -rf fluxcal
+```
 
 
 ## Running FluxCal
