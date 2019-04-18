@@ -64,10 +64,11 @@ c      integer i
      $      get_integration_at_pos,get_info_of_particle,
      $      get_closest_particles,get_integration_at_all_pos,
      $      get_true_luminosity
-      common/truelum/ get_true_luminosity
       common/opacitytype/ rossonly
       real*8 step1,step2,step3,step4
       common/steps/ step1,step2,step3,step4
+      real*8 Topac_Planck
+      common/Topacity_Planck/ Topac_Planck
       real*8 taulimit,posx,posy
       real*8 tau_thick_envfit,tau_thick_integrator,tau_thick
       common/tauthick/ tau_thick_integrator,tau_thick_envfit,tau_thick
@@ -79,7 +80,8 @@ c      integer i
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_info_of_particle,envfit,
      $      get_closest_particles,flux_cal_dir
-      common/getint/ get_integration_at_pos,get_integration_at_all_pos
+      common/getint/ get_integration_at_pos,get_integration_at_all_pos,
+     $      get_true_luminosity
       character*255 outfile
       common/outputfile/ outfile
       real*8 t
