@@ -2,6 +2,12 @@
 
 ## Installation
 
+### Dependencies
+FLuxCal uses `gfortran` to compile its code. Install using,
+```
+sudo apt install gfortran
+```
+
 ### Linux
 To install FluxCal on Linux, run the following commands from the terminal
 ```
