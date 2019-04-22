@@ -25,22 +25,22 @@ c      end if
       read(43,*)
       read(43,*) numrho,numtem
 
-      if(rossonly) then
-         do irho=1,numrho
-            do item=1,numtem
-               read(43,*) rhotable(irho),temtable(item),
-     $              localrosstable(irho,item)
-            enddo
+c      if(rossonly) then
+      do irho=1,numrho
+         do item=1,numtem
+            read(43,*) rhotable(irho),temtable(item),
+     $           localrosstable(irho,item)
          enddo
-      else
-         do irho=1,numrho
-            do item=1,numtem
-               read(43,*) rhotable(irho),temtable(item),
-     $              localrosstable(irho,item),
-     $              dummy,localplancktable(irho,item)
-            enddo
-         enddo
-      endif
+      enddo
+c      else
+c         do irho=1,numrho
+c            do item=1,numtem
+c               read(43,*) rhotable(irho),temtable(item),
+c     $              localrosstable(irho,item),
+c     $              dummy,localplancktable(irho,item)
+c            enddo
+c         enddo
+c      endif
 
 
       rhotable1=rhotable(1)
@@ -79,22 +79,22 @@ c      end if
       read(44,*) numrhodust,numtemdust
 
 
-      if(rossonly) then
-         do irhodust=1,numrhodust
-            do itemdust=1,numtemdust
-               read(44,*) rhotabledust(irhodust),temtabledust(itemdust),
-     $              localrosstabledust(irhodust,itemdust)
-            enddo
+c      if(rossonly) then
+      do irhodust=1,numrhodust
+         do itemdust=1,numtemdust
+            read(44,*) rhotabledust(irhodust),temtabledust(itemdust),
+     $           localrosstabledust(irhodust,itemdust)
          enddo
-      else
-         do irhodust=1,numrhodust
-            do itemdust=1,numtemdust
-               read(44,*) rhotabledust(irhodust),temtabledust(itemdust),
-     $              localrosstabledust(irhodust,itemdust),
-     $              dummy,localplancktabledust(irhodust,itemdust)
-            enddo
-         enddo
-      endif
+      enddo
+c      else
+c         do irhodust=1,numrhodust
+c            do itemdust=1,numtemdust
+c               read(44,*) rhotabledust(irhodust),temtabledust(itemdust),
+c     $              localrosstabledust(irhodust,itemdust),
+c     $              dummy,localplancktabledust(irhodust,itemdust)
+c            enddo
+c         enddo
+c      endif
 
       rhotabledust1=rhotabledust(1)
       temtabledust1=temtabledust(1)

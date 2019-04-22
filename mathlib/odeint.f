@@ -16,8 +16,6 @@
       common /yscales/ yscalfactor
       real*8 step1, step2, step3, step4
       common/steps/ step1,step2,step3,step4
-      logical rossonly,get_closest_taus
-      common/opacitytype/ rossonly,get_closest_taus
       real*8 taulimit,posx,posy
       common/inputstuff/ taulimit,posx,posy
 c      logical get_integration_at_pos,get_integration_at_all_pos

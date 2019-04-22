@@ -62,6 +62,7 @@
  tau_thick_envfit     = 0.1000E+02
  envfit               =          F
  
+ Topac_Planck         = 0.1000E+04
  metallicity          = 0.2000E-01
  Rform                = 0.1000E+31
  
@@ -74,7 +75,6 @@
  track_particles            = F
  get_info_of_particle       = T
    info_particle =       10
- rossonly                   = F
  
  eosfile         = 'sph.eos'
  opacityfile     = 'sph.opacities_ferguson_yes_grains_and_molecules'

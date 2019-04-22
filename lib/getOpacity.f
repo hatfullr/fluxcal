@@ -23,8 +23,8 @@ c              To be used when ncooling > 1
       DIMENSION eD(5,6)
       DIMENSION eG(71,71)
       common/opac_dust/eD,eG
-      logical rossonly
-      common/opacitytype/ rossonly
+      real*8 Topac_Planck
+      common/Topacity_Planck/ Topac_Planck
       
 c     silly test
 c         if(tem.le.8000.d0)  then
@@ -38,32 +38,33 @@ c            end do
 c         end if
 
       
-c     We should use both rosseland and planck opacities, always.
-
-      if(tem.le.1000.d0) then
+      if(tem.le.Topac_Planck) then
          call cop(eD,eG,rhocgs,tem,opacit)
-         getOpacity=opacit
-         return
-      end if
-
-      if(rossonly) then         ! User-set input file variable
-         ! Rosseland opacities only
-         call table(rhocgs,tem,opacit)
-         getOpacity=opacit
       else
-         ! Rosseland and Planck opacities transfer function
-         ! opacitross is local Rosseland opacity
-         ! opacitplanck is local Planck opacity
-         call table2(rhocgs,tem,opacitross,opacitplanck)
-         if(tau1.gt.0d0) then
-            getOpacity=exp(-2*tau1)*opacitplanck
-     $           +(1d0-exp(-2*tau1))*opacitross
-         else
-            getOpacity=opacitplanck
-         endif
-        
-      endif
+         call table(rhocgs,tem,opacit)
+      end if
+      
+      getOpacity=opacit
 
+c     This is old code, but I want to keep it here to have easy
+c     access to the smoothing function Jamie wrote
+c      if(rossonly) then         ! User-set input file variable
+c         ! Rosseland opacities only
+c         call table(rhocgs,tem,opacit)
+c         getOpacity=opacit
+c      else
+c         ! Rosseland and Planck opacities transfer function
+c         ! opacitross is local Rosseland opacity
+c         ! opacitplanck is local Planck opacity
+c         call table2(rhocgs,tem,opacitross,opacitplanck)
+c         if(tau1.gt.0d0) then
+c            getOpacity=exp(-2*tau1)*opacitplanck
+c     $           +(1d0-exp(-2*tau1))*opacitross
+c         else
+c            getOpacity=opacitplanck
+c         endif
+c        
+c      endif
       
       return
       end function

@@ -61,7 +61,7 @@
       ! Calculate the flux at each grid cell and record the data.
       get_fluxes=.false.
 
-      ! Calculate the true luminosity
+      ! Calculate the true luminosity (not a full feature yet)
       get_true_luminosity=.false.
       
       ! Set this to true to create a data file containing all the
@@ -202,9 +202,16 @@
       
       
       !### Physics
+      ! DEPRECATED
       ! If true, use Rosseland opacities only. If false, will use
       ! Rosseland and Planck opacities with a smoothing function.
       rossonly=.true.
+
+      ! For T_SPH <= Topac_Planck, use Planck opacities. For
+      ! T_SPH > Topac_Planck, use Rosseland opacities. Opacities
+      ! aren't smoothed between ross and planck yet, but hopefully
+      ! that will be a feature soon. Default=1000.d0
+      Topac_Planck=1000.d0
       
       ! Solar metallicity
       metallicity=0.02d0
@@ -218,7 +225,9 @@
       ! Rotation angle about z axis (degrees)
       anglezdeg=0.d0
 
-      ! Dust formation radius (set to 1.d30 for no dust)
+      ! Dust formation radius (set to 1.d30 for no dust). This
+      ! specifically controls a toy model for dust. To use real
+      ! dust opacities, use Topac_Planck. You should not use both.
       Rform=1.d30
 
       ! Cold temperature dust parameters
@@ -408,7 +417,8 @@ c     Write everything to the terminal
       write(*,100) "tau_thick_envfit    ",tau_thick_envfit
       write(*,108) "envfit              ",envfit
       write(*,*) ""
-c      write(*,102) "rossonly    ",rossonly
+c     write(*,102) "rossonly    ",rossonly
+      write(*,100) "Topac_Planck        ",Topac_Planck
       write(*,100) "metallicity         ",metallicity
       write(*,100) "Rform               ",Rform
       
@@ -439,8 +449,6 @@ c      write(*,102) "rossonly    ",rossonly
          write(*,107) "info_particle", info_particle
       end if
       
-      write(*,102) "rossonly                  ",rossonly
-
       write(*,*) ""
       write(*,103) "eosfile        ",trim(adjustl(eosfile))
       write(*,103) "opacityfile    ",trim(adjustl(opacityfile))

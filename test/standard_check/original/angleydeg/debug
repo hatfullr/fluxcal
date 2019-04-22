@@ -62,6 +62,7 @@
  tau_thick_envfit     = 0.1000E+02
  envfit               =          T
  
+ Topac_Planck         = 0.1000E+04
  metallicity          = 0.2000E-01
  Rform                = 0.1000E+31
  
@@ -75,7 +76,6 @@
  get_closest_particles      = T
  track_particles            = F
  get_info_of_particle       = F
- rossonly                   = F
  
  eosfile         = 'sph.eos'
  opacityfile     = 'sph.opacities_ferguson_yes_grains_and_molecules'
@@ -118,8 +118,8 @@
  Calculating the flux at each grid point
  Writing 'teffs00000_000_090_000.dat'
  
- Luminosity =  3.90666623670972E+37
- Average Teff =  3.05159012581273E+03
+ Luminosity =  8.82078809308667E+37
+ Average Teff =  3.40355354411146E+03
  Effective visible area =  5.42182579644954E+26
  
  Writing to 'flux_cal.output'
