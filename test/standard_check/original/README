@@ -1,21 +1,22 @@
-Ran with GNU Fortran (Ubuntu 5.4.0-6ubuntu1~16.04.10) 5.4.0 20160609
-
-
 Changes:
-   11/28/2018 (Roger)
-      I came up with a better way to find the "last particle" in odeint.
-      Now that it is implemented, the "last particle" ID number in the
-      int_at_all_pos_0000.dat file will be different. I double-checked
-      the output to make sure that NONE of the changes I made affected
-      the final output files, EXCEPT for the change to "last particle".
+   04/18/2019 (Roger)
+      Re-ran this directory after removing the rossonly code. I noticed
+      that this directory had been all run with rossonly=.false., which
+      was the incorrect setting. I updated this and re-ran the directory.
 
+   03/19/2019 (Roger)
+      Completely revamped the test suite. Now testing is more
+      comprehensive.
+      
    11/29/2018 (Roger)
       I found a way to mostly handle integrating through empty space.
       This made the int_at_all_pos files differ and also the teffs files
       differ by a very small amount. This makes sense, so it is time to
       replace the original files again.
 
-   03/19/2019 (Roger)
-      Completely revamped the test suite. Now testing is more
-      comprehensive.
-
+   11/28/2018 (Roger)
+      I came up with a better way to find the "last particle" in odeint.
+      Now that it is implemented, the "last particle" ID number in the
+      int_at_all_pos_0000.dat file will be different. I double-checked
+      the output to make sure that NONE of the changes I made affected
+      the final output files, EXCEPT for the change to "last particle".
