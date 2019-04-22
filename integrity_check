@@ -9,12 +9,13 @@ mycheck () {
 }
 
 echo "Checking integrity of files"
-echo "This may take up to 10 minutes"
+echo "This may take up to 10 minutes or so"
 echo ""
 
-\cd test/standard_check
+\cd test/standard_check/test
 mycheck
-./run_test
+./run
 mycheck
-\cd ../../
-mycheck
+
+echo ""
+echo "Integrity check finished"
