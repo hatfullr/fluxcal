@@ -417,7 +417,8 @@ c     Write everything to the terminal
       write(*,100) "tau_thick_envfit    ",tau_thick_envfit
       write(*,108) "envfit              ",envfit
       write(*,*) ""
-c      write(*,102) "rossonly    ",rossonly
+c     write(*,102) "rossonly    ",rossonly
+      write(*,100) "Topac_Planck        ",Topac_Planck
       write(*,100) "metallicity         ",metallicity
       write(*,100) "Rform               ",Rform
       
@@ -448,8 +449,6 @@ c      write(*,102) "rossonly    ",rossonly
          write(*,107) "info_particle", info_particle
       end if
       
-      write(*,102) "rossonly                  ",rossonly
-
       write(*,*) ""
       write(*,103) "eosfile        ",trim(adjustl(eosfile))
       write(*,103) "opacityfile    ",trim(adjustl(opacityfile))

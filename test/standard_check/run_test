@@ -15,6 +15,6 @@ fi
 \cd ..
 echo "Test complete"
 echo "Checking for differences between test/standard_check/test and test/standard_test/original"
-./check
+./check > diffs.txt
 echo "Done"
 
