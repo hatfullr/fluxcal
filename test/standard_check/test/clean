@@ -8,10 +8,13 @@ check () {
 }
 
 curdir=$(pwd)
-dirlist=( $(find . -name flux_cal | rev | cut -d'/' -f2- | rev) )
+dirlist=( $(find . -name flux_cal | rev | cut -d'/' -f2- | rev | sort) )
 check
 
 echo "Removing old files"
+if [ -f errors.txt ]; then
+    rm -f errors.txt
+fi
 rm -f GNUFortran.txt
 check
 for i in ${dirlist[@]}; do
