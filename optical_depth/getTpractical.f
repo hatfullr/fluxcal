@@ -63,26 +63,32 @@ c      if(mu .eq. 0.d0) then
 c         mu = 1.d-30
 c      end if
 
-      call odeint(taustart,4+numfilters,z1,zstop,
-     $     eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
-     $     rkqs)
-
-      Tthin4=taustart(4) ! int_0^tau T^4 e^(-tau') dtau'
-      tau_thin = taustart(1)    ! Attenuation factor
-
-      if(kount1.gt.1) then      ! Integrator didn't reach an optically thick particle
-         sa=s(kount1-1)         ! z-position w/ optical depth tau_tot<tau_thick_integrator
-         sb=s(kount1)           ! z-position w/ optical depth tau_tot>=tau_thick_integrator
+      if(z1.ne.zstop)then
+         call odeint(taustart,4+numfilters,z1,zstop,
+     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+     $        rkqs)
          
-         ! Interpolate to find position where optical tau_tot=tau_thick_integrator:
-         sphoto=(sa*(tau(1,kount1)-1.d0)
-     $        +sb*(1.d0-tau(1,kount1-1)))/
-     $        (tau(1,kount1)-tau(1,kount1-1))
-      else if (thick_p.gt.0) then ! Integrator reached an optically thick particle
-         sphoto=zthick
-         Tthick4 = Teff(thick_p)**4.d0 * exp(-tau_thin)
+         Tthin4=taustart(4)     ! int_0^tau T^4 e^(-tau') dtau'
+         tau_thin = taustart(1) ! Attenuation factor
+
+         if(kount1.gt.1) then   ! Integrator didn't reach an optically thick particle
+            sa=s(kount1-1)      ! z-position w/ optical depth tau_tot<tau_thick_integrator
+            sb=s(kount1)        ! z-position w/ optical depth tau_tot>=tau_thick_integrator
+         
+            ! Interpolate to find position where optical tau_tot=tau_thick_integrator:
+            sphoto=(sa*(tau(1,kount1)-1.d0)
+     $           +sb*(1.d0-tau(1,kount1-1)))/
+     $           (tau(1,kount1)-tau(1,kount1-1))
+         else if (thick_p.gt.0) then ! Integrator reached an optically thick particle
+            sphoto=zthick
+            Tthick4 = Teff(thick_p)**4.d0 * exp(-tau_thin)
+         end if
+      else                      ! Integrator started and stopped at an optically thick particle
+         Tthick4 = Teff(thick_p)**4.d0 ! No attenuation
+         Tthin4 = 0.d0
       end if
 
+         
       Tpractical = (Tthick4 + Tthin4)**0.25d0
       
 cc     zstop = max(z0,zthick)

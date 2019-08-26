@@ -117,8 +117,7 @@ c        write(*,*) xpos/runit,ypos/runit
 
         if(printIntegrationSteps) then
            call getLocalQuantities(xpos,ypos,xint)
-           call getOpacitySub(xpos,ypos,xint,dble(t6*1d6),rhocgs,
-     $          yint(1),Rform,opacit)
+           call getOpacitySub(dble(t6*1d6),rhocgs,yint(1),opacit)
            write(intout,'(12ES22.14,I22)')xpos/runit_out,ypos/runit_out,
      $          xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
      $          ucgs/Eunit_out*munit_out,xh/muunit_out,

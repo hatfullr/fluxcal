@@ -68,9 +68,7 @@ c     where zp() is a zero-point magnitude.
 c     t6 is the temperature in millions of degrees Kelvin
 
       if(t6.gt.0) then
-         call getOpacitySub(xpos,ypos,zpos,t6*1d6,
-     $        rhocgs,0.d0,Rform,opacit)
-      
+         call getOpacitySub(t6*1d6,rhocgs,0.d0,opacit)
 c      if(t6.gt.0) then
 c
 c         if ((xpos**2+ypos**2+zpos**2)**0.5d0.lt.Rform) then

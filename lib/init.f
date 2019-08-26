@@ -575,7 +575,7 @@ c      end if
          write(*,*)"correct, and if flux_cal was properly installed."
          error stop "init.f"
       end if
-      
+
       write(file2,200) trim(adjustl(flux_cal_dir)),"kP_h2001.dat"
       inquire(file=trim(adjustl(file2)), exist=fileexists)
       if(.not. fileexists) then
@@ -584,9 +584,34 @@ c      end if
          write(*,*)"correct, and if flux_cal was properly installed."
          error stop "init.f"
       end if
-      
+
       ! cold T opacities initialization
       call ini_opac_dust_and_gas(file1,file2)
+      
+      write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $     "gs98_z0.02_x0.7.data"
+      inquire(file=trim(adjustl(inputfile)), exist=fileexists)
+      if(.not. fileexists) then
+         write(*,*)"Could not find 'gs98_z0.02_x0.7.data' in"
+         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+         write(*,*)"correct, and if flux_cal was properly installed."
+         error stop "init.f"
+      end if
+
+      call ini_highT_opacities(inputfile)
+
+      write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $     "lowT_fa05_gs98_z0.02_x0.7.data"
+      inquire(file=trim(adjustl(inputfile)), exist=fileexists)
+      if(.not. fileexists) then
+         write(*,*)"Could not find 'lowT_fa05_gs98_z0.02_x0.7.data' in"
+         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
+         write(*,*)"correct, and if flux_cal was properly installed."
+         error stop "init.f"
+      end if
+
+      call ini_lowT_opacities(inputfile)
+      
 
       if(envfit) then
          ! Initialize find_teff dependencies

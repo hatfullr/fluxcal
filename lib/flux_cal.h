@@ -25,6 +25,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 wtab(ntab),ctab
       common/wtabul/ wtab,ctab
 
+      real*8 bilinear_interpolate
+	
       real*8 mu
       common/surfaceangle/ mu
 	

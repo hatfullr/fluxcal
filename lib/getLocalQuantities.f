@@ -45,7 +45,7 @@ c        Find a more precise value for boundary cases
             ! This case is so negligible that it realy isn't worth
             ! coding in. Our grid spacing is small enough to ignore cases
             ! like this.
-c            write(*,*) "I finished in spot"
+            write(*,*) "I finished in spot"
             return
          else if((rhoxyz(ix,iy,iz).le.0.d0).and.
      $           (rhoxyz(ix,iy,iz+1).gt.0.d0)) then !Only behind is empty

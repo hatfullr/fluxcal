@@ -88,11 +88,9 @@ c      character*255 fname
             entropy(i) = 0.d0
          end if
 
-         call getOpacitySub(x(i),y(i),z(i),tempp(i),
-     $        rho(i),0.d0,Rform,opacit)
-         opac_sph(i)=opacit
+         call getOpacitySub(tempp(i),rho(i),0.d0,opac_sph(i))
 c         if(tempp(i).le.8000) write(*,*) "OPACITY", tempp(i), opacit
-         tauA(i) = taucoef*am(i)*opacit/hp(i)**2.d0
+         tauA(i) = taucoef*am(i)*opac_sph(i)/hp(i)**2.d0
 
 c     If the user wants to use get_teff, and particle i is optically
 c     thick, store get_teff for use in getTpractical.f
