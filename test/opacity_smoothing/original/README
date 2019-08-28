@@ -1,0 +1,6 @@
+cp -p /home/hatfull/data/cedar/dynamical/d011c_test_200k_nopt30_a64_cooling/fluxcal_0342.dat .
+cp -p /home/hatfull/data/cedar/dynamical/d011c_test_200k_nopt30_a64_cooling/fluxcal_angles2/a1_000_000_000/teffs00342_000_000_000.dat .
+cp -p /home/hatfull/data/cedar/dynamical/d011c_test_200k_nopt30_a64_cooling/fluxcal_angles2/a1_000_000_000/flux_cal.input .
+\rm -f flux_cal
+ln -s ../../flux_cal .
+cp -p /home/hatfull/data/cedar/dynamical/d011c_test_200k_nopt30_a64_cooling/fluxcal_angles2/a1_000_000_000/dimen00342_000_000_000.dat .

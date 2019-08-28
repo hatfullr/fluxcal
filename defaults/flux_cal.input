@@ -156,8 +156,14 @@
       
       !### Physics
       ! If true, use Rosseland opacities only. If false, will use
-      ! Rosseland and Planck opacities with a smoothing function.
-      rossonly=.false.
+      ! both Rosseland and Planck opacities. Use Planck opacities
+      ! for T <= Tplanck and Rosseland opacities for T > Tplanck.
+      ! Default Tplanck = 1000.d0. Opacities aren't smoothed
+      ! between ross and planck yet, but hopefully that will be a
+      ! feature soon.
+      use_rosseland = .true.
+      use_planck = .true.
+      Tplanck = 1000.d0
       
       ! Solar metallicity
       metallicity=0.02d0
@@ -170,9 +176,6 @@
 
       ! Rotation angle about z axis (degrees)
       anglezdeg=0.d0
-
-      ! Dust formation radius (set to 1.d30 for no dust)
-      Rform=1.d30
 
       ! Cold temperature dust parameters
       !    dust_model controls the silicate type
@@ -202,8 +205,8 @@
       ! File name for the opacity files, filters file, and output file.
       ! Set opacitydustfile='' for no dust.
       eosfile='sph.eos'
-      opacityfile='sph.opacities_ferguson_yes_grains_and_molecules'
-      opacitydustfile='sph.opacities_yes_grains_and_molecules_ncooling2'
+      opacityfile_planck='kP_h2001.dat'
+      opacityfile_rosseland='kR_h2001.dat'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
 

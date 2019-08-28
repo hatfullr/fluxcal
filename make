@@ -3,7 +3,7 @@
 make clean
 
 if [ $? -eq 0 ]; then
-    make
+    make -j
     if [ $? -eq 0 ]; then
 	echo ""
 	echo "Success"

@@ -4,7 +4,7 @@
       integer i
       logical inputexists,baseunitsexists,fileexists
       character*255 eosfilepath,inputfile, opacfile1, opacfile2
-      character*255 file1,file2
+      character*255 inputfile_rosseland,inputfile_planck
       character*255 info_particle_string
 
       write(*,*)" ___________________________________________________  "
@@ -202,16 +202,15 @@
       
       
       !### Physics
-      ! DEPRECATED
       ! If true, use Rosseland opacities only. If false, will use
-      ! Rosseland and Planck opacities with a smoothing function.
-      rossonly=.true.
-
-      ! For T_SPH <= Topac_Planck, use Planck opacities. For
-      ! T_SPH > Topac_Planck, use Rosseland opacities. Opacities
-      ! aren't smoothed between ross and planck yet, but hopefully
-      ! that will be a feature soon. Default=1000.d0
-      Topac_Planck=1000.d0
+      ! both Rosseland and Planck opacities. Use Planck opacities
+      ! for T <= Tplanck and Rosseland opacities for T > Tplanck.
+      ! Default Tplanck = 1000.d0. Opacities aren't smoothed
+      ! between ross and planck yet, but hopefully that will be a
+      ! feature soon.
+      use_rosseland=.true.
+      use_planck=.true.
+      Tplanck = 1000.d0
       
       ! Solar metallicity
       metallicity=0.02d0
@@ -225,10 +224,6 @@
       ! Rotation angle about z axis (degrees)
       anglezdeg=0.d0
 
-      ! Dust formation radius (set to 1.d30 for no dust). This
-      ! specifically controls a toy model for dust. To use real
-      ! dust opacities, use Topac_Planck. You should not use both.
-      Rform=1.d30
 
       ! Cold temperature dust parameters
       !    dust_model controls the silicate type
@@ -258,8 +253,8 @@
       ! File name for the opacity files, filters file, and output file.
       ! Set opacitydustfile='' for no dust.
       eosfile='sph.eos'
-      opacityfile='sph.opacities_ferguson_yes_grains_and_molecules'
-      opacitydustfile='sph.opacities_yes_grains_and_molecules_ncooling2'
+      opacityfile_planck='kP_h2001.dat'
+      opacityfile_rosseland='kR_h2001.dat'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
 
@@ -296,8 +291,7 @@
       inquire(file='flux_cal.baseunits',exist=baseunitsexists)
       if(baseunitsexists) then
          write(*,*) "'flux_cal.baseunits' file found. Using"//
-     $        " user-specified"
-         write(*,*) "physical base units."
+     $        " user-specified physical base units."
          open(42,file='flux_cal.baseunits')
          read(42,baseunits)
          close(42)
@@ -314,10 +308,9 @@
             close(42)
          else
             write(*,*)"WARNING: No 'flux_cal.baseunits' default file "//
-     $           "found"
-            write(*,*)"in either the current working directory or"
-            write(*,*)"'",trim(adjustl(flux_cal_dir)),"/defaults'."
-            write(*,*)"Assuming units cgs for all variables."
+     $           "found in either the current working directory or "//
+     $           "'",trim(adjustl(flux_cal_dir)),"/defaults'. "//
+     $           "Assuming cgs units for all variables."
          end if
       end if
       
@@ -366,7 +359,7 @@
  100  format(A21," = ",E10.4)
  101  format(A21," = ",I10)
  102  format(A27," = ",L1)
- 103  format(A16," = '",A,"'")
+ 103  format(A22," = '",A,"'")
  104  format("   ",A," = ",L1)
  105  format("   ",A," = ",E10.4)
  106  format("   ",A," = '",A,"'")
@@ -417,10 +410,10 @@ c     Write everything to the terminal
       write(*,100) "tau_thick_envfit    ",tau_thick_envfit
       write(*,108) "envfit              ",envfit
       write(*,*) ""
-c     write(*,102) "rossonly    ",rossonly
-      write(*,100) "Topac_Planck        ",Topac_Planck
+      write(*,102) "use_rosseland             ",use_rosseland
+      write(*,102) "use_planck                ",use_planck
+      write(*,100) "Tplanck             ",Tplanck
       write(*,100) "metallicity         ",metallicity
-      write(*,100) "Rform               ",Rform
       
       write(*,*) ""
       write(*,102) "get_fluxes                ",get_fluxes
@@ -450,34 +443,36 @@ c     write(*,102) "rossonly    ",rossonly
       end if
       
       write(*,*) ""
-      write(*,103) "eosfile        ",trim(adjustl(eosfile))
-      write(*,103) "opacityfile    ",trim(adjustl(opacityfile))
-      write(*,103) "opacitydustfile",trim(adjustl(opacitydustfile))
-      write(*,103) "filtersfile    ",trim(adjustl(filtersfile))
-      write(*,103) "outfile        ",trim(adjustl(outfile))
+      write(*,103) "eosfile              ",trim(adjustl(eosfile))
+      write(*,103) "opacityfile_planck   ",
+     $     trim(adjustl(opacityfile_planck))
+      write(*,103) "opacityfile_rosseland",
+     $     trim(adjustl(opacityfile_rosseland))
+      write(*,103) "filtersfile          ",trim(adjustl(filtersfile))
+      write(*,103) "outfile              ",trim(adjustl(outfile))
       write(*,*) ""
 
 
 c     Catch some runtime errors
       if(tau_thick_integrator .gt. taulimit) then
-         write(*,*) "tau_thick_integrator > taulimit, integrator "//
-     $        "will always stop before reaching"
-         write(*,*) "optically thick material."
+         write(*,*) "tau_thick_integrator > taulimit. Integration "//
+     $        "will always stop before reaching optically thick "//
+     $        "material."
          error stop "init.f"
       end if
 
       if((tau_thick_integrator .gt. tau_thick_envfit).and.
      $     (envfit)) then
-         write(*,*) "tau_thick_integrator > tau_thick_envfit."
-         write(*,*) "Integrator will not return physical values."
+         write(*,*) "tau_thick_integrator > tau_thick_envfit. "//
+     $        "Integrator will not return physical values."
          error stop "init.f"
       end if
       
       if((.not.envfit).and.(taulimit.lt.tau_thick).and.
      $     (tau_thick.ne.-1.d30)) then ! LEGACY
-         write(*,*) "envfit is off and taulimit < tau_thick."
-         write(*,*) "Integration stops before reaching optically "//
-     $        "thick material always."
+         write(*,*) "envfit is off and taulimit < tau_thick. "//
+     $        "Integration will always stop before reaching "//
+     $        "optically thick material."
          error stop "init.f"
       end if
       
@@ -536,81 +531,89 @@ c      end if
       call readineostable(inputfile)
 
       call tabulinit
-
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),
-     $     trim(adjustl(opacityfile))
-      inquire(file=trim(adjustl(inputfile)),exist=fileexists)
-      if (.not. fileexists) then
-         write(*,*) "Could not find opacity file '",
-     $        trim(adjustl(opacityfile)),"'"
-         write(*,*) "in flux_cal_dir/defaults. Make sure flux_cal_dir"
-         write(*,*)"is correct, and if flux_cal was properly installed."
-         error stop "init.f"
-      end if
-      
-      call readinkappatable(inputfile)
-
-      if(len(trim(adjustl(opacitydustfile))).gt.0) then
-         write(inputfile,200) trim(adjustl(flux_cal_dir)),
-     $        trim(adjustl(opacitydustfile))
-         inquire(file=trim(adjustl(inputfile)),exist=fileexists)
-         if(fileexists) call readinkappatabledust(inputfile)
-      else
-         write(*,*) "No dust opacity table found. Setting the radius at"
-         write(*,*) "which dust begins to form to Rform=1.d30 to avoid"
-         write(*,*) "any dust calculations."
-         Rform=1.d30
-      end if
       
 c      inquire(file=opacitydustfile,exist=fileexists)
 c      if(fileexists .and. (Rform .gt. 0.d0)) then
 c         call readinkappatabledust
 c      end if
 
-      write(file1,200) trim(adjustl(flux_cal_dir)),"kR_h2001.dat"
-      inquire(file=trim(adjustl(file1)), exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*)"Could not find 'kR_h2001.dat' in"
-         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*)"correct, and if flux_cal was properly installed."
-         error stop "init.f"
+      if (len(trim(adjustl(opacityfile_rosseland))).eq.0) then
+         use_rosseland = .false.
+      else
+         ! Check current working directory for the file
+         inquire(file=trim(adjustl(opacityfile_rosseland)),
+     $        exist=fileexists)
+         if(fileexists) then
+            inputfile_rosseland = opacityfile_rosseland
+         else
+            write(*,*) "WARNING: Could not find '"//
+     $           trim(adjustl(opacityfile_rosseland))//"'. "//
+     $           "Checking the defaults directory in '"//
+     $           trim(adjustl(flux_cal_dir))//"/defaults'."
+
+            ! Check the defaults directory for the file
+            write(inputfile_rosseland,200) trim(adjustl(flux_cal_dir)),
+     $           trim(adjustl(opacityfile_rosseland))
+            inquire(file=trim(adjustl(inputfile_rosseland)),
+     $           exist=fileexists)
+            if(fileexists) then
+               write(*,*) "Found '"//
+     $              trim(adjustl(opacityfile_rosseland))//"' in '"//
+     $              trim(adjustl(inputfile_rosseland))//"'."
+            else
+               write(*,*)"Could not find '"//
+     $              trim(adjustl(inputfile_rosseland))//"' in "//
+     $              "flux_cal_dir/defaults. make sure flux_cal_dir is"//
+     $              " correct, and if flux_cal was properly installed."
+               error stop "init.f"
+            end if
+         end if
       end if
 
-      write(file2,200) trim(adjustl(flux_cal_dir)),"kP_h2001.dat"
-      inquire(file=trim(adjustl(file2)), exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*)"Could not find 'kP_h2001.dat' in"
-         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*)"correct, and if flux_cal was properly installed."
-         error stop "init.f"
+
+      if (len(trim(adjustl(opacityfile_planck))).eq.0) then
+         use_planck = .false.
+      else
+         ! Check current working directory for the file
+         inquire(file=trim(adjustl(opacityfile_planck)),
+     $        exist=fileexists)
+         if(fileexists) then
+            inputfile_planck = opacityfile_planck
+         else
+            write(*,*) "WARNING: Could not find '"//
+     $           trim(adjustl(opacityfile_planck))//"'. "//
+     $           "Checking the defaults directory in '"//
+     $           trim(adjustl(flux_cal_dir))//"/defaults'."
+
+            ! Check the defaults directory for the file
+            write(inputfile_planck,200) trim(adjustl(flux_cal_dir)),
+     $           trim(adjustl(opacityfile_planck))
+            inquire(file=trim(adjustl(inputfile_planck)),
+     $           exist=fileexists)
+            if(fileexists) then
+               write(*,*) "Found '"//
+     $              trim(adjustl(opacityfile_planck))//"' in '"//
+     $              trim(adjustl(inputfile_planck))//"'."
+            else
+               write(*,*)"Could not find '"//
+     $              trim(adjustl(inputfile_planck))//"' in "//
+     $              "flux_cal_dir/defaults. make sure flux_cal_dir is "//
+     $              "correct, and if flux_cal was properly installed."
+               error stop "init.f"
+            end if
+         end if
       end if
 
-      ! cold T opacities initialization
-      call ini_opac_dust_and_gas(file1,file2)
+      if((use_rosseland.eqv..false.) .and. (use_planck.eqv..false.))then
+         write(*,*) "Both use_rosseland and use_planck are '.false.',"//
+     $        " either because they were set as such in the input "//
+     $        "file or because opacityfile_rosseland='' and "//
+     $        "opacityfile_planck=''."
+         error stop "init.f"
+      end if
       
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),
-     $     "gs98_z0.02_x0.7.data"
-      inquire(file=trim(adjustl(inputfile)), exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*)"Could not find 'gs98_z0.02_x0.7.data' in"
-         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*)"correct, and if flux_cal was properly installed."
-         error stop "init.f"
-      end if
-
-      call ini_highT_opacities(inputfile)
-
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),
-     $     "lowT_fa05_gs98_z0.02_x0.7.data"
-      inquire(file=trim(adjustl(inputfile)), exist=fileexists)
-      if(.not. fileexists) then
-         write(*,*)"Could not find 'lowT_fa05_gs98_z0.02_x0.7.data' in"
-         write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*)"correct, and if flux_cal was properly installed."
-         error stop "init.f"
-      end if
-
-      call ini_lowT_opacities(inputfile)
+      call ini_opac(use_rosseland,use_planck,inputfile_rosseland,
+     $     inputfile_planck)
       
 
       if(envfit) then
@@ -621,8 +624,8 @@ c      end if
          if(.not. fileexists) then
             write(*,*) "Could not find '",trim(adjustl(filtersfile)),
      $           "' in"
-            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
-            write(*,*)"correct, and if flux_cal was properly installed."
+            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
+     $           "is correct, and if flux_cal was properly installed."
             error stop "init.f"
          end if
          
@@ -635,8 +638,8 @@ c      end if
          if(.not. fileexists) then
             write(*,*) "Could not find '",trim(adjustl(filtersfile)),
      $           "' in"
-            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir is"
-            write(*,*)"correct, and if flux_cal was properly installed."
+            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
+     $           "is correct, and if flux_cal was properly installed."
             error stop "init.f"
          end if
       
@@ -648,9 +651,9 @@ c     Check to see if the filtersfile exists and read it if it does
      $     trim(adjustl(filtersfile))
       inquire(file=trim(adjustl(inputfile)),exist=fileexists)
       if(.not.fileexists) then
-         write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' in"
-         write(*,*) "flux_cal_dir/defaults. make sure flux_cal_dir is"
-         write(*,*) "correct, and if flux_cal was properly installed."
+         write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' "//
+     $        "in flux_cal_dir/defaults. make sure flux_cal_dir is "//
+     $        "correct, and if flux_cal was properly installed."
          error stop "init.f"
       end if
       

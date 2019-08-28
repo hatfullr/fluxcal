@@ -21,8 +21,7 @@ findTefflib = find_teff
 math_modules = $(mathlib)/bilinear_interpolation.o
 
 # Library objects
-lib_obj = $(llib)/usekappatable.o       \
-          $(llib)/getTemperature.o      \
+lib_obj = $(llib)/getTemperature.o      \
           $(llib)/derivs2.o             \
           $(llib)/kernels.o             \
           $(llib)/init.o                \
@@ -34,13 +33,11 @@ lib_obj = $(llib)/usekappatable.o       \
           $(llib)/readineostable.o      \
           $(llib)/trackParticles.o      \
           $(llib)/getOpacitySub.o       \
-	  $(llib)/opacities_cold.o      \
           $(llib)/quicksort.o           \
           $(llib)/makeOutputFile.o      \
           $(llib)/output.o              \
           $(llib)/getLocalAngle.o       \
-	  $(llib)/ini_highT_opacities.o \
-	  $(llib)/ini_lowT_opacities.o  \
+	  $(llib)/opacity.o             \
 
 # Math objects
 math_obj = $(mathlib)/odeint.o               \

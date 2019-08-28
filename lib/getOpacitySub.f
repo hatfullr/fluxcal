@@ -1,11 +1,9 @@
       subroutine getOpacitySub(tem,rho,tau,opacit)
 c      include 'flux_cal.h'
 
-      real*8 tem,x,y,z,Rform,rho,tau
+      real*8 tem,x,y,z,rho,tau
 
       real*8 getOpacity
-      external usetable,usetable2
-      external usetabledust,usetabledust2
 
       real*8 opacit,opacit1,opacit2,fcondense
       integer nn

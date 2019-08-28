@@ -25,8 +25,6 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
       real*8 opacit,opacit1,opacit2
       real*8 fcondense,nn
-      real*8 Rform
-      common/dust/ Rform
       integer intout
       common/intoutput/ intout
       real*8 getLocalAngle
@@ -43,9 +41,6 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       real*8 hmin,hmax,dr2,dx2,dy2,dz2,bigd,maxbigd
       common/intpar/ hmin,hmax,n
 
-      external usetable,usetabledust
-      external usetable2,usetabledust2
-      
       integer lastpart
       common/lastparticle/ lastpart
 

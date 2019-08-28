@@ -42,8 +42,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common /splotfilters/ wavelength,absoluteflux,numfilters
       common /filternames/ filtername
 c      integer i
-      character*255 opacityfile,opacitydustfile,filtersfile,trackfile,
-     $      eosfile
+      character*255 opacityfile_rosseland,opacityfile_planck,filtersfile,
+     $      trackfile, eosfile
       real*8 yscalconst,fracaccuracy,metallicity
       integer nkernel
       common/kernels/ nkernel
@@ -57,20 +57,18 @@ c      integer i
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
      $      Lunit_out,kunit_out,sunit_out
 
-      real*8 Rform
-      common/dust/Rform
       integer start,finish,step
       common/filevars/ start,finish,step
-      logical rossonly,get_particles_at_pos,
+      logical use_rosseland,use_planck,get_particles_at_pos,
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_integration_at_pos,get_info_of_particle,
      $      get_closest_particles,get_integration_at_all_pos,
      $      get_true_luminosity
-      common/opacitytype/ rossonly
+      common/opacitytype/ use_rosseland, use_planck
       real*8 step1,step2,step3,step4
       common/steps/ step1,step2,step3,step4
-      real*8 Topac_Planck
-      common/Topacity_Planck/ Topac_Planck
+      real*8 Tplanck
+      common/Topacity_Planck/ Tplanck
       real*8 taulimit,posx,posy
       real*8 tau_thick_envfit,tau_thick_integrator,tau_thick
       common/tauthick/ tau_thick_integrator,tau_thick_envfit,tau_thick
@@ -90,7 +88,7 @@ c      integer i
       common/time/ t
       character*3 dust_model
       character*1 dust_topology, dust_shape
-      common/colddust/ dust_model,dust_topology,dust_shape
+      common/dust/ dust_model,dust_topology,dust_shape
       logical track_all
       common/trackall/ track_all
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
@@ -98,18 +96,18 @@ c      integer i
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
      $      Lunit_out,dust_model,dust_topology,dust_shape,
-     $      nkernel,opacityfile,opacitydustfile,filtersfile,metallicity,
-     $      Rform,anglexdeg,angleydeg,anglezdeg,start,finish,step,
-     $      rossonly,step1,step2,step3,step4,taulimit,
+     $      nkernel,opacityfile_rosseland,opacityfile_planck,filtersfile,
+     $      metallicity,anglexdeg,angleydeg,anglezdeg,start,finish,step,
+     $      use_rosseland,use_planck,step1,step2,step3,step4,taulimit,
      $      get_particles_at_pos,posx,posy,track_particles,trackfile,
      $      binary_tracking_file,get_fluxes,envfit,
      $      get_integration_at_pos,get_integration_at_all_pos,
      $      get_info_of_particle,info_particle,
      $      outfile,tau_thick_envfit,eosfile,get_true_luminosity,
      $      get_closest_particles,flux_cal_dir,tau_thick_integrator,
-     $      tau_thick,track_all,kunit_out,sunit_out
-      common/inputfilenames/ opacityfile,opacitydustfile,filtersfile,
-     $      trackfile,eosfile
+     $      tau_thick,track_all,kunit_out,sunit_out,Tplanck
+      common/inputfilenames/ opacityfile_rosseland,opacityfile_planck,
+     $      filtersfile,trackfile,eosfile
 
       real*8 yscalfactor(numfiltersmax)
       common /yscales/ yscalfactor
@@ -129,8 +127,6 @@ c      integer i
 
 
       real*8 getOpacity,useeostable
-      external usetable,usetabledust
-      external usetable2,usetabledust2
 
       real*8 get_teff,getLocalAngle
       real*8 fourPointArea, fourPointArea2
