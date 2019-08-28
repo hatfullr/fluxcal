@@ -217,7 +217,8 @@
       ! Set opacitydustfile='' for no dust.
       eosfile='sph.eos'
       opacityfile_planck='kP_h2001.dat'
-      opacityfile_rosseland='kR_h2001.dat'
+      !opacityfile_rosseland='kR_h2001.dat'
+      opacityfile_rosseland='/home/hatfull/ags04.7.1.tron'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
 

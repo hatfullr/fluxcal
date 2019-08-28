@@ -43,7 +43,7 @@
 
       ! Finds the data being used at each integration step for all grid
       ! cells. Creates one output file for every grid cell, so use with
-      ! extreme caution! You must also set get_fluxes=.true. to use this
+      ! extreme caution! You must also set get_fluxes to .true. to use this
       ! routine.
       get_integration_at_all_pos=.false.
 
@@ -156,8 +156,14 @@
       
       !### Physics
       ! If true, use Rosseland opacities only. If false, will use
-      ! Rosseland and Planck opacities with a smoothing function.
-      rossonly=.false.
+      ! both Rosseland and Planck opacities. Use Planck opacities
+      ! for T <= Tplanck and Rosseland opacities for T > Tplanck.
+      ! Default Tplanck = 1000.d0. Opacities aren't smoothed
+      ! between ross and planck yet, but hopefully that will be a
+      ! feature soon.
+      use_rosseland = .true.
+      use_planck = .true.
+      Tplanck = 1000.d0
       
       ! Solar metallicity
       metallicity=0.02d0

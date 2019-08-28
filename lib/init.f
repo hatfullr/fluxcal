@@ -34,7 +34,9 @@
       call sleep(1)
       
       write(*,*) "** Initializing **"
-      
+
+
+
 !-----------------------------------------------------------------------
 
 
@@ -51,7 +53,7 @@
       ! The directory flux_cal was installed to. This is used to find the
       ! included tabulated equation of state 'sph.eos' and other data
       ! tables required for flux_cal to run.
-      flux_cal_dir = ''
+      flux_cal_dir = '../'
 
       
 
@@ -61,9 +63,6 @@
       ! Calculate the flux at each grid cell and record the data.
       get_fluxes=.false.
 
-      ! Calculate the true luminosity (not a full feature yet)
-      get_true_luminosity=.false.
-      
       ! Set this to true to create a data file containing all the
       ! particles whose surfaces are closest to the observer  along each
       ! driving grid cell. In other words, the particles that flux_cal
@@ -82,7 +81,7 @@
 
       ! Finds the data being used at each integration step for all grid
       ! cells. Creates one output file for every grid cell, so use with
-      ! extreme caution! You must also set get_fluxes=.true. to use this
+      ! extreme caution! You must also set get_fluxes to .true. to use this
       ! routine.
       get_integration_at_all_pos=.false.
 
@@ -111,9 +110,9 @@
       !### Simulation parameters
       ! nkernel determines what kind of kernel to use. You should set
       ! this to the kernel you used to calculate your data.
-      ! 0 = cubic spline
-      ! 1 = Wendland 3,3
-      ! 2 = Wendland C4
+      ! 0 is cubic spline
+      ! 1 is Wendland 3,3
+      ! 2 is Wendland C4
       nkernel=0
 
 
@@ -127,7 +126,7 @@
       fracaccuracy=0.01d0
 
       ! step1 is the step size the integrator should take when it is
-      ! near tau=1
+      ! near tau of 1
       step1=1d0
       step2=1d30
       step3=1d4
@@ -135,23 +134,15 @@
 
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
-      taulimit=1.d0
+      taulimit=1.d1
 
       ! Optical depth by which the integrator will detect that a region
       ! is optically thick.
-      tau_thick_integrator=1.d0
+      tau_thick_integrator=1.d1
 
       ! The value of optical depth that a particle must exceed to be
       ! handled by the envelope fitting routine. 1.d1 by default.
       tau_thick_envfit=1.d1
-      
-      ! Optical depth value that signifies optically thick material. If
-      ! the integrator finds a region where tau is equal to this value,
-      ! it will tell flux_cal to use the envelope fitting routine.
-      ! Otherwise, flux_cal will use the SPH temperature. Set to 10.d0 by
-      ! default, because the envelope fitting routine works mostly for
-      ! tau > 10. (LEGACY)
-      tau_thick=-1.d30
       
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
@@ -163,12 +154,12 @@
       
       !### Data units
       ! Give the conversion factors from your data's units to cgs.
-      ! For example, set runit=6.955d10 if your distances are measured
+      ! For example, set runit to 6.955d10 if your distances are measured
       ! in solar radii. This is intended for codes that use intricate
       ! unit systems, such as StarSmasher. If your data is in units that
       ! aren't that intricate, use the flux_cal.baseunits file instead.
-      ! For example, StarSmasher uses vunit=sqrt(G*Msun/Rsun) cm/s and
-      ! tunit=sqrt(Rsun^3/GMsun).
+      ! For example, StarSmasher uses vunit of sqrt(G*Msun/Rsun) cm/s and
+      ! tunit of sqrt(Rsun^3/GMsun).
       !
       ! Be sure to give these in cgs. If you want to use other units,
       ! edit the flux_cal.baseunits file.
@@ -197,7 +188,7 @@
       punit_out=1.d0            ! pressure
       Lunit_out=1.d0            ! luminosity
       kunit_out=1.d0            ! opacity
-      sunit_out=1.d0            ! specific entropy
+      sunit_out=1.d0		! specific entropy
       
       
       
@@ -205,11 +196,11 @@
       ! If true, use Rosseland opacities only. If false, will use
       ! both Rosseland and Planck opacities. Use Planck opacities
       ! for T <= Tplanck and Rosseland opacities for T > Tplanck.
-      ! Default Tplanck = 1000.d0. Opacities aren't smoothed
+      ! Default Tplanck is 1000.d0. Opacities aren't smoothed
       ! between ross and planck yet, but hopefully that will be a
       ! feature soon.
-      use_rosseland=.true.
-      use_planck=.true.
+      use_rosseland = .true.
+      use_planck = .true.
       Tplanck = 1000.d0
       
       ! Solar metallicity
@@ -224,12 +215,11 @@
       ! Rotation angle about z axis (degrees)
       anglezdeg=0.d0
 
-
       ! Cold temperature dust parameters
       !    dust_model controls the silicate type
-      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg)=0.3,
-      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg)=0.0,
-      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg)=0.4,
+      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg) is 0.3,
+      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg) is 0.0,
+      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg) is 0.4,
       !    dust_topology controls the topology of the grains
       !       'h' - homogeneous particles,
       !       'c' - composite particles,
@@ -239,8 +229,8 @@
       !       'a' - aggregate dust,
       !       '5' - 5-layered spherical dust
       ! For any dust_model, you can not use:
-      !    dust_topology='h' AND dust_shape='5'
-      !    dust_topology='p' AND dust_shape='a'
+      !    dust_topology is 'h' AND dust_shape is '5'
+      !    dust_topology is 'p' AND dust_shape is 'a'
       dust_model='nrm'
       dust_topology='h'
       dust_shape='s'
@@ -251,7 +241,7 @@
       
       !### File names
       ! File name for the opacity files, filters file, and output file.
-      ! Set opacitydustfile='' for no dust.
+      ! Set opacitydustfile to '' for no dust.
       eosfile='sph.eos'
       opacityfile_planck='kP_h2001.dat'
       opacityfile_rosseland='kR_h2001.dat'
