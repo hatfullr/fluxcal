@@ -1,0 +1,6 @@
+#!/bin/bash
+
+\cp ../../../../defaults/flux_cal.input .
+
+
+sed -i "s/flux_cal_dir='..\/'/flux_cal_dir='..\/..\/..\/..'/g" flux_cal.input

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+\cp ../default/flux_cal.input .
+
+
+sed -i 's/get_fluxes=.false./get_fluxes=.true./g' flux_cal.input
+sed -i 's/get_integration_at_all_pos=.false./get_integration_at_all_pos=.true./g' flux_cal.input
+

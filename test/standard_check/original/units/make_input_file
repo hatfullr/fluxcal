@@ -1,0 +1,29 @@
+#!/bin/bash
+
+\cp ../default/flux_cal.input .
+
+
+sed -i 's/get_fluxes=.false./get_fluxes=.true./g' flux_cal.input
+
+sed -i 's/runit=1.d0/runit=3.4799d10/g' flux_cal.input
+sed -i 's/munit=1.d0/munit=9.946d32/g' flux_cal.input
+sed -i 's/tunit=1.d0/tunit=7.96765d2/g' flux_cal.input
+sed -i 's/vunit=1.d0/vunit=2.18377d7/g' flux_cal.input
+sed -i 's/Eunit=1.d0/Eunit=1.897235d48/g' flux_cal.input
+sed -i 's/rhounit=1.d0/rhounit=2.950245d0/g' flux_cal.input
+sed -i 's/muunit=1.d0/muunit=0.5d0/g' flux_cal.input
+sed -i 's/gunit=1.d0/gunit=1.370395d4/g' flux_cal.input
+
+sed -i 's/runit_out=1.d0/runit_out=0.5d0/g' flux_cal.input
+sed -i 's/munit_out=1.d0/munit_out=0.5d0/g' flux_cal.input
+sed -i 's/tunit_out=1.d0/tunit_out=0.5d0/g' flux_cal.input
+sed -i 's/vunit_out=1.d0/vunit_out=0.5d0/g' flux_cal.input
+sed -i 's/Eunit_out=1.d0/Eunit_out=0.5d0/g' flux_cal.input
+sed -i 's/rhounit_out=1.d0/rhounit_out=0.5d0/g' flux_cal.input
+sed -i 's/muunit_out=1.d0/muunit_out=0.5d0/g' flux_cal.input
+sed -i 's/gunit_out=1.d0/gunit_out=0.5d0/g' flux_cal.input
+sed -i 's/tempunit_out=1.d0/tempunit_out=1.d0/g' flux_cal.input
+sed -i 's/punit_out=1.d0/punit_out=1.d0/g' flux_cal.input
+sed -i 's/Lunit_out=1.d0/Lunit_out=1.d0/g' flux_cal.input
+sed -i 's/kunit_out=1.d0/kunit_out=1.d0/g' flux_cal.input
+sed -i 's/sunit_out=1.d0/sunit_out=1.d0/g' flux_cal.input

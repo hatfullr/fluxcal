@@ -265,10 +265,10 @@
          error stop "init.f"
       end if
 
-      if(tau_thick.ne.-1.d30) then
-         tau_thick_integrator = taulimit
-         tau_thick_envfit = tau_thick
-      end if
+c      if(tau_thick.ne.-1.d30) then
+c         tau_thick_integrator = taulimit
+c         tau_thick_envfit = tau_thick
+c      end if
       
       
       ! Base units (cgs). These are 

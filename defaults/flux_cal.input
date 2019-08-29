@@ -15,7 +15,7 @@
       ! The directory flux_cal was installed to. This is used to find the
       ! included tabulated equation of state 'sph.eos' and other data
       ! tables required for flux_cal to run.
-      flux_cal_dir = '../'
+      flux_cal_dir='../'
 
       
 
@@ -161,9 +161,9 @@
       ! Default Tplanck is 1000.d0. Opacities aren't smoothed
       ! between ross and planck yet, but hopefully that will be a
       ! feature soon.
-      use_rosseland = .true.
-      use_planck = .true.
-      Tplanck = 1000.d0
+      use_rosseland=.true.
+      use_planck=.true.
+      Tplanck=1000.d0
       
       ! Solar metallicity
       metallicity=0.02d0

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+\cp ../default/flux_cal.input .
+
+
+sed -i 's/track_particles=.false./track_particles=.true./g' flux_cal.input

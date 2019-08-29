@@ -1,0 +1,8 @@
+#!/bin/bash
+
+\cp ../../default/flux_cal.input .
+
+
+sed -i "s/flux_cal_dir='..\/..\/..\/..'/flux_cal_dir='..\/..\/..\/..\/..'/g" flux_cal.input
+sed -i 's/get_fluxes=.false./get_fluxes=.true./g' flux_cal.input
+sed -i "s/dust_model='nrm'/dust_model='irs'/g" flux_cal.input

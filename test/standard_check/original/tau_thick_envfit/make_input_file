@@ -1,2 +1,7 @@
 #!/bin/bash
 
+\cp ../default/flux_cal.input .
+
+
+sed -i 's/get_fluxes=.false./get_fluxes=.true./g' flux_cal.input
+sed -i 's/tau_thick_envfit=1.d1/tau_thick_envfit=1.d10/g' flux_cal.input

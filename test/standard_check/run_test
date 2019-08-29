@@ -1,0 +1,135 @@
+#!/bin/bash
+
+# This script will run flux_cal in all the directories after cleaning out
+# all old output files.
+
+check () {
+    if [ $? -ne 0 ]; then
+	echo "ERROR"
+	exit 1
+    fi
+}
+
+diffcheck () {
+    testdir=$1
+    here=$(basename $testdir)
+    origdir=$(echo $testdir | sed 's/test/original/2')
+    for j in $(find $origdir -type f ! -name 'flux_cal' -and ! -name 'flux_cal.input' -and ! -name "dimen*" -and ! -name "make_input_file"); do
+	diff --brief $testdir/$(basename $j) $j
+	if [ $? -ne 0 ]; then
+	    return 1
+	fi
+    done
+    return 0
+}
+
+
+showLoading() {
+  mypid=$!
+
+  printf "%03.1d%% [    ] %s" $1 $2
+  
+  while kill -0 $mypid 2>/dev/null; do
+      printf "\r%03.1d%% [.   ] %s" $1 $2
+      #echo -ne "$loadingText.\r"
+      sleep 0.5
+      printf "\r%03.1d%% [..  ] %s" $1 $2
+      #echo -ne "$loadingText..\r"
+      sleep 0.5
+      printf "\r%03.1d%% [... ] %s" $1 $2
+      #echo -ne "$loadingText...\r"
+      sleep 0.5
+      printf "\r%03.1d%% [....] %s" $1 $2
+      sleep 0.5
+      echo -ne "\r\033[K"
+  done
+
+  #echo "$loadingText...FINISHED"
+}
+
+curdir=$(pwd)
+errorfile=$curdir/errors.txt
+origdir=$curdir/original
+
+
+# Remove the old testing directory if there is one
+if [ -d $curdir/test ]; then
+    rm -rf $curdir/test
+    check
+fi
+
+\cp -r $curdir/original $curdir/test
+check
+\cd $curdir/test
+check
+
+for i in $(find $curdir/test -type f ! -name 'fluxcal_0000.dat' -and ! -name 'dimen*.dat' -and ! -name 'flux_cal' -and ! -name 'fluxcal.particles' -and ! -name 'flux_cal.input'); do
+    rm -f $i
+    check
+done
+
+rm -f test/GNUFortran.txt
+
+dirlist=( $(find $curdir/test -name flux_cal) )
+check
+
+
+echo "Writing gfortran version information to $curdir/GNUFortran.txt"
+$(which gfortran) --version > GNUFortran.txt
+
+diff --brief $origdir/GNUFortran.txt GNUFortran.txt
+if [ $? -ne 0 ]; then
+    printf "\e[31mWarning: Your gfortran version differs from the original. This may cause differences in floating point precision, making some or all tests fail. If so, the integrity check can not be trusted. We do not recommend downgrading gfortran, as this is generally harmful. Continue to use this installation of FluxCal at your own risk.\e[0m\n"
+else
+    echo "Your gfortran version matches the test suite version"
+fi
+
+count=1
+fail=0
+pass=0
+error=0
+for i in ${dirlist[@]}; do
+    prcnt=$(( $count*100 / ${#dirlist[@]} ))
+    #printf "%03.1d%% [    ] %s " $prcnt "$i"
+    \cd $(dirname $i)
+    echo "$(dirname $i):" >> $errorfile
+    ./flux_cal > debug 2>errors & showLoading $prcnt "$(dirname $i | rev | cut -d'/' -f1 | rev)"
+    if [ -s errors ]; then # There's errors
+    	error=1
+    	cat errors >> $errorfile
+    fi
+    rm -f errors
+    \cd $curdir
+    diffcheck $(dirname $i) &>> $errorfile
+    if [ $? -ne 0 ]; then
+	error=1
+    fi
+
+    if [ $error -eq 1 ]; then
+	printf "\r%03.1d%% [\e[31mFAIL\e[0m] %s\n" $prcnt "$(dirname $i | rev | cut -d'/' -f1 | rev)"
+	fail=$(( $fail + 1 ))
+    else
+	printf "\r%03.1d%% [\e[32mPASS\e[0m] %s\n" $prcnt "$(dirname $i | rev | cut -d'/' -f1 | rev)"
+	pass=$(( $pass + 1 ))
+    fi
+    
+    count=$(( $count + 1 ))
+    error=0
+done
+
+\cd $curdir
+
+echo ""
+echo "Results"
+printf "    \e[32mPass\e[0m: %s\n" "$pass"
+printf "    \e[31mFail\e[0m: %s\n" "$fail"
+printf "   Total: %s\n" "$(( $pass + $fail ))"
+echo ""
+if [[ "$fail" > 0 ]]; then
+    echo "Your installation may be corrupt. Please try re-installing."
+    echo "See 'more $curdir/errors.txt' for more information."
+    exit 1
+else
+    echo "Your installation should be stable"
+    exit 0
+fi
