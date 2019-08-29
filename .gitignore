@@ -14,6 +14,7 @@ defaults/._kP_h2001.dat
 defaults/._kR_h2001.dat
 **/*.pyc
 tools/settings_plot_Teff.py.dev
-
+test/standard_check/test
+test/standard_check/errors.txt
 build
 **/*.mod
