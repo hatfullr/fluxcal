@@ -231,8 +231,8 @@ c            TXY(I,J)=TphotoXY(I,J)
       end do
 
       call cpu_time(finish_time)
-      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
-     $     TOTALTpracticalXY(i/2,j/2)
-      write(*,*) "integrateTau took ",finish_time-start_time
+c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
+c     $     TOTALTpracticalXY(i/2,j/2)
+c      write(*,*) "integrateTau took ",finish_time-start_time
       
       end subroutine
