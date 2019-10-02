@@ -116,7 +116,7 @@
       ! Otherwise, flux_cal will use the SPH temperature. Set to 10.d0 by
       ! default, because the envelope fitting routine works mostly for
       ! tau > 10. (LEGACY)
-      tau_thick=-1.d30
+      ! tau_thick=-1.d30
       
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
@@ -217,8 +217,7 @@
       ! Set opacitydustfile='' for no dust.
       eosfile='sph.eos'
       opacityfile_planck='kP_h2001.dat'
-      !opacityfile_rosseland='kR_h2001.dat'
-      opacityfile_rosseland='/home/hatfull/ags04.7.1.tron'
+      opacityfile_rosseland='kR_h2001.dat'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
 

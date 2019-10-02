@@ -43,15 +43,18 @@ cc     Use a 3x3 grid for starters:
 c      NXMAPnext=3
 c      NYMAPnext=3
 
- 102  format(" ",A5," ",A15  ," ",A15  ," ",A5," ",A15  ," ",A15  ," ",
-     $     A5," ",A15," ",A10)
- 103  format(" ",i5," ",ES15.7," ",ES15.7," ",i5," ",ES15.7," ",
-     $     ES15.7," ",i5," ",ES15.7," ",A10)
-      write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny","<F>",
-     $     "reason"
-      write(*,102) repeat("-",5), repeat("-",15), repeat("-",15),
-     $     repeat("-",5), repeat("-",15), repeat("-",15),
-     $     repeat("-",5), repeat("-",15), repeat("-",10)
+ 102  format(" ",A5," ",A11  ," ",A11  ," ",A5," ",A11  ," ",A11  ," ",
+     $     A5," ",A11," ",A11," ",A8," ",A8," ",A11," ",A10)
+ 103  format(" ",i5," ",ES11.4," ",ES11.4," ",i5," ",ES11.4," ",
+     $     ES11.4," ",i5," ",ES11.4," ",ES11.4," ",i8," ",i8," ",ES11.4,
+     $     " ",A10)
+      write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny",
+     $     "minstpsize","maxstpsize","minNstp","maxNstp",
+     $     "<F>","reason"
+      write(*,102) repeat("-",5), repeat("-",11), repeat("-",11),
+     $     repeat("-",5), repeat("-",11), repeat("-",11),
+     $     repeat("-",5), repeat("-",11), repeat("-",11),
+     $     repeat("-",8), repeat("-",8), repeat("-",11), repeat("-",10)
       
       counter = 1
       lastnumcell = int(1.d-30)
@@ -165,12 +168,14 @@ c     print *,'no convergence yet...try again'
 
          if(TOTALflux.eq.0) then
             write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $           yminmap/runit_out,hymap/runit_out,nymap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $           max_step_size,min_steps_taken,max_steps_taken,
      $           0.d0,"Finished  "
             goto 42
          else
             write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $           yminmap/runit_out,hymap/runit_out,nymap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $           max_step_size,min_steps_taken,max_steps_taken,
      $           TOTALflux/numcell,reason
          end if
 
@@ -181,11 +186,13 @@ c     print *,'no convergence yet...try again'
 
       if(TOTALflux.eq.0) then
          write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $        yminmap/runit_out,hymap/runit_out,nymap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $        max_step_size,min_steps_taken,max_steps_taken,
      $        0.d0,"Finished  "
       else
          write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $        yminmap/runit_out,hymap/runit_out,nymap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $        max_step_size,min_steps_taken,max_steps_taken,
      $        TOTALflux/numcell,"Finished  "
       end if
 

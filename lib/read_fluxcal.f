@@ -28,6 +28,7 @@ c      character*255 fname
       integer i, do_debug
       real*8 moutsideTEOS,eoutsideTEOS,mintempoutsideTEOS
       real*8 maxtempoutsideTEOS,minrhooutsideTEOS,maxrhooutsideTEOS
+      real*8 myxhi
       
       if(nnit.le.9999) then
          write(infname,"('fluxcal_',i4.4,'.dat')") nnit
@@ -88,7 +89,9 @@ c      character*255 fname
             entropy(i) = 0.d0
          end if
 
-         call getOpacitySub(tempp(i),rho(i),0.d0,opac_sph(i))
+         myxhi = -0.6d0+0.2d0*metallicity
+     $        +0.8d0*1.67262158d-24/wmeanmolecular(i)
+         opac_sph(i) = getOpacity(tempp(i),rho(i),myxhi)
 c         if(tempp(i).le.8000) write(*,*) "OPACITY", tempp(i), opacit
          tauA(i) = taucoef*am(i)*opac_sph(i)/hp(i)**2.d0
 

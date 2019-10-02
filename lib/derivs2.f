@@ -68,42 +68,7 @@ c     where zp() is a zero-point magnitude.
 c     t6 is the temperature in millions of degrees Kelvin
 
       if(t6.gt.0) then
-         call getOpacitySub(t6*1d6,rhocgs,0.d0,opacit)
-c      if(t6.gt.0) then
-c
-c         if ((xpos**2+ypos**2+zpos**2)**0.5d0.lt.Rform) then
-c            
-cc     We're too close to the origin for there to be dust
-c            opacit=getOpacity(dble(t6*1d6),rhocgs,tau(1),
-c     $           usetable,usetable2)
-c         else
-c
-cc     There will be some dust at this location
-cc     opacit1 is local Rosseland opacity without dust or molecules
-cc     opacit2 is local Rosseland opacity with dust and molecules
-c            opacit1=getOpacity(dble(t6*1d6),rhocgs,tau(1),
-c     $           usetable,usetable2)
-c            opacit2=getOpacity(dble(t6*1d6),rhocgs,tau(1),
-c     $           usetabledust,usetabledust2)
-c
-cc     here we are setting f=f_max*(1-(r_form/r)^2) which comes from combining
-cc     eqn 5 of Nanni et al. (2013, http://adsabs.harvard.edu/abs/2013MNRAS.434.2390N)
-cc     with eqn 4 of Kochanek (2014, http://adsabs.harvard.edu/abs/2014MNRAS.444.2043K).
-cc     Kochanek uses a velocity scaling exponent n=0, while we use n=1:
-c            nn=1
-cc     the 1 at the beginning is what we have set f_max to. 0<f_max<1 so we assume 1 for now
-c            fcondense=1*(1-(Rform/(xpos**2+ypos**2+
-c     $           zpos**2)**0.5d0)**(2+nn))**3
-c               
-cc     here we put our reduced condensation function f into eqn4 of Nanni et al 2013
-cc     to find the opacity with partial dust and molecule formation
-c            opacit=(1-fcondense)*opacit1+fcondense*opacit2
-c            
-c            
-c         endif
-c
-cc         write(*,*) "opacit, t6 = ", opacit, t6
-c
+         opacit = getOpacity(t6*1d6,rhocgs,xh)
 
          if(opacit.le.1d30) then
             dtauds(1)=-opacit*rhocgs ! NEGATIVE SIGN IS BECAUSE STEP IS IN NEGATIVE DIRECTION
@@ -127,9 +92,6 @@ c
                dtauds(4+ifilter)=0.d0
             enddo
          endif
-
-c     call usetable(rhocgs,dble(t6*1d6),opacit)
-c     opacit=opacity(rhocgs,t6*1d6)
          dtauds(3)=-1/xhp       ! NEGATIVE SIGN IS BECAUSE STEP IS IN NEGATIVE DIRECTION
       else
          dtauds(1)=0.d0

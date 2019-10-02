@@ -4,8 +4,10 @@
       integer i
       logical inputexists,baseunitsexists,fileexists
       character*255 eosfilepath,inputfile, opacfile1, opacfile2
-      character*255 inputfile_rosseland,inputfile_planck
+      character*255 opacityfile_temp
       character*255 info_particle_string
+      logical use_rosseland, use_planck
+      logical throw_error
 
       write(*,*)" ___________________________________________________  "
       write(*,*)"/         ___  _              ___        _          \ "
@@ -107,7 +109,7 @@
 
 
       
-      !### Simulation parameters
+      !### SPH simulation parameters
       ! nkernel determines what kind of kernel to use. You should set
       ! this to the kernel you used to calculate your data.
       ! 0 is cubic spline
@@ -120,9 +122,16 @@
 
       
       !### Integration
+      ! Set rotation angles about the x, y, and z axes (degrees)
+      anglexdeg=0.d0
+      angleydeg=0.d0
+      anglezdeg=0.d0
+      
       ! yscale proportionality constant
       yscalconst=0.06d0
-      
+
+      ! When the detected flux from the simulation changes by less than
+      ! fracaccuracy, grid refinement stops.
       fracaccuracy=0.01d0
 
       ! step1 is the step size the integrator should take when it is
@@ -131,6 +140,9 @@
       step2=1d30
       step3=1d4
       step4=1d15
+
+      ! The maximum number of steps the integrator will take before failing
+      MAXSTP=10000
 
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
@@ -152,6 +164,187 @@
 
 
       
+      !### Opacities
+      ! When opacityfiles are not present or when a given (rho,T) lies outside
+      ! the domain of the opacityfiles, FluxCal uses analytic approximations
+      ! to calculate the boundfree, freefree, electron scatter, and negative H
+      ! ion opacities, as done in Onno Pols notes on Stellar Evolution.
+      ! astro.ru.nl/~onnop/education/stev_utrecht_notes/chapter5-6.pdf
+      
+      ! Decide to throw either an error, warning, both, or neither when (rho,T)
+      ! is out of bounds for both the opacityfiles and any available analytic
+      ! approximations in the code. When using the analytic approximations,
+      ! a warning will always be thrown. By default, the opacity is set to 0.d0
+      ! when out of bounds of both the opacityfiles and analytic approximations.
+      !
+      ! Setting opacity_analytic_warning to .false. suppresses the warnings
+      ! given when FluxCal uses analytic approximations to calculate the 
+      ! opacity. This should only be set to .false. for debugging purposes.
+      opacity_oob_error=.false.
+      opacity_oob_warning=.true.
+      opacity_analytic_warning=.true.
+
+      
+      ! Define the opacity files you would like to be read in, as well as how
+      ! you would like the code to transition between them. You must give the
+      ! maximum and minimum logT and logR values (logTmins, logTmaxs,
+      ! logRmins, and logRmaxs). Set these to -1.d30 to use up to the maximum
+      ! and minimum in the file. You must also give the point at which you want
+      ! opacity blending to begin (logT_blend1, logT_blend2, logR_blend1,
+      ! logR_blend2). Blending will always occur in the region between mins and
+      ! blend1 and between blend2 and maxs. No blending is done between blend1
+      ! and blend2. Set blend values to -1.d30 to turn off the blending region.
+      !
+      ! logR = logRho - 3*logT + 18
+      !
+      ! You can only use up to 9 opacity files.
+      !
+      ! The first two values in opacityfiles array are reserved for the
+      ! included lowT rosseland and planck opacity files. These files
+      ! require the included code "opacity.f" to be read.
+      ! For the first two files, 1.0D-19 < rho < 1.0D-7 and
+      ! 500 < T < 10000.
+      ! logR = logrho - 3logT + 18
+      ! for rhomin,Tmin, logR = -9.0969
+      ! for rhomin,Tmax, logR = -13
+      ! for rhomax,Tmin, logR = 2.90309
+      ! for rhomax,Tmax, logR = -1
+      ! Thus, the low temperature opacity routine can handle logR in the
+      ! following ranges:
+      ! -9.0969 < logR < 2.90309  for rhomin < rho < rhomax and T=Tmin
+      !     -13 < logR < -1       for rhomin < rho < rhomax and T=Tmax
+      ! -9.0969 < logR < -13      for Tmin < T < Tmax and rho=rhomin
+      !      -1 < logR < 2.90309  for Tmin < T < Tmax and rho=rhomax
+      ! Thus, for any constant temperature within the temperature range,
+      ! varying density over the density range gives -13 < logR < 2.90309.
+      ! However, for any constant density, varying the temperature over
+      ! the temperature range reveals a gap in -9.0969 < logR < -1.
+      !
+      ! FluxCal always favors results from opacityfiles(1) and
+      ! opacityfiles(2) over all other opacityfiles.
+
+      opacityfiles(1)='kP_h2001.dat' ! Planck opacities (lowT)
+      logTmins(1)=-1.d30        ! This does nothing. Limits are set in code
+      logTmaxs(1)=3.041393      ! Not using Planck opacities above this T
+      logRmins(1)=-1.d30        ! This does nothing. Limits are set in code
+      logRmaxs(1)=-1.d30        ! This does nothing. Limits are set in code
+      logT_blend1(1)=-1.d30     ! No blending at lower T bound
+      logT_blend2(1)=2.995635d0 ! Start blending from Planck to Rosseland 
+      logR_blend1(1)=-1.d30     ! No blending at lower R bound
+      logR_blend2(1)=-1.d30     ! No blending at upper R bound
+   
+      opacityfiles(2)='kR_h2001.dat' ! Rosseland opacities (lowT)
+      logTmins(2)=2.995635d0    ! Not using Rosseland opacities below this T
+      logTmaxs(2)=-1.d30       ! This does nothing. Limits are set in code
+      logRmins(2)=-1.d30        ! This does nothing. Limits are set in code
+      logRmaxs(2)=-1.d30        ! This does nothing. Limits are set in code
+      logT_blend1(2)=3.041393d0 ! Stop blending from Planck to Rosseland 
+      logT_blend2(2)=-1.d30     ! Start blending from Rosseland to user files
+      logR_blend1(2)=-1.d30     ! No blending at lower R bound
+      logR_blend2(2)=-1.d30     ! No blending at upper R bound
+      
+      opacityfiles(3)=''
+      logTmins(3)=-1.d30
+      logTmaxs(3)=-1.d30
+      logRmins(3)=-1.d30
+      logRmaxs(3)=-1.d30
+      logT_blend1(3)=-1.d30
+      logT_blend2(3)=-1.d30
+      logR_blend1(3)=-1.d30
+      logR_blend2(3)=-1.d30
+
+      opacityfiles(4)=''
+      logTmins(4)=-1.d30
+      logTmaxs(4)=-1.d30
+      logRmins(4)=-1.d30
+      logRmaxs(4)=-1.d30
+      logT_blend1(4)=-1.d30
+      logT_blend2(4)=-1.d30
+      logR_blend1(4)=-1.d30
+      logR_blend2(4)=-1.d30
+
+      opacityfiles(5)=''
+      logTmins(5)=-1.d30
+      logTmaxs(5)=-1.d30
+      logRmins(5)=-1.d30
+      logRmaxs(5)=-1.d30
+      logT_blend1(5)=-1.d30
+      logT_blend2(5)=-1.d30
+      logR_blend1(5)=-1.d30
+      logR_blend2(5)=-1.d30
+
+      opacityfiles(6)=''
+      logTmins(6)=-1.d30
+      logTmaxs(6)=-1.d30
+      logRmins(6)=-1.d30
+      logRmaxs(6)=-1.d30
+      logT_blend1(6)=-1.d30
+      logT_blend2(6)=-1.d30
+      logR_blend1(6)=-1.d30
+      logR_blend2(6)=-1.d30
+
+      opacityfiles(7)=''
+      logTmins(7)=-1.d30
+      logTmaxs(7)=-1.d30
+      logRmins(7)=-1.d30
+      logRmaxs(7)=-1.d30
+      logT_blend1(7)=-1.d30
+      logT_blend2(7)=-1.d30
+      logR_blend1(7)=-1.d30
+      logR_blend2(7)=-1.d30
+
+      opacityfiles(8)=''
+      logTmins(8)=-1.d30
+      logTmaxs(8)=-1.d30
+      logRmins(8)=-1.d30
+      logRmaxs(8)=-1.d30
+      logT_blend1(8)=-1.d30
+      logT_blend2(8)=-1.d30
+      logR_blend1(8)=-1.d30
+      logR_blend2(8)=-1.d30
+      
+      opacityfiles(9)=''
+      logTmins(9)=-1.d30
+      logTmaxs(9)=-1.d30
+      logRmins(9)=-1.d30
+      logRmaxs(9)=-1.d30
+      logT_blend1(9)=-1.d30
+      logT_blend2(9)=-1.d30
+      logR_blend1(9)=-1.d30
+      logR_blend2(9)=-1.d30
+      
+
+      
+
+      ! This is for controlling the Planck and Rosseland opacities of
+      ! the lowT opacity files 'kR_h2001.dat' and 'kP_h2001.dat'.
+      !    dust_model controls the silicate type
+      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg) is 0.3,
+      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg) is 0.0,
+      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg) is 0.4,
+      !    dust_topology controls the topology of the grains
+      !       'h' - homogeneous particles,
+      !       'c' - composite particles,
+      !       'p' - porous composite particles,
+      !    dust_shape controls the shape of the particles
+      !       's' - spherical dust,
+      !       'a' - aggregate dust,
+      !       '5' - 5-layered spherical dust
+      ! For any dust_model, you can not use:
+      !    dust_topology is 'h' AND dust_shape is '5'
+      !    dust_topology is 'p' AND dust_shape is 'a'
+      dust_model='nrm'
+      dust_topology='h'
+      dust_shape='s'
+
+      
+      
+      !### Miscellaneous
+      ! Solar metallicity
+      metallicity=0.02d0
+      
+
+
       !### Data units
       ! Give the conversion factors from your data's units to cgs.
       ! For example, set runit to 6.955d10 if your distances are measured
@@ -189,66 +382,18 @@
       Lunit_out=1.d0            ! luminosity
       kunit_out=1.d0            ! opacity
       sunit_out=1.d0		! specific entropy
-      
-      
-      
-      !### Physics
-      ! If true, use Rosseland opacities only. If false, will use
-      ! both Rosseland and Planck opacities. Use Planck opacities
-      ! for T <= Tplanck and Rosseland opacities for T > Tplanck.
-      ! Default Tplanck is 1000.d0. Opacities aren't smoothed
-      ! between ross and planck yet, but hopefully that will be a
-      ! feature soon.
-      use_rosseland = .true.
-      use_planck = .true.
-      Tplanck = 1000.d0
-      
-      ! Solar metallicity
-      metallicity=0.02d0
-      
-      ! Rotation angle about x axis (degrees)
-      anglexdeg=0.d0
-
-      ! Rotation angle about y axis (degrees)
-      angleydeg=0.d0
-
-      ! Rotation angle about z axis (degrees)
-      anglezdeg=0.d0
-
-      ! Cold temperature dust parameters
-      !    dust_model controls the silicate type
-      !       'nrm' - "normal" silicate dust model,    Fe/(Fe+Mg) is 0.3,
-      !       'ips' - "iron-poor" silicate dust model, Fe/(Fe+Mg) is 0.0,
-      !       'irs' - "iron-rich" silicate dust model, Fe/(Fe+Mg) is 0.4,
-      !    dust_topology controls the topology of the grains
-      !       'h' - homogeneous particles,
-      !       'c' - composite particles,
-      !       'p' - porous composite particles,
-      !    dust_shape controls the shape of the particles
-      !       's' - spherical dust,
-      !       'a' - aggregate dust,
-      !       '5' - 5-layered spherical dust
-      ! For any dust_model, you can not use:
-      !    dust_topology is 'h' AND dust_shape is '5'
-      !    dust_topology is 'p' AND dust_shape is 'a'
-      dust_model='nrm'
-      dust_topology='h'
-      dust_shape='s'
-
 
 
 
       
       !### File names
-      ! File name for the opacity files, filters file, and output file.
-      ! Set opacitydustfile to '' for no dust.
+      ! File name for the EOS, opacity files, filters file,
+      ! and output file. For opacity files, set to '' to not
+      ! use any file (turns off that part of the code).
       eosfile='sph.eos'
-      opacityfile_planck='kP_h2001.dat'
-      opacityfile_rosseland='kR_h2001.dat'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
-
-
+ 
 
 
       
@@ -356,6 +501,9 @@ c      end if
  107  format("   ",A," = ",I8)
  108  format(A21," = ",L10)
  109  format(A13," = '",A,"'")
+ 110  format(A13,"(",I1,") = '",A,"'")
+ 111  format(A15,"(",I1,") = ",E10.4)
+ 112  format(A27," = ",L1)
 
 c     Write everything to the terminal
       write(*,*) ""
@@ -395,14 +543,12 @@ c     Write everything to the terminal
       write(*,100) "step2               ",step2
       write(*,100) "step3               ",step3
       write(*,100) "step4               ",step4
+      write(*,101) "MAXSTP              ",MAXSTP
       write(*,100) "taulimit            ",taulimit
       write(*,100) "tau_thick_integrator",tau_thick_integrator
       write(*,100) "tau_thick_envfit    ",tau_thick_envfit
       write(*,108) "envfit              ",envfit
       write(*,*) ""
-      write(*,102) "use_rosseland             ",use_rosseland
-      write(*,102) "use_planck                ",use_planck
-      write(*,100) "Tplanck             ",Tplanck
       write(*,100) "metallicity         ",metallicity
       
       write(*,*) ""
@@ -431,13 +577,30 @@ c     Write everything to the terminal
       if(get_info_of_particle) then
          write(*,107) "info_particle", info_particle
       end if
+
+      write(*,*)
+      write(*,112) "opacity_oob_error         ",opacity_oob_error
+      write(*,112) "opacity_oob_warning       ",opacity_oob_warning
+      write(*,112) "opacity_analytic_warning  ",opacity_analytic_warning
+      
+
+      do i=1,numopacityfiles
+         if(len(trim(adjustl(opacityfiles(i)))).gt.0) then
+            write(*,*)
+            write(*,110) "opacityfiles",i,trim(adjustl(opacityfiles(i)))
+            write(*,111) "      logTmins",i,logTmins(i)
+            write(*,111) "      logTmaxs",i,logTmaxs(i)
+            write(*,111) "      logRmins",i,logRmins(i)
+            write(*,111) "      logRmaxs",i,logRmaxs(i)
+            write(*,111) "   logT_blend1",i,logT_blend1(i)
+            write(*,111) "   logT_blend2",i,logT_blend1(i)
+            write(*,111) "   logR_blend1",i,logR_blend1(i)
+            write(*,111) "   logR_blend2",i,logR_blend1(i)
+         end if
+      end do
       
       write(*,*) ""
       write(*,103) "eosfile              ",trim(adjustl(eosfile))
-      write(*,103) "opacityfile_planck   ",
-     $     trim(adjustl(opacityfile_planck))
-      write(*,103) "opacityfile_rosseland",
-     $     trim(adjustl(opacityfile_rosseland))
       write(*,103) "filtersfile          ",trim(adjustl(filtersfile))
       write(*,103) "outfile              ",trim(adjustl(outfile))
       write(*,*) ""
@@ -489,25 +652,6 @@ c     Catch some runtime errors
       end if
 
       
-      ! Check for conflicting flags
-c      if(get_integration_at_pos .and. get_fluxes) then
-c         write(*,*) "Do not use get_integration_at_pos and get_fluxes"
-c         write(*,*) "at the same time."
-c         error stop "init.f"
-c      end if
-      
-c      if(get_integration_at_all_pos.and..not.get_fluxes) then
-c         write(*,*) "get_integration_at_all_pos should not be called"
-c         write(*,*) "without setting get_fluxes to .true."
-c         error stop "init.f"
-c      end if
-
-c      if(get_integration_at_all_pos.and.get_integration_at_pos) then
-c         write(*,*) "Do not use both of these at the same time."
-c         error stop "init.f"
-c      end if
-
-      
  200  format(A,"/defaults/",A)
       
       write(inputfile,200) trim(adjustl(flux_cal_dir)),
@@ -521,91 +665,142 @@ c      end if
       call readineostable(inputfile)
 
       call tabulinit
-      
-c      inquire(file=opacitydustfile,exist=fileexists)
-c      if(fileexists .and. (Rform .gt. 0.d0)) then
-c         call readinkappatabledust
-c      end if
-
-      if (len(trim(adjustl(opacityfile_rosseland))).eq.0) then
-         use_rosseland = .false.
-      else
-         ! Check current working directory for the file
-         inquire(file=trim(adjustl(opacityfile_rosseland)),
-     $        exist=fileexists)
-         if(fileexists) then
-            inputfile_rosseland = opacityfile_rosseland
-         else
-            write(*,*) "WARNING: Could not find '"//
-     $           trim(adjustl(opacityfile_rosseland))//"'. "//
-     $           "Checking the defaults directory in '"//
-     $           trim(adjustl(flux_cal_dir))//"/defaults'."
-
-            ! Check the defaults directory for the file
-            write(inputfile_rosseland,200) trim(adjustl(flux_cal_dir)),
-     $           trim(adjustl(opacityfile_rosseland))
-            inquire(file=trim(adjustl(inputfile_rosseland)),
-     $           exist=fileexists)
-            if(fileexists) then
-               write(*,*) "Found '"//
-     $              trim(adjustl(opacityfile_rosseland))//"' in '"//
-     $              trim(adjustl(inputfile_rosseland))//"'."
-            else
-               write(*,*)"Could not find '"//
-     $              trim(adjustl(inputfile_rosseland))//"' in "//
-     $              "flux_cal_dir/defaults. make sure flux_cal_dir is"//
-     $              " correct, and if flux_cal was properly installed."
-               error stop "init.f"
-            end if
-         end if
-      end if
 
 
-      if (len(trim(adjustl(opacityfile_planck))).eq.0) then
-         use_planck = .false.
-      else
-         ! Check current working directory for the file
-         inquire(file=trim(adjustl(opacityfile_planck)),
-     $        exist=fileexists)
-         if(fileexists) then
-            inputfile_planck = opacityfile_planck
-         else
-            write(*,*) "WARNING: Could not find '"//
-     $           trim(adjustl(opacityfile_planck))//"'. "//
-     $           "Checking the defaults directory in '"//
-     $           trim(adjustl(flux_cal_dir))//"/defaults'."
-
-            ! Check the defaults directory for the file
-            write(inputfile_planck,200) trim(adjustl(flux_cal_dir)),
-     $           trim(adjustl(opacityfile_planck))
-            inquire(file=trim(adjustl(inputfile_planck)),
-     $           exist=fileexists)
-            if(fileexists) then
-               write(*,*) "Found '"//
-     $              trim(adjustl(opacityfile_planck))//"' in '"//
-     $              trim(adjustl(inputfile_planck))//"'."
-            else
-               write(*,*)"Could not find '"//
-     $              trim(adjustl(inputfile_planck))//"' in "//
-     $              "flux_cal_dir/defaults. make sure flux_cal_dir is "//
-     $              "correct, and if flux_cal was properly installed."
-               error stop "init.f"
-            end if
-         end if
-      end if
-
-      if((use_rosseland.eqv..false.) .and. (use_planck.eqv..false.))then
-         write(*,*) "Both use_rosseland and use_planck are '.false.',"//
-     $        " either because they were set as such in the input "//
-     $        "file or because opacityfile_rosseland='' and "//
-     $        "opacityfile_planck=''."
+      if ( len(trim(adjustl(opacityfiles(1)))).eq.0 .and.
+     $     len(trim(adjustl(opacityfiles(2)))).eq.0 ) then
+         write(*,*) "opacityfiles(1) = '"//
+     $        trim(adjustl(opacityfiles(1)))//"'"
+         write(*,*) "opacityfiles(2) = '"//
+     $        trim(adjustl(opacityfiles(2)))//"'"
+         write(*,*) "There must be valid arguments for one"//
+     $        "of or both opacityfiles(1) and opacityfiles(2)"//
+     $        " (Planck and Rosseland opacities, respectively)."
          error stop "init.f"
       end if
       
-      call ini_opac(use_rosseland,use_planck,inputfile_rosseland,
-     $     inputfile_planck)
+      use_planck = .false.
+      use_rosseland = .false.
+      if (len(trim(adjustl(opacityfiles(1)))).ne.0) use_planck=.true.
+      if (len(trim(adjustl(opacityfiles(2)))).ne.0) use_rosseland=.true.
+
+      if((use_planck.eqv..false.).and.(use_rosseland.eqv..false.)) then
+         write(*,*) "No Planck or Rosseland file found. There should"//
+     $        " at least be 'kP_h2001.dat' and 'kR_h2001.dat' in the"//
+     $        " defaults directory of your flux_cal installation." //
+     $        " Please check that flux_cal installed properly."
+         error stop "init.f"
+      end if
+      
+      throw_error = .false.
+      do i=1,numopacityfiles
+         if(len(trim(adjustl(opacityfiles(i)))).gt.0) then
+            ! Check current working directory for the file
+            inquire(file=trim(adjustl(opacityfiles(i))),
+     $           exist=fileexists)
+            if (fileexists.eqv..false.) then
+               write(*,*) "WARNING: Could not find '"//
+     $              trim(adjustl(opacityfiles(i)))//"'. "//
+     $              "Checking the defaults directory in '"//
+     $              trim(adjustl(flux_cal_dir))//"/defaults'."
+               write(opacityfile_temp,200) trim(adjustl(flux_cal_dir)),
+     $              trim(adjustl(opacityfiles(i)))
+               opacityfiles(i) = trim(adjustl(opacityfile_temp))
+               inquire(file=trim(adjustl(opacityfiles(i))),
+     $              exist=fileexists)
+               if(fileexists) then
+                  write(*,*) "Found '"//trim(adjustl(opacityfiles(i)))//"'."
+               else
+                  write(*,*)"Could not find '"//
+     $                 trim(adjustl(opacityfiles(i)))//"' in "//
+     $                 "flux_cal_dir/defaults. make sure flux_cal_dir"//
+     $                 " is correct, and if flux_cal was properly "//
+     $                 "installed."
+                  throw_error = .true.
+               end if
+            end if
+
+            ! Check to make sure the blending regions are valid
+            if ( logT_blend1(i).ne.-1.d30
+     $           .and.
+     $           ((logTmins(i).ne.-1.d30 .and.
+     $           logT_blend1(i).lt.logTmins(i))
+     $           .or.
+     $           (logTmaxs(i).ne.-1.d30 .and.
+     $           logT_blend1(i).gt.logTmaxs(i)))) then
+               write(*,*) "Your logT_blend1(i) is invalid for"//
+     $              " opacityfiles(i) = '"//
+     $              trim(adjustl(opacityfiles(i)))//"'."
+               throw_error = .true.
+            end if
+            if ( logT_blend2(i).ne.-1.d30
+     $           .and.
+     $           ((logTmaxs(i).ne.-1.d30 .and.
+     $           logT_blend2(i).gt.logTmaxs(i))
+     $           .or.
+     $           (logTmins(i).ne.-1.d30 .and.
+     $           logT_blend2(i).lt.logTmins(i)))) then
+               write(*,*) "Your logT_blend2(i) is invalid for"//
+     $              " opacityfiles(i) = '"//
+     $              trim(adjustl(opacityfiles(i)))//"'."
+               throw_error = .true.
+            end if
+            if ( logR_blend1(i).ne.-1.d30
+     $           .and.
+     $           ((logRmins(i).ne.-1.d30 .and.
+     $           logR_blend1(i).lt.logRmins(i))
+     $           .or.
+     $           (logRmaxs(i).ne.-1.d30 .and.
+     $           logR_blend1(i).gt.logRmaxs(i)))) then
+               write(*,*) "Your logR_blend1(i) is invalid for"//
+     $              " opacityfiles(i) = '"//
+     $              trim(adjustl(opacityfiles(i)))//"'."
+               throw_error = .true.
+            end if
+            if ( logR_blend2(i).ne.-1.d30
+     $           .and.
+     $           ((logRmaxs(i).ne.-1.d30 .and.
+     $           logR_blend2(i).gt.logRmaxs(i))
+     $           .or.
+     $           (logRmins(i).ne.-1.d30 .and.
+     $           logR_blend2(i).lt.logRmins(i)))) then
+               write(*,*) "Your logR_blend2(i) is invalid for"//
+     $              " opacityfiles(i) = '"//
+     $              trim(adjustl(opacityfiles(i)))//"'."
+               throw_error = .true.
+            end if
+         end if
+      end do
+
+      if(throw_error) error stop "init.f"
       
 
+      if (use_planck .or. use_rosseland) then
+         if(use_planck) then
+            write(*,*)"Using Planck opacities from '"//
+     $           trim(adjustl(opacityfiles(1)))//"'"
+         else
+            write(*,*) "WARNING (init.f): Not using any Planck"//
+     $           " opacities."
+         end if
+         if(use_rosseland) then
+            write(*,*)"Using Rosseland opacities from '"//
+     $           trim(adjustl(opacityfiles(2)))//"'"
+         else
+            write(*,*) "WARNING (init.f): Not using any "//
+     $           "Rosseland opacities."
+         end if
+            
+         call init_lowT_opac(use_planck,use_rosseland,
+     $        opacityfiles(1),opacityfiles(2),0) ! in opacity.f
+      end if
+
+      call init_highT_opac(0) ! in opacity_highT.f
+
+
+
+
+      
       if(envfit) then
          ! Initialize find_teff dependencies
          write(inputfile,200) trim(adjustl(flux_cal_dir)),

@@ -39,7 +39,11 @@
       avgxhp=0.d0
 c      if(dimenFileAlreadyExists) then
 c         write(*,*) "Integrating through each point on the driving grid"
-c      end if
+c     end if
+      max_step_size = 0.d0
+      min_step_size = 0.d0
+      min_steps_taken = MAXSTP
+      max_steps_taken = 0
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
@@ -48,12 +52,16 @@ c      end if
             TpracticalXYthick=0.d0
 
             if(zmin(i,j).lt.1d30)then
-
+c               write(*,*) "xpos, ypos = ",XPOS/runit,YPOS/runit
+c               write(*,*) "zmin(i,j),zmax(i,j) = ",zmin(i,j)/runit,
+c     $              zmax(i,j)/runit
+               nstp = 0
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TOTALTpracticalXY(i,j),
      $              tauthin(i,j),zintpos(i,j))
-
+               min_steps_taken = min(min_steps_taken,nstp)
+               max_steps_taken = max(max_steps_taken,nstp)
 c               TOTALTpracticalXY(i,j) = TpracticalXYthin +
 c     $              TpracticalXYthick
                

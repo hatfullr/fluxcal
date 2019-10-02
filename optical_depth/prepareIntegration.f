@@ -47,6 +47,11 @@ c            count = count+1
             zmax(i,j)=-1d30
             zmax_thick(i,j)=-1d30
             thick_part(i,j)=0
+            ! This is intended to, by default, let the integrator
+            ! take a very large step if there is no fluid on the LOS.
+            ! h1(i,j) receives a value not equal to h1(i,j) when
+            ! fluid is found along the LOS.
+            h1(i,j)=1.d30
          enddo
       enddo
 
@@ -73,7 +78,7 @@ c            count = count+1
                      if(Z(IP)-maxdz.lt.zmin(i,j)) then
                         zmin(i,j)=Z(IP)-maxdz
                         h1(i,j)=hp(ip)
-                     endif
+                     end if
 c                     if(Z(IP)+maxdz.gt.zmax(i,j)) then
 c                        count=count+1
 c                        closest(count) = IP
@@ -145,7 +150,7 @@ c     Find 3d density grid for quick look-up later
                      uxyz(i,j,iz)=uxyz(i,j,iz)+am(ip)*wpc*a(ip)
                      hpxyz(i,j,iz)=hpxyz(i,j,iz)+am(ip)*wpc*hp(ip)
                      xhi=-0.6d0+0.2d0*metallicity
-     $                    +0.8d0*1.67262158d-24/wmeanmolecular(Ip)
+     $                    +0.8d0*1.67262158d-24/wmeanmolecular(ip)
                      xhxyz(i,j,iz)=xhxyz(i,j,iz)+am(ip)*wpc*xhi
                      gxyz(i,j,iz)=gxyz(i,j,iz)+am(ip)*wpc*
      $                    localg(ip)

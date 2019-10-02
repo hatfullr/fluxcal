@@ -194,11 +194,10 @@ C     .  'init_d' - a routine to initialise dust model parameters,
 C     .  'init_g' - the same as 'init_d' but for gas opacities, 
 C     .
 C     ...........................................................................
-      subroutine ini_opac(ross,planck,opacityfile_rosseland,
-     $     opacityfile_planck)
-      
+      subroutine init_lowT_opac(planck,ross,opacityfile_planck,
+     $     opacityfile_rosseland,verbose)
       IMPLICIT NONE
-C Global variable(s):   
+C Global variable(s):
       REAL*8 eD_R, eG_R, eD_P, eG_P
       DIMENSION eD_R(5,6), eD_P(5,6) 
       DIMENSION eG_R(71,71), eG_P(71,71)
@@ -214,6 +213,7 @@ C Global variable(s):
 
       LOGICAL ross,planck
       integer i,j
+      integer verbose
       
       model=dust_model
       top=dust_topology
@@ -238,17 +238,17 @@ C Global variable(s):
       if(ross) then
 C     Initialize Rosseland opacities
 C     Initialization of all necessary data for a chosen dust model:
-         call init_d(.true.,model,top,shape,eD_R)
+         call init_d(.true.,model,top,shape,eD_R,verbose)
 C     Initialization of data for the gas model:
-         call init_g(eG_R,opacityfile_rosseland)
+         call init_g(eG_R,opacityfile_rosseland,verbose)
       end if
 
       if(planck) then
 C     Initialize Planck opacities
 C     Initialization of all necessary data for a chosen dust model:
-         call init_d(.false.,model,top,shape,eD_P)
+         call init_d(.false.,model,top,shape,eD_P,verbose)
 C     Initialization of data for the gas model:
-         call init_g(eG_P,opacityfile_planck)
+         call init_g(eG_P,opacityfile_planck,verbose)
       end if
       END
 
@@ -284,7 +284,7 @@ C            where I describe a temperature region and J - position of
 C            a fit coefficient in the fit polynom.
 C
 C.............................................................................
-      SUBROUTINE init_d(ross,model,top,shape,eD)
+      SUBROUTINE init_d(ross,model,top,shape,eD,verbose)
       IMPLICIT NONE
 C Global variable(s):
       REAL*8 eD
@@ -292,6 +292,8 @@ C Global variable(s):
       CHARACTER*3 model
       CHARACTER*1 top, shape
       LOGICAL ross
+      integer verbose
+      
 C Search among possible models:
       if (model.eq.'nrm') then  !"normal" silicate models,
 
@@ -447,7 +449,7 @@ C.............................................................................
 C
 C   'eG': eG(71,71) - Rosseland or Planck mean gas opacity grids
 C.............................................................................
-      SUBROUTINE init_g(eG,opacityfile)
+      SUBROUTINE init_g(eG,opacityfile,verbose)
       IMPLICIT NONE
 C Global variable(s):
       REAL*8 eG
@@ -456,7 +458,8 @@ C Local variable(s):
       INTEGER i, j, k
       REAL*8 seq, xmy
       character*255 opacityfile
-      DIMENSION seq(71*71)    
+      DIMENSION seq(71*71)
+      integer verbose
 
 C      
 C     Open input file:
@@ -500,8 +503,9 @@ C
 C  'aKext': Rosseland or Planck mean opacities (extinction), cm^2/g
 C
 C.............................................................................
-      SUBROUTINE cop(eD,eG,rho_in,T_in,aKext)
+      SUBROUTINE cop(eD,eG,rho_in,T_in,aKext,verbose)
       IMPLICIT NONE
+      integer verbose
 C Global variable(s):
       REAL*8 eD, eG, rho_in, T_in, aKext
       DIMENSION eD(5,6),eG(71,71)
@@ -534,7 +538,13 @@ C Data related to the evaporation temperatures of silicates, iron and ice:
 C                                                    !'ro'
 C Initialization of the output parameters:
       aKext = 0.0D0
-      if (T_in.lt.1.0D0) RETURN !T must be more that few degrees [K]
+      if (T_in.lt.1.0D0) then
+         if(verbose.eq.1) then
+            write(*,*) "WARNING: Temperature < 1.d0 in cop "//
+     $           "(opacity.f). opacity = 0.d0."
+         end if
+         RETURN                 !T must be more than few degrees [K]
+      end if
 C.............................................................................
 C Constant(s):
 C.............................................................................
@@ -584,7 +594,7 @@ C.............................................................................
 C The gas-dominated opacity:
 C.............................................................................
        IF (KK.eq.6) THEN
-        CALL gop(eG,rho_in,T_in,aKext)
+        CALL gop(eG,rho_in,T_in,aKext,verbose)
         RETURN
        END IF
 C.............................................................................
@@ -611,7 +621,7 @@ C-----------------------------------------------------------------------------
      &           eD(KK,5))*T1+eD(KK,6)
 C
        IF (KK.eq.5) THEN
-        CALL gop(eG,rho_in,T2,aKg_ext)
+        CALL gop(eG,rho_in,T2,aKg_ext,verbose)
       aKrR = aKg_ext
        ELSE
       aKrR = ((((eD(KK+1,1)*T2+eD(KK+1,2))*T2+eD(KK+1,3))*T2+
@@ -658,11 +668,13 @@ C
 C     'aK': Rosseland or Planck mean opacities (extinction), cm^2/g
 C
 C.............................................................................
-      SUBROUTINE gop(eG,rho_in,T_in,aK)
+      SUBROUTINE gop(eG,rho_in,T_in,aK,verbose)
       IMPLICIT NONE
       INTEGER iflag
       REAL*8 eG, rho_in, T_in, aK, T, rho, aKext
       DIMENSION T(71),rho(71),eG(71,71)
+      integer verbose
+      
 C
 C The temperature array for which the calculation have been performed:
       DATA  T(1), T(2), T(3), T(4), T(5), T(6), T(7), T(8), T(9),T(10),
@@ -718,15 +730,28 @@ C Initialization of output parameter(s):
 C
 C Check if the input parameters "rho_in", "T_in" are inside
 C the ranges:      
-       if (rho_in.gt.1.0D-07) RETURN
-       if (rho_in.lt.1.0D-19) RETURN
-       if (T_in.lt.500.0) RETURN
-       if (T_in.gt.10000) RETURN
+c       if (rho_in.gt.1.0D-07) RETURN
+c       if (rho_in.lt.1.0D-19) RETURN
+c       if (T_in.lt.500.0) RETURN
+c       if (T_in.gt.10000) RETURN
+
+       if ( (rho_in.gt.1.0D-07) .or. (rho_in.lt.1.0D-19) .or.
+     $     (T_in.lt.500.0) .or. (T_in.gt.10000) ) then
+          if(verbose.eq.1) then
+             write(*,'(A,ES11.4,", ",ES11.4,A,ES11.4)')
+     $            " WARNING (opacity.f): (rho,T) = (",rho_in,T_in,
+     $            ") is not in the range 1.0D-19 < rho < 1.0D-07,"//
+     $            " 500.0 < T < 10000 in subroutine gop. opacity = ",aK
+          end if
+          RETURN
+       end if
+       
 C The parameters are outside the ranges, send "stop" signal:
-      if (iflag.eq.1) then
-         write(*,*) 'gop: input parameters outside the ranges::'
-         write(*,*) 'rho_in = ',rho_in,' T_in = ',T_in
-         stop
+       if (iflag.eq.1) then
+          ! This is an error, so we will always print it
+          write(*,*) 'gop: input parameters outside the ranges::'
+          write(*,*) 'rho_in = ',rho_in,' T_in = ',T_in
+          error stop "opacity.f"
       end if
      
 C Calculate the opacity:

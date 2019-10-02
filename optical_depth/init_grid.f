@@ -106,12 +106,28 @@ c      enddo
 
  1000 isInitGrid=.true.
 
+ 100  format(A25," = ",ES22.14,", ",ES22.14)
+ 101  format(A25," = ",I22,", ",I22)
       write(*,*) ""
-      write(*,*) "Grid details (cgs):"
-      write(*,*) "   xminmap,xmaxmap = ",xminmap,xmaxmap
-      write(*,*) "   yminmap,ymaxmap = ",yminmap,ymaxmap
-      write(*,*) "   hxmap,hymap     = ",hxmap,hymap
-      write(*,*) "   nxmap,nymap     = ",nxmap,nymap
+      write(*,*) "Grid details:"
+      write(*,100) "xminmap,xmaxmap      ",xminmap/runit_out,
+     $     xmaxmap/runit_out
+      write(*,100) "yminmap,ymaxmap      ",yminmap/runit_out,
+     $     ymaxmap/runit_out
+      write(*,100) "hxmap,hymap          ",hxmap/runit_out,
+     $     hymap/runit_out
+      write(*,101) "nxmap,nymap          ",nxmap,nymap
+c      write(*,100) "minstpsize,maxstpsize",min_step_size,max_step_size
+c      write(*,101) "minNstp,maxNstp      ",min_steps_taken,
+c     $     max_steps_taken
       write(*,*) ""
+      
+c      write(*,*) ""
+c      write(*,*) "Grid details (cgs):"
+c      write(*,*) "   xminmap,xmaxmap = ",xminmap,xmaxmap
+c      write(*,*) "   yminmap,ymaxmap = ",yminmap,ymaxmap
+c      write(*,*) "   hxmap,hymap     = ",hxmap,hymap
+c      write(*,*) "   nxmap,nymap     = ",nxmap,nymap
+c      write(*,*) ""
       
       end subroutine

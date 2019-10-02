@@ -209,7 +209,7 @@ c
          write(*,*) "tau_thin = ",tau_thin
          write(*,*) "Tthin4 = ",Tthin4
          write(*,*) "Tthick4 = ",Tthick4
-         error stop
+         error stop "getTpractical.f"
       end if
       
       end subroutine

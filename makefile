@@ -7,8 +7,8 @@ endif
 
 FFLAGS = -O4 -ffixed-line-length-132 -mcmodel=large
 
-LIB = -L/usr/lib
-BUILD_DIR = ./build
+LIB = /usr/lib
+BUILD_DIR = build
 
 executable = flux_cal
 
@@ -18,7 +18,9 @@ opdeplib = optical_depth
 findTefflib = find_teff
 
 # These need to be built first
-math_modules = $(mathlib)/bilinear_interpolation.o
+math_modules = $(mathlib)/bilinear_interpolation.o \
+	       $(mathlib)/toms760.o                \
+
 
 # Library objects
 lib_obj = $(llib)/getTemperature.o      \
@@ -32,18 +34,21 @@ lib_obj = $(llib)/getTemperature.o      \
           $(llib)/useeostable.o         \
           $(llib)/readineostable.o      \
           $(llib)/trackParticles.o      \
-          $(llib)/getOpacitySub.o       \
           $(llib)/quicksort.o           \
           $(llib)/makeOutputFile.o      \
           $(llib)/output.o              \
           $(llib)/getLocalAngle.o       \
 	  $(llib)/opacity.o             \
+	  $(llib)/opacity_highT.o       \
 
 # Math objects
 math_obj = $(mathlib)/odeint.o               \
            $(mathlib)/rkck.o                 \
            $(mathlib)/rkqs.o                 \
            $(mathlib)/fourPointArea.o        \
+	   $(mathlib)/interp.o               \
+	   $(mathlib)/toms526.o              \
+	   $(mathlib)/blend.o                \
 
 # Optical depth objects
 opdep_obj = $(opdeplib)/optical_depth.o            \
@@ -79,11 +84,11 @@ modules = $(math_modules)
 process_obj = $(modules) $(lib_obj) $(math_obj) $(opdep_obj) $(findTeff_obj)
 
 $(executable): $(executable).o $(process_obj)
-	$(FC) -I$(BUILD_DIR) -o $(executable) $(executable).o $(process_obj) $(LIB)
-	@\mv $(process_obj) $(BUILD_DIR)/.
-	@\mv *.mod $(BUILD_DIR)/.
+	$(FC) $(FFLAGS) -o $(executable) $(executable).o $(process_obj) -L$(LIB) -I$(BUILD_DIR) 
+	@\mv $(executable).o $(process_obj) $(BUILD_DIR)/.
+	@\mv $(shell find . -name "*.mod") $(BUILD_DIR)/.
 
 # Delete all made stuff
 clean:
 	@\rm -f $(BUILD_DIR)/* $(executable)
-#	@\rm -rf $(executable).o $(process_obj) $(modules) $(executable)
+

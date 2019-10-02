@@ -1,10 +1,10 @@
       SUBROUTINE odeint(ystart,nvar,x1,x2,eps,h1,hmaximum,nok,nbad,
      $     derivs,rkqs)
       implicit none
-      INTEGER nbad,nok,nvar,KMAXX,NMAX,maxstp
+      INTEGER nbad,nok,nvar,KMAXX,NMAX
       real*8 eps,h1,hmaximum,x1,x2,ystart(nvar) ! ,TINY
       EXTERNAL derivs,rkqs
-      PARAMETER (MAXSTP=10000,NMAX=50,KMAXX=200) !,TINY=1.d-30)
+      PARAMETER (NMAX=50,KMAXX=200) !,TINY=1.d-30)
       INTEGER i,kmax,kount,kount1 !,kount2
       real*8 dxsav,h,hdid,hnext,xint,xsav,dydx(NMAX),xp(KMAXX),
      *yint(NMAX),yp(NMAX,KMAXX),yscal(NMAX)
@@ -15,7 +15,8 @@
       real*8 yscalfactor(numfiltersmax)
       common /yscales/ yscalfactor
       real*8 step1, step2, step3, step4
-      common/steps/ step1,step2,step3,step4
+      integer MAXSTP
+      common/steps/ step1,step2,step3,step4,MAXSTP
       real*8 taulimit,posx,posy
       common/inputstuff/ taulimit,posx,posy
 c      logical get_integration_at_pos,get_integration_at_all_pos
@@ -28,6 +29,7 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       integer intout
       common/intoutput/ intout
       real*8 getLocalAngle
+      real*8 getOpacity
 
       integer mymax
       parameter(mymax=420000)
@@ -47,10 +49,6 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       real*8 tau_thick_integrator
       common/tauthick/ tau_thick_integrator
 
-      real*8 rayout1(10,maxstp)
-      integer rayout2(maxstp),nstp
-      common/rayout/ rayout1,rayout2,nstp
-
       logical printIntegrationSteps
       common/intatpos/ printIntegrationSteps
       
@@ -65,8 +63,12 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
 
       real*8 xpos,ypos
       common/taugrid/xpos,ypos
-      
-      
+
+      real*8 max_step_size,min_step_size
+      integer min_steps_taken,max_steps_taken
+      integer nstp
+      common/boundsteptaken/ max_step_size,min_step_size,min_steps_taken,
+     $     max_steps_taken,nstp
 
 c      logical resolved
 c      common /resolvedboolean/ resolved
@@ -82,7 +84,14 @@ c      kount2=0
  11   continue
 
       do 16 nstp=1,MAXSTP
-c        print *,'looping',x,y(1)
+c     print *,'looping',x,y(1)
+        if(min_step_size.eq.0.d0 .and. abs(h).ne.0.d0) then
+           min_step_size = abs(h)
+        else
+           min_step_size = min(min_step_size,abs(h))
+        end if
+        max_step_size = max(max_step_size,abs(h))
+        
         call derivs(xint,yint,dydx)
         do 12 i=1,nvar
            yscal(i)=abs(yint(i))+abs(h*dydx(i)) ! +TINY
@@ -107,12 +116,22 @@ c     I want to make sure the penultimate step (the step right before the photos
         enddo
 
         if((xint+h-x2)*(xint+h-x1).gt.0.d0) h=x2-xint
-c        write(*,*) xpos/runit,ypos/runit
+c     write(*,*) xpos/runit,ypos/runit
+
         call rkqs(yint,dydx,nvar,xint,h,eps,yscal,hdid,hnext,derivs)
 
+c        call getLocalQuantities(xpos,ypos,xint)
+c        call getOpacity(dble(t6*1d6),rhocgs,xh)
+c        write(*,'(12ES22.14,I22,ES22.14)')xpos/runit_out,ypos/runit_out,
+c     $       xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
+c     $       ucgs/Eunit_out*munit_out,xh/muunit_out,
+c     $       gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
+c     $       opacit,yint(1),lastpart,log10(rhocgs/runit_out) -
+c     $       3.d0*log10(tcgs/tempunit_out) + 18.d0
+        
         if(printIntegrationSteps) then
            call getLocalQuantities(xpos,ypos,xint)
-           call getOpacitySub(dble(t6*1d6),rhocgs,yint(1),opacit)
+           opacit = getOpacity(dble(t6*1d6),rhocgs,xh)
            write(intout,'(12ES22.14,I22)')xpos/runit_out,ypos/runit_out,
      $          xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
      $          ucgs/Eunit_out*munit_out,xh/muunit_out,
