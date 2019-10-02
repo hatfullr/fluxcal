@@ -351,7 +351,8 @@
       ! File name for the opacity files, filters file, and output file.
       ! Set opacitydustfile='' for no dust.
       eosfile='sph.eos'
-      filtersfile='filters.dat'
+      !filtersfile='filters.dat'
+      filtersfile=''
       outfile='flux_cal.output'
 
 

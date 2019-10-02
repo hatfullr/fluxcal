@@ -807,7 +807,7 @@ c     Catch some runtime errors
      $        "lowT_fa05_gs98_z0.02_x0.7.data"
          inquire(file=trim(adjustl(inputfile)), exist=fileexists)
          if(.not. fileexists) then
-            write(*,*) "Could not find '",trim(adjustl(filtersfile)),
+            write(*,*) "Could not find '",trim(adjustl(inputfile)),
      $           "' in"
             write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
      $           "is correct, and if flux_cal was properly installed."
@@ -821,7 +821,7 @@ c     Catch some runtime errors
      $        "table_nabla.dat"
          inquire(file=trim(adjustl(inputfile)),exist=fileexists)
          if(.not. fileexists) then
-            write(*,*) "Could not find '",trim(adjustl(filtersfile)),
+            write(*,*) "Could not find '",trim(adjustl(inputfile)),
      $           "' in"
             write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
      $           "is correct, and if flux_cal was properly installed."
@@ -832,25 +832,27 @@ c     Catch some runtime errors
       end if
          
 c     Check to see if the filtersfile exists and read it if it does
-      write(inputfile,200) trim(adjustl(flux_cal_dir)),
-     $     trim(adjustl(filtersfile))
-      inquire(file=trim(adjustl(inputfile)),exist=fileexists)
-      if(.not.fileexists) then
-         write(*,*) "Could not find '",trim(adjustl(filtersfile)),"' "//
-     $        "in flux_cal_dir/defaults. make sure flux_cal_dir is "//
-     $        "correct, and if flux_cal was properly installed."
-         error stop "init.f"
+      if(len(trim(adjustl(filtersfile))).gt.0) then
+         write(inputfile,200) trim(adjustl(flux_cal_dir)),
+     $        trim(adjustl(filtersfile))
+         inquire(file=trim(adjustl(inputfile)),exist=fileexists)
+         if(.not.fileexists) then
+            write(*,*) "Could not find '",trim(adjustl(inputfile)),"'"//
+     $           " in flux_cal_dir/defaults. make sure flux_cal_dir"//
+     $           " is correct, and if flux_cal was properly installed."
+            error stop "init.f"
+         end if
+      
+         write(*,*) "Reading filtersfile"
+         open(16,file=trim(adjustl(inputfile)),status='old')
+         read (16,*) numfilters
+      
+         do i=1,numfilters
+            read(16,*) filtername(i), wavelength(i),absoluteflux(i)
+            yscalfactor(i)=yscalconst*wavelength(i)
+         enddo
+         close(16)
       end if
-      
-      write(*,*) "Reading filtersfile"
-      open(16,file=trim(adjustl(inputfile)),status='old')
-      read (16,*) numfilters
-      
-      do i=1,numfilters
-         read(16,*) filtername(i), wavelength(i),absoluteflux(i)
-         yscalfactor(i)=yscalconst*wavelength(i)
-      enddo
-      close(16)
 
       
       if(track_particles) then
