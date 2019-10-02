@@ -36,9 +36,10 @@ c     Integrate down to the optically thick particle or until
 c     accumulated tau is equal to tau_thick_integrator.
       ! Initialize the integrator
       nrhs=0
-      do ifilter=1,numfilters+4
-         taustart(ifilter)=0.d0
-      enddo
+c     We might want this later
+c      do ifilter=1,numfilters+4
+c         taustart(ifilter)=0.d0
+c      enddo
 
 cc     Find the particle kernel closest to xpos,ypos,z1
 c      maxz = -1.d30

@@ -11,20 +11,21 @@ c     L669 to L817
       TOTALLUM=0.d0
       TOTALpracticalLUM=0.d0
       TOTALflux=0.d0
-      tavg=0.d0
-      t2avg=0.d0
-      t4avg=0.d0
-      tphoto4avg=0.d0
-      tpractical4avg=0.d0
-      ttherm4avg=0.d0
-      tphotoavg=0.d0
-      tthermavg=0.d0
-      cellcount=0
-      cctherm=0
-
-      do ifilter=1,numfilters
-         totalfluxdensity(ifilter)=0.d0
-      enddo
+c     We might want this later
+c      tavg=0.d0
+c      t2avg=0.d0
+c      t4avg=0.d0
+c      tphoto4avg=0.d0
+c      tpractical4avg=0.d0
+c      ttherm4avg=0.d0
+c      tphotoavg=0.d0
+c      tthermavg=0.d0
+c      cellcount=0
+c      cctherm=0
+c
+c      do ifilter=1,numfilters
+c         totalfluxdensity(ifilter)=0.d0
+c      enddo
       
       if(codeerror) goto 626
 
@@ -119,40 +120,44 @@ c     luminosity without worrying about surface areas.
                stop
             endif
 
-            do ifilter=1,numfilters
-               totalfluxdensity(ifilter)=totalfluxdensity(ifilter)+
-     $              fluxdensityXY(I,J,ifilter)*HXMAP*HYMAP
-     $              /distance**2
-            enddo
+c     We might want this later
+c            do ifilter=1,numfilters
+c               totalfluxdensity(ifilter)=totalfluxdensity(ifilter)+
+c     $              fluxdensityXY(I,J,ifilter)*HXMAP*HYMAP
+c     $              /distance**2
+c            enddo
 
             TMAX=MAX(TMAX,TXY(I,J))
             IF(TXY(I,J).GT.0.d0) then
                TMIN=MIN(TMIN,TXY(I,J))
-               tavg=tavg+TXY(I,J)
-               t2avg=t2avg+TXY(I,J)**2
-               t4avg=t4avg+TXY(I,J)**4
-               cellcount=cellcount+1
+c               tavg=tavg+TXY(I,J)
+c               t2avg=t2avg+TXY(I,J)**2
+c               t4avg=t4avg+TXY(I,J)**4
+c               cellcount=cellcount+1
             endif
-            IF(TphotoXY(I,J).GT.0.d0) then
-               tphotoavg=tphotoavg+TphotoXY(I,J)
-               tphoto4avg=tphoto4avg+TphotoXY(I,J)**4
-               tpractical4avg=tpractical4avg
-     $              + TOTALTpracticalXY(I,J)**4.d0
-
-            endif
-            IF(TthermXY(I,J).GT.0.d0) then
-               tthermavg=tthermavg+TthermXY(I,J)
-               ttherm4avg=ttherm4avg+TthermXY(I,J)**4
-               cctherm=cctherm+1
-            endif
+c     We might want this later
+c            IF(TphotoXY(I,J).GT.0.d0) then
+c               tphotoavg=tphotoavg+TphotoXY(I,J)
+c               tphoto4avg=tphoto4avg+TphotoXY(I,J)**4
+c               tpractical4avg=tpractical4avg
+c     $              + TOTALTpracticalXY(I,J)**4.d0
+c
+c            endif
+c
+c            IF(TthermXY(I,J).GT.0.d0) then
+c               tthermavg=tthermavg+TthermXY(I,J)
+c               ttherm4avg=ttherm4avg+TthermXY(I,J)**4
+c               cctherm=cctherm+1
+c            endif
          ENDDO
       ENDDO
 
-   
-      do ifilter=1,numfilters
-         mag(ifilter)=-2.5d0*log10(
-     $        totalfluxdensity(ifilter)/absoluteflux(ifilter))
-      enddo
+
+c     We might want this later
+c      do ifilter=1,numfilters
+c         mag(ifilter)=-2.5d0*log10(
+c     $        totalfluxdensity(ifilter)/absoluteflux(ifilter))
+c      enddo
 
 !     IMINGLOW = leftmost   grid cell that "glows" (has tau>1)
 !     IMAXGLOW = rightmost  grid cell that "glows" (has tau>1)
@@ -161,43 +166,44 @@ c     luminosity without worrying about surface areas.
 c      print *,'IMINGLOW,IMAXGLOW,JMINGLOW,JMAXGLOW=',IMINGLOW,IMAXGLOW,
 c     $     JMINGLOW,JMAXGLOW
 
-      tavg=tavg/cellcount
-      t2avg=t2avg/cellcount
-      t4avg=t4avg/cellcount
-      do insl=1,nsl
-         if (goodccphoto(insl).gt.0) then
-            goodtphoto4avg(insl)=goodtphoto4avg(insl)/goodccphoto(insl)
-         endif
-      enddo
-c      if(warning+goodccphoto(10).ne.ccphoto) then
-c         print *,'counting error',warning,goodccphoto(10),ccphoto
-!     warning = number of cells for which the photosphere is less
-!               than 10 smoothing lengths from surface
-!     goodccphoto(10) = number of cells for which the photosphere is
-!                       at least 10 smoothing lengths from surface
-!     ccphoto = total number of cells spanned by the photosphere
-c         stop
+c      tavg=tavg/cellcount
+c      t2avg=t2avg/cellcount
+c      t4avg=t4avg/cellcount
+c     We might want this later
+c      do insl=1,nsl
+c         if (goodccphoto(insl).gt.0) then
+c            goodtphoto4avg(insl)=goodtphoto4avg(insl)/goodccphoto(insl)
+c         endif
+c      enddo
+cc      if(warning+goodccphoto(10).ne.ccphoto) then
+cc         print *,'counting error',warning,goodccphoto(10),ccphoto
+c!     warning = number of cells for which the photosphere is less
+c!               than 10 smoothing lengths from surface
+c!     goodccphoto(10) = number of cells for which the photosphere is
+c!                       at least 10 smoothing lengths from surface
+c!     ccphoto = total number of cells spanned by the photosphere
+cc         stop
+cc      endif
+c      nphotoavg=nphotoavg/ccphoto
+c      if(cctherm.gt.0)then
+c         ttherm4avg=ttherm4avg/cctherm
+c         tthermavg=tthermavg/cctherm
 c      endif
-      nphotoavg=nphotoavg/ccphoto
-      if(cctherm.gt.0)then
-         ttherm4avg=ttherm4avg/cctherm
-         tthermavg=tthermavg/cctherm
-      endif
-      rmid=rmid/cellcount
-      r2mid=r2mid/cellcount
-      call getLocalvz(xcosthetamax,ycosthetamax,zcosthetamax,
-     $     localvx,localvy,vPCygni)
+c      rmid=rmid/cellcount
+c      r2mid=r2mid/cellcount
+c      call getLocalvz(xcosthetamax,ycosthetamax,zcosthetamax,
+c     $     localvx,localvy,vPCygni)
       
-      vzavg=vzavg/tphoto4avg   ! Use this now that weighting by flux
-      vz2avg=vz2avg/tphoto4avg ! Use this now that weighting by flux
-      tphotoavg=tphotoavg/ccphoto
-      tphoto4avg=tphoto4avg/ccphoto
-      tpractical4avg=tpractical4avg/ccphoto
-      vravg=vravg/ccphoto
-      vr2avg=vr2avg/ccphoto
-      area=cellcount*HXMAP*HYMAP
-      areaphoto=ccphoto*HXMAP*HYMAP
-      areatherm=cctherm*HXMAP*HYMAP
+c      vzavg=vzavg/tphoto4avg   ! Use this now that weighting by flux
+c      vz2avg=vz2avg/tphoto4avg ! Use this now that weighting by flux
+c      tphotoavg=tphotoavg/ccphoto
+c      tphoto4avg=tphoto4avg/ccphoto
+c      tpractical4avg=tpractical4avg/ccphoto
+c      vravg=vravg/ccphoto
+c      vr2avg=vr2avg/ccphoto
+c      area=cellcount*HXMAP*HYMAP
+c      areaphoto=ccphoto*HXMAP*HYMAP
+c      areatherm=cctherm*HXMAP*HYMAP
 c     write (6,*) 'Total luminosity in enclosed area=',TOTALLUM
 
 c     Get luminosity to solar units:
@@ -221,24 +227,25 @@ c      write(*,*) Atot/runit_out**2.d0
 c      write(*,*) Atot/runit_out**2.d0 / nxmap/nymap,
 c     $     hxmap*hymap / runit_out**2.d0
 
-      sigmat=(t2avg-tavg**2)**0.5d0
-      if(cellcount.le.1) then
-         sigmar=0.d0
-      else
-         sigmar=(r2mid-rmid**2)**0.5d0
-      endif
-
-      if(sigmar.ne.sigmar) then
-         print *,'sigmar=',sigmar
-         print *,'r2mid=',r2mid
-         print *,'rmid=',rmid
-         print *,'r2mid-rmid**2=',r2mid-rmid**2
-         print *,'cellcount=',cellcount
-         sToP
-      endif
-
-      sigmavz=(vz2avg-vzavg**2)**0.5d0
-      sigmavr=(vr2avg-vravg**2)**0.5d0
+c     We might want this later
+c      sigmat=(t2avg-tavg**2)**0.5d0
+c      if(cellcount.le.1) then
+c         sigmar=0.d0
+c      else
+c         sigmar=(r2mid-rmid**2)**0.5d0
+c      endif
+c
+c      if(sigmar.ne.sigmar) then
+c         print *,'sigmar=',sigmar
+c         print *,'r2mid=',r2mid
+c         print *,'rmid=',rmid
+c         print *,'r2mid-rmid**2=',r2mid-rmid**2
+c         print *,'cellcount=',cellcount
+c         sToP
+c      endif
+c
+c      sigmavz=(vz2avg-vzavg**2)**0.5d0
+c      sigmavr=(vr2avg-vravg**2)**0.5d0
 
       konstant=4d0*sigma/3.839d33
 
