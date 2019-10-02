@@ -39,7 +39,7 @@ lib_obj = $(llib)/getTemperature.o      \
           $(llib)/output.o              \
           $(llib)/getLocalAngle.o       \
 	  $(llib)/opacity.o             \
-	  $(llib)/opacity_highT.o       \
+	  $(llib)/opacityTables.o       \
 
 # Math objects
 math_obj = $(mathlib)/odeint.o               \

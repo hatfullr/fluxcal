@@ -62,22 +62,16 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common/blending/ logT_blend1, logT_blend2,
      $      logR_blend1, logR_blend2
       integer nrows_opac_table,ncols_opac_table
-      parameter (nrows_opac_table=138*2,ncols_opac_table=37*2)
+      parameter (nrows_opac_table=300,ncols_opac_table=300)
       integer nrows_tables(numopacityfiles), ncols_tables(numopacityfiles)
-      real*8 logopacity_highT_tables(numopacityfiles,
+      real*8 logopacitytables(numopacityfiles,
      $      nrows_opac_table,ncols_opac_table)
-      real*8 logopacity_highT_table(nrows_opac_table,ncols_opac_table)
-      real*8 logT_opac_array(nrows_opac_table)
-      real*8 logR_opac_array(ncols_opac_table)
-      real*8 logrho_opac_array(ncols_opac_table)
       real*8 logTs(numopacityfiles,nrows_opac_table),
      $     logRs(numopacityfiles,ncols_opac_table)
 
       common/TandR/ logTs, logRs
       common/tabledimens/ nrows_tables, ncols_tables
-      common/opacity_hiT_tables/ logopacity_highT_tables
-      common/opacity_hiT_table/ logopacity_highT_table
-      common/opacity_arrays/ logT_opac_array, logR_opac_array
+      common/opacity_hiT_tables/ logopacitytables
       
       character*255 opacityfile_rosseland,opacityfile_planck,
      $      filtersfile,trackfile,eosfile

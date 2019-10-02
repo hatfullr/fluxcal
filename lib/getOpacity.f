@@ -123,7 +123,7 @@ c     Xh     - hydrogen fraction
      $        logTs(i,1:nrows_tables(i)),
      $        ncols_tables(i),
      $        logRs(i,1:ncols_tables(i)),
-     $        logopacity_highT_tables(i,
+     $        logopacitytables(i,
      $        1:nrows_tables(i),1:ncols_tables(i)),
      $        logtem,logR)
 
@@ -132,7 +132,7 @@ c     $        nrows_tables(i),
 c     $        logTs(i,1:nrows_tables(i)),
 c     $        ncols_tables(i),
 c     $        logRs(i,1:ncols_tables(i)),
-c     $        logopacity_highT_tables(i,
+c     $        logopacitytables(i,
 c     $        1:nrows_tables(i),1:ncols_tables(i)),
 c     $        logtem,logR)
          
