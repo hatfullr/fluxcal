@@ -16,23 +16,24 @@ c     L346 to L468
       JMINGLOW=NYMAP+1
       IMAXGLOW=0
       JMAXGLOW=0
-      rmid=0.d0
-      r2mid=0.d0
-      costhetamax=-1d30
-      vzavg=0.d0
-      vz2avg=0.d0
-      vravg=0.d0
-      vr2avg=0.d0
-      dssav=1d30
-      nphotoavg=0.d0
-      warning=0
-
-      do insl=1,nsl
-         goodtphoto4avg(insl)=0
-         goodccphoto(insl)=0
-      enddo
-
-      ccphoto=0
+c     We might want this later
+c      rmid=0.d0
+c      r2mid=0.d0
+c      costhetamax=-1d30
+c      vzavg=0.d0
+c      vz2avg=0.d0
+c      vravg=0.d0
+c      vr2avg=0.d0
+c      dssav=1d30
+c      nphotoavg=0.d0
+c      warning=0
+c      
+c      do insl=1,nsl
+c         goodtphoto4avg(insl)=0
+c         goodccphoto(insl)=0
+c      enddo
+c
+c      ccphoto=0
 
       if(dimenFileAlreadyExists) then
          write(*,*) "Creating the driving grid"

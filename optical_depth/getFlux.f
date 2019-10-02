@@ -51,7 +51,9 @@ c     $           myxpos,myypos+hymap,zintpos(i,j+1),
 c     $           myxpos+hxmap,myypos+hymap,zintpos(i+1,j+1),
 c     $           myxpos+hxmap,myypos,zintpos(i+1,j))
 
-            TOTALLUM=TOTALLUM+TXY(I,J)**4.d0
+c     We might want this later
+c            TOTALLUM=TOTALLUM+TXY(I,J)**4.d0
+            TOTALLUM=TOTALLUM+TOTALTpracticalXY(i,j)**4.d0
 
             ! Attenuate the luminosity from the thick particles if
             ! there is otpically thin stuff in front of it.
@@ -117,25 +119,30 @@ c     luminosity without worrying about surface areas.
                write(*,*) TOTALTpracticalXY(i,j)
                write(*,*) thick_part(i,j)
                write(*,*) Avis(thick_part(i,j))
-               stop
+               error stop "getFlux.f"
             endif
 
+            TMAX=MAX(TMAX,TOTALTpracticalXY(i,j))
+            if(TOTALTpracticalXY(i,j).gt.0.d0) then
+               TMIN=MIN(TMIN,TOTALTpracticalXY(i,j))
+            end if
+            
 c     We might want this later
 c            do ifilter=1,numfilters
 c               totalfluxdensity(ifilter)=totalfluxdensity(ifilter)+
 c     $              fluxdensityXY(I,J,ifilter)*HXMAP*HYMAP
 c     $              /distance**2
 c            enddo
-
-            TMAX=MAX(TMAX,TXY(I,J))
-            IF(TXY(I,J).GT.0.d0) then
-               TMIN=MIN(TMIN,TXY(I,J))
+c
+c            TMAX=MAX(TMAX,TXY(I,J))
+c            IF(TXY(I,J).GT.0.d0) then
+c               TMIN=MIN(TMIN,TXY(I,J))
 c               tavg=tavg+TXY(I,J)
 c               t2avg=t2avg+TXY(I,J)**2
 c               t4avg=t4avg+TXY(I,J)**4
 c               cellcount=cellcount+1
-            endif
-c     We might want this later
+c            endif
+c
 c            IF(TphotoXY(I,J).GT.0.d0) then
 c               tphotoavg=tphotoavg+TphotoXY(I,J)
 c               tphoto4avg=tphoto4avg+TphotoXY(I,J)**4
@@ -246,8 +253,8 @@ c      endif
 c
 c      sigmavz=(vz2avg-vzavg**2)**0.5d0
 c      sigmavr=(vr2avg-vravg**2)**0.5d0
-
-      konstant=4d0*sigma/3.839d33
+c
+c      konstant=4d0*sigma/3.839d33
 
  626  continue
       end subroutine

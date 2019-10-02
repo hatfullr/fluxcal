@@ -75,22 +75,24 @@ c     t6 is the temperature in millions of degrees Kelvin
             dtauds(2)=dtauds(1)
             dtauds(4)=(t6*1d6)**4*exp(-tau(1))*dtauds(1) ! dtauds(1)and hence dtauds(4) are NEGATIVE
                                                          ! BECAUSE STEP IS IN NEGATIVE DIRECTION
-            do ifilter=1,numfilters
-               exponent=coeff/(wavelength(ifilter)*t6)
-               eexponent=exp(exponent)
-               denominator=eexponent-1
-               Bnu=2*planck*crad/wavelength(ifilter)**3d0/
-     $              denominator
-               dtauds(4+ifilter)=Bnu*exp(-tau(1))*dtauds(1) ! dtauds(1)and hence dtauds(4+ifilter) are
-                                                            ! NEGATIVE BECAUSE STEP IS IN NEGATIVE DIRECTION
-            enddo
+c     We might want this later
+c           do ifilter=1,numfilters
+c               exponent=coeff/(wavelength(ifilter)*t6)
+c               eexponent=exp(exponent)
+c               denominator=eexponent-1
+c               Bnu=2*planck*crad/wavelength(ifilter)**3d0/
+c     $              denominator
+c               dtauds(4+ifilter)=Bnu*exp(-tau(1))*dtauds(1) ! dtauds(1)and hence dtauds(4+ifilter) are
+c                                                            ! NEGATIVE BECAUSE STEP IS IN NEGATIVE DIRECTION
+c            enddo
          else
             dtauds(1)=0.d0
             dtauds(2)=0.d0
             dtauds(4)=0.d0
-            do ifilter=1,numfilters
-               dtauds(4+ifilter)=0.d0
-            enddo
+c     We might want this later
+c            do ifilter=1,numfilters
+c               dtauds(4+ifilter)=0.d0
+c            enddo
          endif
          dtauds(3)=-1/xhp       ! NEGATIVE SIGN IS BECAUSE STEP IS IN NEGATIVE DIRECTION
       else
@@ -98,10 +100,11 @@ c     t6 is the temperature in millions of degrees Kelvin
          dtauds(2)=0.d0
          dtauds(3)=0.d0
          dtauds(4)=0.d0
-         do ifilter=1,numfilters
-            dtauds(4+ifilter)=0.d0
-         enddo
+c     We might want this later
+c         do ifilter=1,numfilters
+c            dtauds(4+ifilter)=0.d0
+c         enddo
       endif
-      
+     
       return
       end subroutine

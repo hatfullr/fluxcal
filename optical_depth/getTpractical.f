@@ -40,6 +40,9 @@ c     We might want this later
 c      do ifilter=1,numfilters+4
 c         taustart(ifilter)=0.d0
 c      enddo
+      do i=1,size(taustart)
+         taustart(i)=0.d0
+      end do
 
 cc     Find the particle kernel closest to xpos,ypos,z1
 c      maxz = -1.d30

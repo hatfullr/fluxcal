@@ -216,20 +216,28 @@ c     $     real(TOTALpracticalLUM)
      $     TOTALpracticalLUM/Lunit_out
       write(*,'(A,ES22.14)')' Maximum Teff=',TMAX/tempunit_out
       write(*,'(A,ES22.14)')' Average Teff=',avgt/numcell/tempunit_out
-      
-      call peakWavelengths
 
+c     We might want this later
+c      call peakWavelengths
 
       if (mlog.eq.1) then
 C     Transform to log scale:
          do j=1,nymap
             do i=1,nxmap
-               if (TXY(I,J).ge.TMIN) then
-c                  if(TXY(I,J).eq.TMAX) print *, 'MAX AT',i,j
-                  TXY(I,J)=LOG10(TXY(I,J))
+               if(TOTALTpracticalXY(i,j).ge.TMIN) then
+                  if(TOTALTpracticalXY(i,j).eq.TMAX)
+     $                 write(*,*) "MAX AT",i,j
+                  TOTALTpracticalXY(i,j)=log10(TOTALTpracticalXY(i,j))
                else
-                  TXY(I,J)=0.d0
+                  TOTALTpracticalXY(i,j)=0.d0
                end if
+c     We might want this later
+c               if (TXY(I,J).ge.TMIN) then
+cc                  if(TXY(I,J).eq.TMAX) print *, 'MAX AT',i,j
+c                  TXY(I,J)=LOG10(TXY(I,J))
+c               else
+c                  TXY(I,J)=0.d0
+c               end if
             end do
          end do
       end if

@@ -3,7 +3,7 @@
       real*8 XPOS, YPOS, TMAX, TMIN, anglex, angley, anglez
       COMMON/TAUGRID/XPOS,YPOS
       integer mlog
-      PARAMETER (MLOG=1)
+      PARAMETER (MLOG=0)
 
 C NXMAP and NYMAP ARE NOW SET IN THE CODE
       integer NXMAPMAX,NYMAPMAX,NZMAP

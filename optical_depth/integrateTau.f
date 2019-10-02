@@ -133,7 +133,7 @@ c
 c     Use Planck blackbody spectrum for presumed reasonable temperature for
 c     optically thin material
 
-c     Commented for right now. We might want to use this in the future.
+c     We might want this later
 c                  do ifilter=1,numfilters
 c                     exponent=coeff/(wavelength(ifilter)*t6)
 c                     eexponent=exp(exponent)
@@ -147,12 +147,11 @@ c                  end do
                   ! If there is a photosphere:
                   ! If thick_part(i,j) > 0,
                   ! OR if tauthin >= tau_thick
-                  if(TOTALTpracticalXY(I,J).gt.0.d0) then !"detectable photopshere"
                      
-                     if(I.lt.IMINGLOW) IMINGLOW=I
-                     if(I.gt.IMAXGLOW) IMAXGLOW=I
-                     if(J.lt.JMINGLOW) JMINGLOW=J
-                     if(J.gt.JMAXGLOW) JMAXGLOW=J
+                  if(I.lt.IMINGLOW) IMINGLOW=I
+                  if(I.gt.IMAXGLOW) IMAXGLOW=I
+                  if(J.lt.JMINGLOW) JMINGLOW=J
+                  if(J.gt.JMAXGLOW) JMAXGLOW=J
 
 c     We might want this later
 c                     ccphoto=ccphoto+1
@@ -215,7 +214,6 @@ c                     vr2avg=vr2avg+localvr**2
 c                     
 c                  else
 c                     TphotoXY(I,J) = 0.d0
-                  end if                  
                end if
             else
                TOTALTpracticalXY(i,j)=0.d0
@@ -233,7 +231,8 @@ c            TXY(I,J)=TphotoXY(I,J)
       end do
 
       call cpu_time(finish_time)
-
+      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
+     $     TOTALTpracticalXY(i/2,j/2)
       write(*,*) "integrateTau took ",finish_time-start_time
       
       end subroutine
