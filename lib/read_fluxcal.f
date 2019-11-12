@@ -91,7 +91,12 @@ c      character*255 fname
 
          myxhi = -0.6d0+0.2d0*metallicity
      $        +0.8d0*1.67262158d-24/wmeanmolecular(i)
-         opac_sph(i) = getOpacity(tempp(i),rho(i),myxhi)
+         
+         if(a(i).ne.0.d0) then
+            opac_sph(i) = getOpacity(tempp(i),rho(i),myxhi)
+         else
+            opac_sph(i) = 0.d0
+         end if
 c         if(tempp(i).le.8000) write(*,*) "OPACITY", tempp(i), opacit
          tauA(i) = taucoef*am(i)*opac_sph(i)/hp(i)**2.d0
 

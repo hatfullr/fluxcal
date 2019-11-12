@@ -540,8 +540,8 @@ C Initialization of the output parameters:
       aKext = 0.0D0
       if (T_in.lt.1.0D0) then
          if(verbose.eq.1) then
-            write(*,*) "WARNING: Temperature < 1.d0 in cop "//
-     $           "(opacity.f). opacity = 0.d0."
+            write(*,*) "WARNING (opacity.f): Temperature < 1.d0 in "//
+     $           "cop. opacity = 0.d0."
          end if
          RETURN                 !T must be more than few degrees [K]
       end if

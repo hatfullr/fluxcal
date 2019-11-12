@@ -1,15 +1,15 @@
       SUBROUTINE odeint(ystart,nvar,x1,x2,eps,h1,hmaximum,nok,nbad,
      $     derivs,rkqs)
       implicit none
-      INTEGER nbad,nok,nvar,KMAXX,NMAX
-      real*8 eps,h1,hmaximum,x1,x2,ystart(nvar) ! ,TINY
-      EXTERNAL derivs,rkqs
-      PARAMETER (NMAX=50,KMAXX=200) !,TINY=1.d-30)
-      INTEGER i,kmax,kount,kount1 !,kount2
-      real*8 dxsav,h,hdid,hnext,xint,xsav,dydx(NMAX),xp(KMAXX),
-     *yint(NMAX),yp(NMAX,KMAXX),yscal(NMAX)
-      COMMON /path/ kmax,kount,dxsav,xp,yp
-      common /kounts/kount1 !,kount2
+      integer nbad,nok,nvar,kmaxx,intnmax
+      real*8 eps,h1,hmaximum,x1,x2,ystart(nvar)
+      external derivs,rkqs
+      parameter (intnmax=50,kmaxx=200)
+      integer i,kmax,kount,kount1
+      real*8 dxsav,h,hdid,hnext,xint,xsav,dydx(intnmax),xp(kmaxx),
+     $     yint(intnmax),yp(intnmax,kmaxx),yscal(intnmax)
+      common /path/ kmax,kount,dxsav,xp,yp
+      common /kounts/kount1
       integer numfiltersmax
       parameter (numfiltersmax=15)
       real*8 yscalfactor(numfiltersmax)
@@ -19,25 +19,21 @@
       common/steps/ step1,step2,step3,step4,MAXSTP
       real*8 taulimit,posx,posy
       common/inputstuff/ taulimit,posx,posy
-c      logical get_integration_at_pos,get_integration_at_all_pos
-c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       real*8 rhocgs,xhp,gcgs,pcgs,tcgs,ucgs
       real xh,t6
       common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
-      real*8 opacit,opacit1,opacit2
-      real*8 fcondense,nn
+      real*8 opacit
       integer intout
       common/intoutput/ intout
-      real*8 getLocalAngle
       real*8 getOpacity
 
-      integer mymax
-      parameter(mymax=420000)
-      real*8 x(mymax),y(mymax),z(mymax),am(mymax),hp(mymax),rho(mymax),
-     $      vx(mymax),vy(mymax),vz(mymax),a(mymax),wmeanmolecular(mymax),
-     $      localg(mymax),metal(mymax),tempp(mymax),pp(mymax)
+      integer nmax
+      parameter (nmax=420000)
+      real*8 x(nmax),y(nmax),z(nmax),am(nmax),hp(nmax),rho(nmax),
+     $     vx(nmax),vy(nmax),vz(nmax),a(nmax),wmeanmolecular(nmax),
+     $     localg(nmax),metal(nmax),tempp(nmax),pp(nmax)
       common/part/ x,y,z,am,hp,rho,vx,vy,vz,a,wmeanmolecular,localg,
-     $      metal,tempp,pp
+     $     metal,tempp,pp
       
       integer n,ip,lp
       real*8 hmin,hmax,dr2,dx2,dy2,dz2,bigd,maxbigd
@@ -67,8 +63,8 @@ c      common/getint/ get_integration_at_pos,get_integration_at_all_pos
       real*8 max_step_size,min_step_size
       integer min_steps_taken,max_steps_taken
       integer nstp
-      common/boundsteptaken/ max_step_size,min_step_size,min_steps_taken,
-     $     max_steps_taken,nstp
+      common/boundsteptaken/ max_step_size,min_step_size,
+     $     min_steps_taken,max_steps_taken,nstp
 
 c      logical resolved
 c      common /resolvedboolean/ resolved

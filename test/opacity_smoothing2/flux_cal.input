@@ -9,8 +9,8 @@
       !### Files to read
       ! flux_cal starts at file number 'start' and ends at file number
       ! 'finish', taking steps of 'step'. All values must be integers.
-      start=100
-      finish=100
+      start=342
+      finish=342
       step=0
 
       ! The directory flux_cal was installed to. This is used to find the
@@ -34,7 +34,7 @@
       ! driving grid cell. In other words, the particles that flux_cal
       ! first interacts with at each grid cell. The file will be called
       ! 'closest_particles_XXXX.dat' where 'XXXX' is a file number.
-      get_closest_particles=.true.
+      get_closest_particles=.false.
 
       ! Finds all the particles the ray-tracer comes in contact with at
       ! posx, posy. Units must be in cgs.
@@ -103,19 +103,19 @@
 
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
-      taulimit=1.d30
+      taulimit=1.d1
 
       ! Optical depth by which the integrator will detect that a region
       ! is optically thick.
-      tau_thick_integrator=1.d30
+      tau_thick_integrator=1.d1
 
       ! The value of optical depth that a particle must exceed to be
       ! handled by the envelope fitting routine. 1.d1 by default.
-      tau_thick_envfit=1.d30
+      tau_thick_envfit=1.d1
       
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
-      envfit=.false.
+      envfit=.true.
 
 
 
@@ -145,14 +145,14 @@
       ! you desire the output units to be in. Internal (cgs) values will
       ! be divided by these to produce your output.
       ! These values are affected by the flux_cal.baseunits file.
-      runit_out=1.d0            ! distance
-      munit_out=1.d0            ! mass
-      tunit_out=1.d0            ! time
-      vunit_out=1.d0            ! velocity
-      Eunit_out=1.d0            ! energy
-      rhounit_out=1.d0          ! density
+      runit_out=6.9598d10            ! distance
+      munit_out=1.9892d33            ! mass
+      tunit_out=1.59353d3            ! time
+      vunit_out=4.36754d7            ! velocity
+      Eunit_out=3.79447d48            ! energy
+      rhounit_out=5.90049d0          ! density
       muunit_out=1.d0           ! mean molecular weight
-      gunit_out=1.d0            ! gravitational acceleration
+      gunit_out=2.74079d4            ! gravitational acceleration
       tempunit_out=1.d0         ! temperature
       punit_out=1.d0            ! pressure
       Lunit_out=3.839d33
@@ -180,6 +180,18 @@
       opacity_oob_error=.false.
       opacity_oob_warning=.false.
       opacity_analytic_warning=.false.
+
+      ! Define the rho for which any rho <= this value forces opacity to equal
+      ! 0.d0. Default is 1.d-19, which is the minimum density allowed by the cop
+      ! subroutine.
+      opacity_rho_cutoff=1.d-30
+
+      ! The smoothing window in the temperature direction for opacities. A
+      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do not
+      ! make this larger than 1.d4, as this is the minimum distance in T 
+      ! required to calculate e- scattering and kramer opacities in the range
+      ! 1.d4 < T < 1.d8.
+      smoothing_window_T = 2000.d0
 
       ! Define the opacity files you would like to be read in, as well as how
       ! you would like the code to transition between them. You must give the
@@ -356,6 +368,7 @@
       outfile='flux_cal.output'
 
 
+      debug=.true.
 
 
       

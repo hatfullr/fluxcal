@@ -42,13 +42,12 @@ lib_obj = $(llib)/getTemperature.o      \
 	  $(llib)/opacityTables.o       \
 
 # Math objects
-math_obj = $(mathlib)/odeint.o               \
-           $(mathlib)/rkck.o                 \
-           $(mathlib)/rkqs.o                 \
-           $(mathlib)/fourPointArea.o        \
-	   $(mathlib)/interp.o               \
-	   $(mathlib)/toms526.o              \
-	   $(mathlib)/blend.o                \
+math_obj = $(mathlib)/odeint.o           \
+           $(mathlib)/rkck.o             \
+           $(mathlib)/rkqs.o             \
+	   $(mathlib)/interp.o           \
+	   $(mathlib)/toms526.o          \
+	   $(mathlib)/tseval_f90.o       \
 
 # Optical depth objects
 opdep_obj = $(opdeplib)/optical_depth.o            \
@@ -90,5 +89,5 @@ $(executable): $(executable).o $(process_obj)
 
 # Delete all made stuff
 clean:
-	@\rm -f $(BUILD_DIR)/* $(executable)
+	@\rm -f $(BUILD_DIR)/* $(executable) $(process_obj)
 

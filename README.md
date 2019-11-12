@@ -107,6 +107,12 @@ This may fail up to 10 times before finally succeeding. Hopefully this error
 disappears with future `gfortran` releases. We do not recommend downgrading
 your GNU compiler suite, as this is generally harmful.
 
+By default, the `make` script in the main FluxCal directory attempts to
+automatically retry compilation if it encounters this error. We think this
+error may be related to how the GNU compiler handles memory allocation. It
+seems that introducing the `getLocalQuantities subroutine` into odeint.f or
+rkqs.f can cause this error.
+
 
 ## Failing standard_check test
 

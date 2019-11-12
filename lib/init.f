@@ -184,6 +184,17 @@
       opacity_oob_warning=.true.
       opacity_analytic_warning=.true.
 
+      ! Define the rho for which any rho <= this value forces opacity to equal
+      ! 0.d0. Default is 1.d-19, which is the minimum density allowed by the cop
+      ! subroutine.
+      opacity_rho_cutoff=1.d-19
+
+      ! The smoothing window in the temperature direction for opacities. A
+      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do not
+      ! make this larger than 1.d4, as this is the minimum distance in T 
+      ! required to calculate e- scattering and kramer opacities in the range
+      ! 1.d4 < T < 1.d8.
+      smoothing_window_T = 1000.d0
       
       ! Define the opacity files you would like to be read in, as well as how
       ! you would like the code to transition between them. You must give the
@@ -393,8 +404,12 @@
       eosfile='sph.eos'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
- 
 
+
+      
+      !### Internal uses
+      ! The debug flag is used internally to make debugging easier.
+      debug=.false.
 
       
 !-----------------------------------------------------------------------
@@ -504,6 +519,7 @@ c      end if
  110  format(A13,"(",I1,") = '",A,"'")
  111  format(A15,"(",I1,") = ",E10.4)
  112  format(A27," = ",L1)
+ 113  format(A27," = ",E10.4)
 
 c     Write everything to the terminal
       write(*,*) ""
@@ -582,6 +598,8 @@ c     Write everything to the terminal
       write(*,112) "opacity_oob_error         ",opacity_oob_error
       write(*,112) "opacity_oob_warning       ",opacity_oob_warning
       write(*,112) "opacity_analytic_warning  ",opacity_analytic_warning
+      write(*,113) "opacity_rho_cutoff        ",opacity_rho_cutoff
+      write(*,113) "smoothing_window_T        ",smoothing_window_T
       
 
       do i=1,numopacityfiles
@@ -593,9 +611,9 @@ c     Write everything to the terminal
             write(*,111) "      logRmins",i,logRmins(i)
             write(*,111) "      logRmaxs",i,logRmaxs(i)
             write(*,111) "   logT_blend1",i,logT_blend1(i)
-            write(*,111) "   logT_blend2",i,logT_blend1(i)
+            write(*,111) "   logT_blend2",i,logT_blend2(i)
             write(*,111) "   logR_blend1",i,logR_blend1(i)
-            write(*,111) "   logR_blend2",i,logR_blend1(i)
+            write(*,111) "   logR_blend2",i,logR_blend2(i)
          end if
       end do
       

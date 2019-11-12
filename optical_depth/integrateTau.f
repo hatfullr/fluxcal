@@ -59,6 +59,8 @@ c     end if
 
             if(zmin(i,j).lt.1d30)then
                nstp = 0
+               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
+     $              zmax(i,j)/runit_out
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TOTALTpracticalXY(i,j),

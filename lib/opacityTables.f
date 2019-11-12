@@ -9,16 +9,16 @@ c     2) Assign values to logopacitytables from opacityfiles
       real*8 dummy,logR_max,logR_min,logT_max,logT_min
       integer numtabused
       integer testsizeT,testsizeR
+      real*8 testlogTmin,testlogTmax,testlogRmin,testlogRmax
       parameter (testsizeT=nrows_opac_table,testsizeR=ncols_opac_table)
       real*8 testlogT(testsizeT), testlogR(testsizeR)
       real*8 testlogopacity(testsizeT,testsizeR)
       real*8 testlogrho
       real*8 logTmin, logTmax, logRmin, logRmax
-      real*8 testlogTmin,testlogTmax,testlogRmin,testlogRmax
       character*255 fmt1,fmt2
       real*8 minT, minR, maxT, maxR
       integer verbose
-
+      
 c     Initialize T and R arrays
       do i=1,numopacityfiles
          do j=1,nrows_opac_table
@@ -40,6 +40,63 @@ c     Initialize the array to hold all the opacity tables
          end do
       end do
 
+
+
+c     Need to set the bounds for the first two opacityfiles if they
+c     haven't been set yet
+      logTmins(1) = log10(500.d0+1.d-8)
+      logRmins(1) = (-19.d0+1.d-8) - 3.d0*logTmins(1) + 18.d0
+      logTmaxs(2) = 4.d0-1.d-8
+      logRmaxs(2) = (-7.d0-1.d-8) - 3.d0*(logTmaxs(2)+1.d-8) + 18.d0
+
+      
+      if ( logT_blend2(2).eq.-1.d30 ) logT_blend2(2)=logTmaxs(2)
+      if ( logT_blend1(1).eq.-1.d30 ) logT_blend1(1)=logTmins(1)
+      if ( logR_blend1(1).eq.-1.d30 ) logR_blend1(1)=logRmins(1)
+      if ( logR_blend2(2).eq.-1.d30 ) logR_blend2(2)=logRmaxs(2)
+
+c     Now logT_blend2(2), logT_blend1(1), logR_blend1(1), and
+c     logR_blend2(2) have valid values
+
+c     Here, the user has set no preference on transitioning from
+c     Planck to Rosseland opacities, so we set a blending by default
+      if ( logTmaxs(1).eq.-1.d30 .and. logTmins(2).eq.-1.d30 ) then
+         logTmaxs(1) = 3.041393d0
+         logTmins(2) = 2.995635d0
+         
+c     The user has set a minimum for Rosseland opacity, so the
+c     maximum for Planck opacity should equal the minimum for
+c     Rosseland opacity
+      else if ( logTmaxs(1).eq.-1.d30 .and. logTmins(2).ne.-1.d30 ) then
+         logTmaxs(1) = logTmins(2)
+         
+c     The user has set a maximum for Planck opacity, so the
+c     minimum for Rosseland opacity should equal the minimum for
+c     Planck opacity
+      else if ( logTmaxs(1).ne.-1.d30 .and. logTmins(2).eq.-1.d30 ) then
+         logTmins(2) = logTmaxs(1)
+      end if
+
+c     Please do not use R blending for Planck and Rosseland opacities...
+      logRmaxs(1) = (-7.d0-1.d-8) - 3.d0*logT_blend2(2) + 18.d0
+      logRmins(2) = (-19.d0+1.d-8) - 3.d0*logT_blend1(1) + 18.d0
+      logR_blend1(1) = logRmins(1)
+      logR_blend2(1) = logRmaxs(1)
+      logR_blend1(2) = logRmins(2)
+      logR_blend2(2) = logRmaxs(2)
+
+c     Turning off blending if blending not specified
+      if ( logT_blend2(1).eq.-1.d30 ) logT_blend2(1)=logTmaxs(1)
+      if ( logT_blend1(2).eq.-1.d30 ) logT_blend1(2)=logTmins(2)
+c      if ( logR_blend2(1).eq.-1.d30 ) logR_blend2(1)=logRmaxs(1)
+c      if ( logR_blend1(2).eq.-1.d30 ) logR_blend1(2)=logRmins(2)
+
+
+      logR_blend1(1) = -1.d30
+      logR_blend2(1) = -1.d30
+      logR_blend1(2) = -1.d30
+      logR_blend2(2) = -1.d30
+      
 c     Loop through the opacityfiles, which should all have
 c     the format of MESA opacity files (I think OPAL?)
 
@@ -85,6 +142,7 @@ c     the format of MESA opacity files (I think OPAL?)
          if ( logTmaxs(i).le.-1.d30 ) logTmaxs(i) = logT_max
          if ( logRmins(i).le.-1.d30 ) logRmins(i) = logR_min
          if ( logRmaxs(i).le.-1.d30 ) logRmaxs(i) = logR_max
+
          read(42,*)             ! Newline
          read(42,*)             ! Descriptor
          read(42,*) (logRs(i,k),k=1,ncols_tables(i)) ! This is still R, not rho
@@ -174,41 +232,52 @@ c     the format of MESA opacity files (I think OPAL?)
       end do
 
       
-c     This is for printing out an opacity file for debugging purposes
-      
-c      do j=1,nrows_opac_table
-c         testlogT(j) = log10(500.d0) +
-c     $        (8.d0-log10(500.d0))/float(nrows_opac_table-1)*(j-1)
-c      end do
-c      do k=1,ncols_opac_table
-c         testlogR(k) = -13.d0 +
-c     $        (3.d0+13.d0)/float(ncols_opac_table-1)*(k-1)
-c      end do
-c
-c      do j=1,nrows_opac_table
-c         do k=1,ncols_opac_table
-c            testlogrho = testlogR(k) + 3.d0*testlogT(j) - 18.d0
-c
-c            testlogopacity(j,k)=log10(
-c     $           getOpacity(10.d0**testlogT(j),10.d0**testlogrho,0.7d0))
-c         end do
-c      end do
-c      
-c      write(fmt1,'("("A","I3"E15.4)")') '"               ", ',
-c     $     ncols_opac_table
-c      write(fmt2,'("("I3"E15.4)")') ncols_opac_table+1
-c
-c 400  format("               ",138E15.4)
-c 401  format(138E15.4)
-c      open(45,file='test_opacity_file.txt',status='unknown')
-c      write(45,fmt1) (testlogR(k),k=1,ncols_opac_table)
-c      
-c      do j=1,nrows_opac_table
-c         write(45,fmt2) testlogT(j),
-c     $        (testlogopacity(j,k),k=1,ncols_opac_table)
-c      end do
-c      close(45)
-
-c      stop
+c$$$c     This is for printing out an opacity file for debugging purposes
+c$$$c
+c$$$      testlogTmin = log10(200.d0)
+c$$$      testlogTmax = 10.d0
+c$$$      testlogRmin = -20.d0
+c$$$      testlogRmax = 10.d0
+c$$$      
+c$$$      do j=1,nrows_opac_table
+c$$$         testlogT(j) = testlogTmin +
+c$$$     $        (testlogTmax-testlogTmin)/float(nrows_opac_table-1)*(j-1)
+c$$$      end do
+c$$$      do k=1,ncols_opac_table
+c$$$         testlogR(k) = testlogRmin +
+c$$$     $        (testlogRmax-testlogRmin)/float(ncols_opac_table-1)*(k-1)
+c$$$      end do
+c$$$
+c$$$      do j=1,nrows_opac_table
+c$$$         do k=1,ncols_opac_table
+c$$$            testlogrho = testlogR(k) + 3.d0*testlogT(j) - 18.d0
+c$$$
+c$$$            testlogopacity(j,k)=log10(
+c$$$     $           getOpacity(10.d0**testlogT(j),10.d0**testlogrho,0.7d0))
+c$$$         end do
+c$$$      end do
+c$$$      
+c$$$      write(fmt1,'("("A","I3"E15.4)")') '"               ", ',
+c$$$     $     ncols_opac_table
+c$$$      write(fmt2,'("("I3"E15.4)")') ncols_opac_table+1
+c$$$
+c$$$ 400  format("               ",138E15.4)
+c$$$ 401  format(138E15.4)
+c$$$      open(45,file='test_opacity_file.txt',status='unknown')
+c$$$      write(45,fmt1) (testlogR(k),k=1,ncols_opac_table)
+c$$$      
+c$$$      do j=1,nrows_opac_table
+c$$$         write(45,fmt2) testlogT(j),
+c$$$     $        (testlogopacity(j,k),k=1,ncols_opac_table)
+c$$$      end do
+c$$$      close(45)
+c$$$
+c$$$      write(*,*) "BREAK"
+c$$$      write(*,*) ""
+c$$$      write(*,*) getOpacity(10.d0**(3.753),10.d0**(4.849+3.*3.753-18),0.7d0)
+c$$$      write(*,*) ""
+c$$$      write(*,*) "WE ARE OUT"
+c$$$      
+c$$$      stop
       
       end subroutine

@@ -76,15 +76,13 @@ c            count = count+1
      $                 -(x(ip)-xpos)**2-(y(ip)-ypos)**2)**0.5d0
                   ! Protect against infinitessimally small integration
                   if(maxdz.gt.0) then
-                     if(Z(IP)-maxdz.lt.zmin(i,j)) then
-                        zmin(i,j)=Z(IP)-maxdz
+                     if(z(ip)-maxdz.lt.zmin(i,j)) then
+                        zmin(i,j)=z(ip)-maxdz
                         h1(i,j)=hp(ip)
                      end if
-c                     if(Z(IP)+maxdz.gt.zmax(i,j)) then
-c                        count=count+1
-c                        closest(count) = IP
-c                     end if
+
                      zmax(i,j)=max(zmax(i,j),Z(IP)+maxdz)
+                     
                      if(Teff(ip).gt.0.d0) then
 c                     if(envfit.and.
 c     $                    (tauA(ip) .gt. tau_thick_envfit)) then

@@ -1,10 +1,10 @@
       implicit none
       integer nmax,nnmax,ntab
-      PARAMETER (NMAX=420000,NNMAX=128)
+      PARAMETER (NMAX=420000,NNMAX=128) ! Also in odeint.f
 c      PARAMETER (NMAX=301000,NNMAX=128)
 c      PARAMETER (NMAX=221000,NNMAX=1000)
 c      PARAMETER (NMAX=180000,NNMAX=100)
-      PARAMETER (NTAB=100000)                                           
+      PARAMETER (NTAB=100000)
       real*8 hmin,hmax
       integer n,nout,nit
       common/intpar/ hmin,hmax,n
@@ -69,6 +69,10 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 logTs(numopacityfiles,nrows_opac_table),
      $     logRs(numopacityfiles,ncols_opac_table)
 
+      real*8 opacity_rho_cutoff
+
+      common/rhocutoff/ opacity_rho_cutoff
+	
       common/TandR/ logTs, logRs
       common/tabledimens/ nrows_tables, ncols_tables
       common/opacity_hiT_tables/ logopacitytables
@@ -120,8 +124,12 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       character*3 dust_model
       character*1 dust_topology, dust_shape
       common/dust/ dust_model,dust_topology,dust_shape
+      logical debug
+      common/dbg/ debug
       logical track_all
       common/trackall/ track_all
+      real*8 smoothing_window_T
+      common/smoothingwindow/ smoothing_window_T
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
@@ -139,7 +147,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      tau_thick,track_all,kunit_out,sunit_out,opacityfiles,logTmins,
      $      logTmaxs,logRmins,logRmaxs,logT_blend1,logT_blend2,
      $      logR_blend1,logR_blend2,MAXSTP,opacity_oob_error,
-     $      opacity_oob_warning,opacity_analytic_warning
+     $      opacity_oob_warning,opacity_analytic_warning,opacity_rho_cutoff,
+     $      debug,smoothing_window_T
 	
       common/inputfilenames/ filtersfile,trackfile,eosfile
 
@@ -227,3 +236,5 @@ c     slops for envelope fitting
       integer nstp
       common/boundsteptaken/ max_step_size,min_step_size,min_steps_taken,
      $      max_steps_taken,nstp
+
+      real*8 taylor_expansion
