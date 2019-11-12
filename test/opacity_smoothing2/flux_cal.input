@@ -9,8 +9,8 @@
       !### Files to read
       ! flux_cal starts at file number 'start' and ends at file number
       ! 'finish', taking steps of 'step'. All values must be integers.
-      start=342
-      finish=342
+      start=100
+      finish=100
       step=0
 
       ! The directory flux_cal was installed to. This is used to find the
@@ -103,11 +103,11 @@
 
       ! Optical depth at which to stop the integration. Only applies to
       ! get_fluxes and get_integration_at_pos.
-      taulimit=1.d1
+      taulimit=1.d30
 
       ! Optical depth by which the integrator will detect that a region
       ! is optically thick.
-      tau_thick_integrator=1.d1
+      tau_thick_integrator=1.d30
 
       ! The value of optical depth that a particle must exceed to be
       ! handled by the envelope fitting routine. 1.d1 by default.
@@ -115,7 +115,7 @@
       
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
-      envfit=.true.
+      envfit=.false.
 
 
 
