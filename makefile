@@ -24,7 +24,7 @@ math_modules = $(mathlib)/bilinear_interpolation.o \
 
 # Library objects
 lib_obj = $(llib)/getTemperature.o      \
-          $(llib)/derivs2.o             \
+          $(llib)/derivs.o              \
           $(llib)/kernels.o             \
           $(llib)/init.o                \
           $(llib)/getOpacity.o          \

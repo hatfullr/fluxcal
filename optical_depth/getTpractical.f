@@ -69,7 +69,7 @@ c      end if
 
       if(z1.ne.zstop)then
          call odeint(taustart,4+numfilters,z1,zstop,
-     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs,
      $        rkqs)
          
          Tthin4=taustart(4)     ! int_0^tau T^4 e^(-tau') dtau'
@@ -109,13 +109,13 @@ c         do ifilter=1,numfilters+4
 c            taustart(ifilter)=0.d0
 c         enddo
 cc     call odeint(taustart,4+numfilters,z1,zstop,
-cc     $           eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+cc     $           eps,0.25d0*myh1,myh1,nok,nbad,derivs,
 cc     $           rkqs)
 c         
 c         ! Integrate with bounds set to the beginning to the surface of
 c         ! the thick particle.
 c         call odeint(taustart,4+numfilters,z1,zthick,
-c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs,
 c     $        rkqs)
 c         Tthin=taustart(4)**0.25d0 ! int_0^tau T^4 e^(-tau') dtau'
 c         tau_thin = taustart(1) ! Attenuation factor
@@ -177,7 +177,7 @@ c         enddo
 c
 c         ! Integrate with bounds set across all fluid
 c         call odeint(taustart,4+numfilters,z1,z0,
-c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs,
 c     $        rkqs)
 c         tau_thin = taustart(1) ! Attenuation factor
 c         nphoto = taustart(3)

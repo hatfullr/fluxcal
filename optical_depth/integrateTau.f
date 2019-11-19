@@ -13,7 +13,9 @@
       real*8 TpracticalXYthin,TpracticalXYthick
       integer nan
       real start_time,finish_time
-
+      integer writefile
+      common/writefilee/writefile
+      
       call cpu_time(start_time)
       
       nan = 0
@@ -48,7 +50,8 @@ c     end if
       min_steps_taken = MAXSTP
       max_steps_taken = 0
 
-      
+      writefile = 11
+      open(writefile,file="rhoT.dat",status="unknown")
 
       DO J=1,NYMAP
          DO I=1,NXMAP
@@ -59,8 +62,8 @@ c     end if
 
             if(zmin(i,j).lt.1d30)then
                nstp = 0
-               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
-     $              zmax(i,j)/runit_out
+c               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
+c     $              zmax(i,j)/runit_out
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TOTALTpracticalXY(i,j),
@@ -129,7 +132,7 @@ c
 c     taustart(4+ifilter) has the same dimensions as the Planck function
 c     Bnu=2*planck*crad/wavelengthcm(ifilter)**3d0/
 c     $                 (exp(exponent)-1.d0)
-c     derivs2 is using cgs units to get taustart(4+ifilter), and this is
+c     derivs is using cgs units to get taustart(4+ifilter), and this is
 c     erg/s/cm^2/Hz/sr  (where sr=steradian)
 c                  
 c     Use Planck blackbody spectrum for presumed reasonable temperature for
@@ -236,5 +239,6 @@ c            TXY(I,J)=TphotoXY(I,J)
 c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
 c     $     TOTALTpracticalXY(i/2,j/2)
 c      write(*,*) "integrateTau took ",finish_time-start_time
-      
+
+      close(writefile)
       end subroutine

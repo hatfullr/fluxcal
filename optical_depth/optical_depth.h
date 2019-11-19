@@ -45,7 +45,7 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
       integer ifilter !,numfiltersmax
       real*8 dssav,eps,s,tau,taustart(NVARMAX)
       COMMON /path/ kmax,kount,dssav,s(KMAXX),tau(NVARMAX,KMAXX)
-      external derivs2,rkqs,derivs3
+      external derivs,rkqs
       integer NXMAP, NYMAP
       real*8 HXMAP, HYMAP
       integer IP
