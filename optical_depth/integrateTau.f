@@ -13,8 +13,6 @@
       real*8 TpracticalXYthin,TpracticalXYthick
       integer nan
       real start_time,finish_time
-      integer writefile
-      common/writefilee/writefile
       
       call cpu_time(start_time)
       
@@ -49,10 +47,7 @@ c     end if
       min_step_size = 0.d0
       min_steps_taken = MAXSTP
       max_steps_taken = 0
-
-      writefile = 11
-      open(writefile,file="rhoT.dat",status="unknown")
-
+      
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
@@ -240,5 +235,4 @@ c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
 c     $     TOTALTpracticalXY(i/2,j/2)
 c      write(*,*) "integrateTau took ",finish_time-start_time
 
-      close(writefile)
       end subroutine

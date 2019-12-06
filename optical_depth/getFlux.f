@@ -58,7 +58,7 @@ c            TOTALLUM=TOTALLUM+TXY(I,J)**4.d0
             ! Attenuate the luminosity from the thick particles if
             ! there is otpically thin stuff in front of it.
             ! Contributions from optically thin stuff are already
-            ! attenuated by the derivs2.f function.
+            ! attenuated by the derivs.f function.
 c            TOTALpracticalLUM=TOTALpracticalLUM
 c     $           + TpracticalXYthick(I,J)**4.d0 * exp(-tauthin(i,j))
 c     $           + TpracticalXYthin(I,J)**4.d0

@@ -24,6 +24,9 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       namelist/baseunits/ gram,sec,cm,kelvin
       real*8 wtab(ntab),ctab
       common/wtabul/ wtab,ctab
+
+      integer neighbors(nmax) ! Remove later
+      common/neigh/ neighbors ! Remove later
 	
       real*8 mu
       common/surfaceangle/ mu
@@ -128,8 +131,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common/dbg/ debug
       logical track_all
       common/trackall/ track_all
-      real*8 smoothing_window_T
-      common/smoothingwindow/ smoothing_window_T
+      real*8 smoothing_window_T,smoothing_window_rho
+      common/smoothingwindow/ smoothing_window_T,smoothing_window_rho
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
@@ -148,7 +151,7 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      logTmaxs,logRmins,logRmaxs,logT_blend1,logT_blend2,
      $      logR_blend1,logR_blend2,MAXSTP,opacity_oob_error,
      $      opacity_oob_warning,opacity_analytic_warning,opacity_rho_cutoff,
-     $      debug,smoothing_window_T
+     $      debug,smoothing_window_T,smoothing_window_rho
 	
       common/inputfilenames/ filtersfile,trackfile,eosfile
 
@@ -238,3 +241,10 @@ c     slops for envelope fitting
      $      max_steps_taken,nstp
 
       real*8 taylor_expansion
+	
+      real*8 depth
+      common/depthtracker/ depth
+
+      real*8 rhoPlanckRossmin, rhoPlanckRossmax
+      parameter(rhoPlanckRossmin=2.d-18,rhoPlanckRossmax=1.d-7)
+      

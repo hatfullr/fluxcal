@@ -195,6 +195,7 @@
       ! required to calculate e- scattering and kramer opacities in the range
       ! 1.d4 < T < 1.d8.
       smoothing_window_T = 1000.d0
+      smoothing_window_rho = 10.d0
       
       ! Define the opacity files you would like to be read in, as well as how
       ! you would like the code to transition between them. You must give the

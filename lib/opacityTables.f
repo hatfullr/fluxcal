@@ -10,8 +10,10 @@ c     2) Assign values to logopacitytables from opacityfiles
       integer numtabused
       integer testsizeT,testsizeR
       real*8 testlogTmin,testlogTmax,testlogRmin,testlogRmax
+      real*8 testlogrhomin,testlogrhomax
       parameter (testsizeT=nrows_opac_table,testsizeR=ncols_opac_table)
-      real*8 testlogT(testsizeT), testlogR(testsizeR)
+      real*8 testlogT(testsizeT), testlogR(testsizeR),
+     $     testlogrho_arr(testsizeR)
       real*8 testlogopacity(testsizeT,testsizeR)
       real*8 testlogrho
       real*8 logTmin, logTmax, logRmin, logRmax
@@ -44,10 +46,12 @@ c     Initialize the array to hold all the opacity tables
 
 c     Need to set the bounds for the first two opacityfiles if they
 c     haven't been set yet
-      logTmins(1) = log10(500.d0+1.d-8)
-      logRmins(1) = (-19.d0+1.d-8) - 3.d0*logTmins(1) + 18.d0
+      logTmins(1) = log10(5.d0+1.d-8)
+      logRmins(1) = (log10(rhoPlanckRossmin)+1.d-8) -
+     $     3.d0*logTmins(1) + 18.d0
       logTmaxs(2) = 4.d0-1.d-8
-      logRmaxs(2) = (-7.d0-1.d-8) - 3.d0*(logTmaxs(2)+1.d-8) + 18.d0
+      logRmaxs(2) = (log10(rhoPlanckRossmax)-1.d-8) -
+     $     3.d0*(logTmaxs(2)+1.d-8)+18.d0
 
       
       if ( logT_blend2(2).eq.-1.d30 ) logT_blend2(2)=logTmaxs(2)
@@ -78,8 +82,10 @@ c     Planck opacity
       end if
 
 c     Please do not use R blending for Planck and Rosseland opacities...
-      logRmaxs(1) = (-7.d0-1.d-8) - 3.d0*logT_blend2(2) + 18.d0
-      logRmins(2) = (-19.d0+1.d-8) - 3.d0*logT_blend1(1) + 18.d0
+      logRmaxs(1) = (log10(rhoPlanckRossmax)-1.d-8) -
+     $     3.d0*logT_blend2(2) + 18.d0
+      logRmins(2) = (log10(rhoPlanckRossmin)+1.d-8) -
+     $     3.d0*logT_blend1(1) + 18.d0
       logR_blend1(1) = logRmins(1)
       logR_blend2(1) = logRmaxs(1)
       logR_blend1(2) = logRmins(2)
@@ -107,11 +113,13 @@ c     the format of MESA opacity files (I think OPAL?)
 
 
       numtabused = 0
+      ! The following will always result in numtabused = 2.
+      ! We send an error to the user in init.f otherwise.
       if(len(trim(adjustl(opacityfiles(1)))).gt.0)
      $     numtabused=numtabused+1
       if(len(trim(adjustl(opacityfiles(2)))).gt.0)
      $     numtabused=numtabused+1
-      
+
       do i=3,numopacityfiles
          if(len(trim(adjustl(opacityfiles(i)))).le.0) cycle
          open(42,file=trim(adjustl(opacityfiles(i))),status='old')
@@ -233,7 +241,7 @@ c     the format of MESA opacity files (I think OPAL?)
 
       
 c$$$c     This is for printing out an opacity file for debugging purposes
-c$$$c
+c$$$
 c$$$      testlogTmin = log10(200.d0)
 c$$$      testlogTmax = 10.d0
 c$$$      testlogRmin = -20.d0
@@ -279,5 +287,55 @@ c$$$      write(*,*) ""
 c$$$      write(*,*) "WE ARE OUT"
 c$$$      
 c$$$      stop
+
+      
+c$$$c     This is for printing out an opacity file for debugging purposes
+c$$$
+c$$$      testlogTmin = 0.d0
+c$$$      testlogTmax = 10.d0
+c$$$      testlogrhomin = -30.d0
+c$$$      testlogrhomax = 15.d0
+c$$$      
+c$$$      do j=1,nrows_opac_table
+c$$$         testlogT(j) = testlogTmin +
+c$$$     $        (testlogTmax-testlogTmin)/float(nrows_opac_table-1)*(j-1)
+c$$$      end do
+c$$$      do k=1,ncols_opac_table
+c$$$         testlogrho_arr(k) = testlogrhomin +
+c$$$     $        (testlogrhomax-testlogrhomin)/float(ncols_opac_table-1)*
+c$$$     $        (k-1)
+c$$$      end do
+c$$$
+c$$$      do j=1,nrows_opac_table
+c$$$         do k=1,ncols_opac_table
+c$$$            testlogopacity(j,k)=log10(
+c$$$     $           getOpacity(10.d0**testlogT(j),10.d0**testlogrho_arr(k),
+c$$$     $           0.7d0))
+c$$$         end do
+c$$$      end do
+c$$$      
+c$$$      write(fmt1,'("("A","I3"E15.4)")') '"               ", ',
+c$$$     $     ncols_opac_table
+c$$$      write(fmt2,'("("I3"E15.4)")') ncols_opac_table+1
+c$$$
+c$$$ 400  format("               ",138E15.4)
+c$$$ 401  format(138E15.4)
+c$$$      open(45,file='test_opacity_file.txt',status='unknown')
+c$$$      write(45,fmt1) (testlogrho_arr(k),k=1,ncols_opac_table)
+c$$$      
+c$$$      do j=1,nrows_opac_table
+c$$$         write(45,fmt2) testlogT(j),
+c$$$     $        (testlogopacity(j,k),k=1,ncols_opac_table)
+c$$$      end do
+c$$$      close(45)
+c$$$
+c$$$c      write(*,*) "BREAK"
+c$$$c      write(*,*) ""
+c$$$c      write(*,*) getOpacity(10.d0**(3.753),10.d0**(4.849+3.*3.753-18),0.7d0)
+c$$$c      write(*,*) ""
+c$$$c      write(*,*) "WE ARE OUT"
+c$$$      
+c$$$      stop
+
       
       end subroutine

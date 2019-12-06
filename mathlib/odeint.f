@@ -66,6 +66,9 @@
       common/boundsteptaken/ max_step_size,min_step_size,
      $     min_steps_taken,max_steps_taken,nstp
 
+      real*8 depth
+      common/depthtracker/ depth
+
 c      logical resolved
 c      common /resolvedboolean/ resolved
       xint=x1
@@ -87,7 +90,8 @@ c     print *,'looping',x,y(1)
            min_step_size = min(min_step_size,abs(h))
         end if
         max_step_size = max(max_step_size,abs(h))
-        
+
+        depth = xint
         call derivs(xint,yint,dydx)
         do 12 i=1,nvar
            yscal(i)=abs(yint(i))+abs(h*dydx(i)) ! +TINY
@@ -124,6 +128,8 @@ c     $       ucgs/Eunit_out*munit_out,xh/muunit_out,
 c     $       gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
 c     $       opacit,yint(1),lastpart,log10(rhocgs/runit_out) -
 c     $       3.d0*log10(tcgs/tempunit_out) + 18.d0
+
+
         
         if(printIntegrationSteps) then
            call getLocalQuantities(xpos,ypos,xint)

@@ -16,7 +16,46 @@ c     xhy    - hydrogen fraction
       DIMENSION eD_R(5,6), eD_P(5,6)
       DIMENSION eG_R(71,71), eG_P(71,71)
       common/opac/eD_R,eG_R,eD_P,eG_P
+      logical exist
+      
+      real*8 XPOS, YPOS, TMAX, TMIN, anglex, angley, anglez
+      COMMON/TAUGRID/XPOS,YPOS
+      real*8 nnbfrac,nnb,nnbdr2,hp2
+      integer k,nnbr,nnbi,nnbitot
+      real*8 neighborslist(1000)
+      integer writefile
+      common/writefilee/writefile
+      real*8 dxy,particle_pos,mydr2,minmydr2,dist
+      integer closestparticle
 
+      integer lastpart
+      common/lastparticle/ lastpart
+      integer index
+      real*8 r2,wpc,rhoxyz
+
+c      if ( rhocgs.lt.1.d-18 ) then
+c         r2=(x(lastpart)-xpos)**2.d0+(y(lastpart)-ypos)**2.d0
+c     $        +(z(lastpart)-depth)**2.d0
+c         index=int(ctab*r2/hp(lastpart)**2.d0)+1
+c         wpc=wtab(index)/hp(lastpart)**3.d0
+c         rhoxyz = am(lastpart)*wpc
+c         write(*,*) "xpos, ypos, zpos = ",xpos/runit_out,ypos/runit_out,
+c     $        depth/runit_out
+c         write(*,*) "x(i), y(i), z(i), 2*hp(i) = ",
+c     $        x(lastpart)/runit_out,
+c     $        y(lastpart)/runit_out,z(lastpart)/runit_out,
+c     $        2.d0*hp(lastpart)/runit_out
+c         write(*,*) "rho(i) = ",rho(lastpart)
+c         write(*,*) "rhoxyz = ",rhoxyz
+c         write(*,*) "sqrt(r2), sqrt(r2)/(2*hp(i)) = ",
+c     $        (r2**0.5d0)/runit_out,
+c     $        (r2**0.5d0)/(2.d0*hp(lastpart))
+c         write(*,*) "rhocgs, tem, lastpart = ",rhocgs,tem,lastpart
+c         getOpacity = -1.d30
+c         return
+c      end if
+      
+      
 c      write(*,*) "rhocgs, tem = ",rhocgs,tem
       if ( rhocgs .le. opacity_rho_cutoff ) then
          getOpacity = 0.d0
@@ -33,7 +72,7 @@ c      write(*,*) "rhocgs, tem = ",rhocgs,tem
       logrho = log10(rhocgs)
       logR = logrho - 3.d0*logtem + 18.d0
 
-      write(*,*) "logR, logtem = ",logR,logtem
+c      write(*,*) "logR, logtem = ",logR,logtem
 
       ! We do not care about these temperature ranges. There is no
       ! way to calculate the opacity there in a way that makes sense,
@@ -45,20 +84,80 @@ c      write(*,*) "rhocgs, tem = ",rhocgs,tem
          getOpacity = calculate_table_opacity(
      $        10.d0**(0.5d0*(logRmaxs(1)+logRmins(1))),
      $        10.d0**logTmins(1))
-         write(*,*) "log10(opacity) = ",log10(opacity)
-         return
+c         write(*,*) "log10(opacity) = ",log10(opacity)
+      else
+      
+         opacity = calculate_table_opacity(10.d0**logR,tem)
+
+         if ( opacity.eq.-1.d30 ) then
+            call extrapolate_opacity(tem,rhocgs,xhy,opacity)
+         end if
+
+
+      
+         getOpacity = opacity
       end if
       
-      opacity = calculate_table_opacity(10.d0**logR,tem)
-
-      if ( opacity.eq.-1.d30 ) then
-         call extrapolate_opacity(tem,rhocgs,xhy,opacity)
-      end if
-
-
-      
-      getOpacity = opacity
-      
+c$$$c     Remove the following later:
+c$$$      if ( n.gt.0 ) then
+c$$$
+c$$$         ! Find distance to closest contributing particle
+c$$$         minmydr2 = 1.d30
+c$$$         closestparticle = 0
+c$$$         do i=1,n
+c$$$            mydr2=(xpos-x(i))**2.d0+(ypos-y(i))**2.d0+(depth-z(i))**2.d0
+c$$$            if ( mydr2.lt.minmydr2 ) then
+c$$$               minmydr2 = mydr2
+c$$$               closestparticle = i
+c$$$            end if
+c$$$         end do
+c$$$
+c$$$         dist = minmydr2**0.5d0 / (2.d0*hp(closestparticle))
+c$$$
+c$$$         write(writefile,'(3E15.7)') rhocgs,tem,dist
+         
+c$$$c     write(*,*) "xpos, ypos, depth = ",xpos,ypos,depth
+c$$$         
+c$$$         
+c$$$         nnbr = 0
+c$$$         nnbi = 0
+c$$$         nnbitot = 0
+c$$$         do i=1,n
+c$$$            hp2 = (2.d0*hp(i))**2.d0
+c$$$            mydr2=(xpos-x(i))**2.d0+(ypos-y(i))**2.d0+(depth-z(i))**2.d0
+c$$$c     write(*,*) "mydr2.le.hp2, mydr2, hp2",mydr2.le.hp2,mydr2,hp2
+c$$$            if(mydr2.le.hp2) then
+c$$$               nnbr = nnbr + 1
+c$$$               nnbitot = nnbitot + neighbors(i)
+c$$$c     if ( neighbors(i).eq.0 ) then
+c$$$c     write(*,*) "Problem i,n = ",i,n
+c$$$c     error stop "getOpacity.f"
+c$$$c     end if
+c$$$            end if
+c$$$         end do
+c$$$         
+c$$$         nnbfrac = float(nnbr) / (float(nnbitot)/float(nnbr))
+c$$$c     write(*,*) "nnbr,nnbitot,<nnbi>,nnbfrac = ",
+c$$$c     $        nnbr,nnbitot,
+c$$$c     $        float(nnbr)/(float(nnbitot)/float(nnbr)),nnbfrac
+c$$$         if ( nnbr.eq.0 .or. nnbitot.eq.0 ) then
+c$$$            write(*,*) "This should never happen."
+c$$$            call getLocalQuantities(xpos,ypos,depth)
+c$$$            write(*,*) "Called getLocalQuantities"
+c$$$            write(*,*) "xpos,ypos,depth = ",xpos/runit_out,
+c$$$     $           ypos/runit_out,depth/runit_out
+c$$$            write(*,*) "rho, T = ",rhocgs,tem
+c$$$            write(*,*) "nnbr,nnbitot,<nnbi>,nnbfrac = ",
+c$$$     $           nnbr,nnbitot,
+c$$$     $           float(nnbr)/(float(nnbitot)/float(nnbr)),nnbfrac
+c$$$c     error stop "getOpacity.f"
+c$$$         end if
+c$$$         write(writefile,'(3E15.7)') rhocgs,tem,nnbfrac
+c$$$c     write(*,*)
+c$$$
+c$$$      end if
+c$$$  ------------------------------------
+         
       return
       end function
 
@@ -461,14 +560,22 @@ c     Do not edit these values. If you do, also edit opacityTables.f
       logTbound_arr(2,2) = logTmaxs(2)
       logTbound_arr(3,2) = logTmins(2)
       logTbound_arr(4,2) = logTmaxs(2)
-      logRbound_arr(1,1) = (-19.d0+1.d-8) -3.d0*logTmins(1) + 18.d0
-      logRbound_arr(2,1) = (-19.d0+1.d-8) -3.d0*logTmaxs(1) + 18.d0
-      logRbound_arr(3,1) = (-7.d0-1.d-8) -3.d0*logTmins(1) + 18.d0
-      logRbound_arr(4,1) = (-7.d0-1.d-8) -3.d0*logTmaxs(1) + 18.d0
-      logRbound_arr(1,2) = (-19.d0+1.d-8) -3.d0*logTmins(2) + 18.d0
-      logRbound_arr(2,2) = (-19.d0+1.d-8) -3.d0*logTmaxs(2) + 18.d0
-      logRbound_arr(3,2) = (-7.d0-1.d-8) -3.d0*logTmins(2) + 18.d0
-      logRbound_arr(4,2) = (-7.d0-1.d-8) -3.d0*logTmaxs(2) + 18.d0
+      logRbound_arr(1,1) = (log10(rhoPlanckRossmin)+1.d-8)
+     $     -3.d0*logTmins(1) + 18.d0
+      logRbound_arr(2,1) = (log10(rhoPlanckRossmin)+1.d-8)
+     $     -3.d0*logTmaxs(1) + 18.d0
+      logRbound_arr(3,1) = (log10(rhoPlanckRossmax)-1.d-8)
+     $     -3.d0*logTmins(1) + 18.d0
+      logRbound_arr(4,1) = (log10(rhoPlanckRossmax)-1.d-8)
+     $     -3.d0*logTmaxs(1) + 18.d0
+      logRbound_arr(1,2) = (log10(rhoPlanckRossmin)+1.d-8)
+     $     -3.d0*logTmins(2) + 18.d0
+      logRbound_arr(2,2) = (log10(rhoPlanckRossmin)+1.d-8)
+     $     -3.d0*logTmaxs(2) + 18.d0
+      logRbound_arr(3,2) = (log10(rhoPlanckRossmax)-1.d-8)
+     $     -3.d0*logTmins(2) + 18.d0
+      logRbound_arr(4,2) = (log10(rhoPlanckRossmax)-1.d-8)
+     $     -3.d0*logTmaxs(2) + 18.d0
       
 
       do i=3,numopacityfiles
@@ -673,15 +780,15 @@ c     to -1.d30.
       real*8 smooth_opacity
       real*8 Rsmooth,Tsmooth
       ! Smoothing distance for R and T directions
-      parameter(Rsmooth=0.d0,Tsmooth=1.d0)
+      parameter(Rsmooth=0.d0,Tsmooth=0.d0)
       real*8 opacityReq,opacityTeq,weightReq,weightTeq,
      $     closestopacReq,closestopacTeq
       real*8 R1,R2,T1,T2,weightR,weightT,weight
-      real*8 smooth_opacity_T
+      real*8 smooth
 
-      write(*,*) "closest_opacityfileR, closest_opacityfileT, "//
-     $     "closest_opacityfile = ",closest_opacityfileR,
-     $     closest_opacityfileT,closest_opacityfile
+c      write(*,*) "closest_opacityfileR, closest_opacityfileT, "//
+c     $     "closest_opacityfile = ",closest_opacityfileR,
+c     $     closest_opacityfileT,closest_opacityfile
       
       opacity = -1.d30
       
@@ -717,7 +824,7 @@ c     to -1.d30.
      $     closest_opacityfileT.ne.0 .and. 
      $     closest_opacityfile.ne.closest_opacityfileT .and.
      $     closest_opacityfile.ne.0)) then
-         write(*,*) "Corner case"
+c         write(*,*) "Corner case"
          closestopac = calculate_table_opacity(10.d0**cornerR,
      $        10.d0**cornerT)
          R1 = cornerR
@@ -725,10 +832,10 @@ c     to -1.d30.
          opacity = ext_Teq(10.d0**cornerR,10.d0**logR,10.d0**cornerT,
      $        closestopac,xhy,metallicity,.false.)
 
-         write(*,*) "cornerR = ",cornerR
-         write(*,*) "cornerT = ",cornerT
-         write(*,*) "closestopac = ",closestopac
-         write(*,*) "opacity = ",opacity
+c         write(*,*) "cornerR = ",cornerR
+c         write(*,*) "cornerT = ",cornerT
+c         write(*,*) "closestopac = ",closestopac
+c         write(*,*) "opacity = ",opacity
 
          if ( opacity.ne.-1.d30 ) then
             ! Test the T direction (constant R)
@@ -745,7 +852,7 @@ c     to -1.d30.
                ! Test the R direction (constant T)
                opac_test = ext_Teq(10.d0**cornerR,10.d0**logR,
      $              10.d0**cornerT,opacity,xhy,metallicity,.false.)
-               write(*,*) "opac_test = ",opac_test
+c               write(*,*) "opac_test = ",opac_test
 c               write(*,*) "opacity, opac_test = ",opacity,opac_test
                if ( opac_test .ne. -1.d30 ) then
                   opacity = opac_test
@@ -761,7 +868,7 @@ c               write(*,*) "opacity, opac_test = ",opacity,opac_test
      $        (closest_opacityfileR.le.2 .and.
      $        closest_opacityfileR.gt.0)) then
 
-         write(*,*) "Teq case"
+c         write(*,*) "Teq case"
          closestopac = calculate_table_opacity(10.d0**closestR,
      $        10.d0**logT)
          if ( cornerR.ne.1.d30 .and. cornerT.ne.1.d30 ) then
@@ -785,7 +892,7 @@ c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
       ! We have found an opacityfile that has logR in its logR range
       else if(closest_opacityfileR.eq.0 .and.
      $        closest_opacityfileT.ne.0)then
-         write(*,*) "Req case"
+c         write(*,*) "Req case"
 
          closestopac = calculate_table_opacity(10.d0**logR,
      $        10.d0**closestT)
@@ -800,10 +907,10 @@ c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
             T1 = closestT
          end if
 
-         write(*,*) "cornerR = ",cornerR
-         write(*,*) "cornerT = ",cornerT
+c         write(*,*) "cornerR = ",cornerR
+c         write(*,*) "cornerT = ",cornerT
 
-         write(*,*) "closestopac = ",closestopac
+c         write(*,*) "closestopac = ",closestopac
          opacity = ext_Req(10.d0**logR,10.d0**closestT,10.d0**logT,
      $        closestopac,xhy,metallicity,.false.) ! If error, opacity=-1.d30
          if ( opacity.eq.-1.d30 ) then
@@ -817,7 +924,7 @@ c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
       else if((closest_opacityfileR.ne.0 .and.
      $         closest_opacityfileT.ne.0) .and.
      $        (closest_opacityfileR.gt.2)) then
-         write(*,*) "Between case"
+c         write(*,*) "Between case"
          ! Try extrapolating with constant T
          closestopacTeq = calculate_table_opacity(10.d0**closestR,
      $        10.d0**logT)
@@ -841,8 +948,8 @@ c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
                T1 = closestT
             end if
             R1 = closestR
-            write(*,*) "closestR = ",closestR
-            write(*,*) "cornerT = ",cornerT
+c            write(*,*) "closestR = ",closestR
+c            write(*,*) "cornerT = ",cornerT
          else if( opacityReq.ne.-1.d30 ) then ! If Teq extrapolation failed
             opacity = opacityReq ! Take the Req extrapolation result
             closestopac = closestopacReq
@@ -923,15 +1030,15 @@ c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
             weight = 0.d0
          end if
          
-         write(*,*) "T1,logT,T2 = ",T1,logT,T2
-         write(*,*) "weight = ",weight
-         write(*,*) "weightR, weightT = ",weightR,weightT
+c         write(*,*) "T1,logT,T2 = ",T1,logT,T2
+c         write(*,*) "weight = ",weight
+c         write(*,*) "weightR, weightT = ",weightR,weightT
          
          ! weight = 1 when logR = R1 or logT = T1
          ! weight = 0 when logR = R2 or logT = T2
 c         opacity = weight*closestopac + (1.d0-weight)*opacity
 
-         opacity = smooth_opacity_T(10.d0**logT,10.d0**T1,10.d0**T2,
+         opacity = smooth(10.d0**logT,10.d0**T1,10.d0**T2,
      $        closestopac,opacity)
          
       end if
@@ -964,7 +1071,7 @@ c     Returns the opacity, not log opacity.
       DIMENSION eG_R(71,71), eG_P(71,71)
       common/opac/eD_R,eG_R,eD_P,eG_P
       integer numtabused
-      real*8 smooth_opacity_T
+      real*8 smooth
       
       ! If the function returns this value, it indicates an error (move
       ! to attempts at extrapolation)
@@ -985,22 +1092,22 @@ c     Returns the opacity, not log opacity.
       ! No matter what, start with the cop subroutine first. Check if (rho,T) is
       ! within the bounds of the cop subroutine and, if so, calculate those 
       ! opacities. We treat these first two opacityfiles as one.
-      if ( (myrho.gt.1.d-19 .and. myrho.lt.1.d-7) .and.
-     $     (myT.gt.500.d0 .and. myT.lt.10000.d0) ) then
+      if ((myrho.gt.rhoPlanckRossmin.and.myrho.lt.rhoPlanckRossmax).and.
+     $    (myT.gt.10.d0**logTmins(1).and.myT.lt.10.d0**logTmaxs(2)))then
          opacity_P = 0.d0
          opacity_R = 0.d0
          
          if(len(trim(adjustl(opacityfiles(1)))).gt.0) then
-            call cop(eD_P,eG_P,myrho,myT,opacity_P,1) ! Planck
+            call cop(eD_P,eG_P,myrho,myT,opacity_P,0) ! Planck
             numtabused = numtabused + 1
          end if
          if(len(trim(adjustl(opacityfiles(2)))).gt.0) then
-            call cop(eD_R,eG_R,myrho,myT,opacity_R,1) ! Rosseland
+            call cop(eD_R,eG_R,myrho,myT,opacity_R,0) ! Rosseland
             numtabused = numtabused + 1
          end if
 
 
-         opacities(1) = smooth_opacity_T(myT,10.d0**logT_blend2(1),
+         opacities(1) = smooth(myT,10.d0**logT_blend2(1),
      $        10.d0**logT_blend1(2),opacity_P,opacity_R)
 
 c         ! We need to stitch the Planck and Rosseland files together
@@ -1191,11 +1298,14 @@ c     covered by the cop subroutine, but 10^-7 < rho < 10^-5 is not.
       integer i
       real*8 Rsmooth
       parameter(Rsmooth=1.d2)
-      real*8 smooth_opacity_T
+      real*8 smooth
+      real*8 smoothing_window_T,smoothing_window_rho
+      common/smoothingwindow/ smoothing_window_T,smoothing_window_rho
+      real*8 rho, rho_o
 
       ext_Teq = -1.d30
       
-      write(*,*) "Extrapolating Teq"
+c      write(*,*) "Extrapolating Teq"
 
       ! R_o H- ion, R H- ion
       opacities(1) = (R/R_o)**(0.5d0) * opac_o
@@ -1214,10 +1324,14 @@ c     covered by the cop subroutine, but 10^-7 < rho < 10^-5 is not.
       ! AND rho_o)
       if ( isHion(R_o,T,Z) .and. isHion(R,T,Z) ) then
          ext_Teq = opacities(1)
+      else if(isKramer(T))then
+         ext_Teq = opacities(2) + opacities(5)
+      else if(isescattering(T))then
+         ext_Teq = opacities(5)
          
-      else if (isescattering(T) .or. isKramer(T)) then
-         ext_Teq = smooth_opacity_T(T,1.d4,1.d6,opacities(2),
-     $        opacities(5))
+c      else if (isescattering(T) .or. isKramer(T)) then
+c         ext_Teq = smooth(T,1.d4,1.d6,opacities(2),
+c     $        opacities(5))
 
       ! If analytic extrapolation failed, we take the boundary case
       ! as the result instead (constant opacity)
@@ -1247,7 +1361,19 @@ c     covered by the cop subroutine, but 10^-7 < rho < 10^-5 is not.
      $        "input file."
          error stop "getOpacity.f"
       end if
-      
+
+      rho = 10.d0**(log10(R)+3.d0*log10(T)-18.d0)
+      rho_o = 10.d0**(log10(R_o)+3.d0*log10(T)-18.d0)
+      if ( rho .gt. rho_o ) then
+         ext_Teq = smooth(rho,rho_o,rho_o-smoothing_window_rho,opac_o,
+     $        ext_Teq)
+      else if ( rho .lt. rho_o ) then
+         ext_Teq = smooth(rho,rho_o,rho_o+smoothing_window_rho,opac_o,
+     $        ext_Teq)
+      else
+         ext_Teq = opac_o
+      end if
+     
       return
       end function
       
@@ -1292,13 +1418,13 @@ c     covered by the cop subroutine, but 10^-7 < rho < 10^-5 is not.
 
 
 
-      real*8 function smooth_opacity_T2(T,N,Ts,ks)
+      real*8 function smooth2(T,N,Ts,ks)
       implicit none
       integer N, mink,maxk,i
       real*8 T, minT, maxT
       real*8 Ts(N), ks(N), B(N), C(N), D(N)
       real*8 SEVAL
-      
+
       minT = 1.d30
       maxT = -1.d30
       do i=1,N
@@ -1313,16 +1439,16 @@ c     covered by the cop subroutine, but 10^-7 < rho < 10^-5 is not.
       end do
 
       if ( T.le.minT ) then
-         smooth_opacity_T2 = mink
+         smooth2 = mink
       else if (T.ge.maxT)then
-         smooth_opacity_T2 = maxk
+         smooth2 = maxk
       else
          do i=1,N
             Ts(i) = log10(Ts(i))
             ks(i) = log10(ks(i))
          end do
          call SPLINE(N,Ts,ks,B,C,D)
-         smooth_opacity_T2 = 10.d0**(SEVAL(N,log10(T),Ts,ks,B,C,D))
+         smooth2 = 10.d0**(SEVAL(N,log10(T),Ts,ks,B,C,D))
       end if
       
       return
@@ -1330,30 +1456,29 @@ c     covered by the cop subroutine, but 10^-7 < rho < 10^-5 is not.
 
       
 
-      real*8 function smooth_opacity_T(T,T1,T2,k1,k2)
+      real*8 function smooth(x,x1,x2,y1,y2)
 c     Do smoothing in log space for greater effect. Otherwise,
 c     opacities change too sharply!
       implicit none
-      real*8 T,k1,k2,T1,T2
+      real*8 x,y1,y2,x1,x2
       real*8 weight
       real*8 SEVAL
-      real*8 Tarr(2), karr(2), B(2), C(2), D(2)
+      real*8 xarr(2), yarr(2), B(2), C(2), D(2)
 
-      if ( T.le.T1 ) then
-         smooth_opacity_T = k1
-      else if ( T.ge.T2 ) then
-         smooth_opacity_T = k2
+      if ( x.le.x1 ) then
+         smooth = y1
+      else if ( x.ge.x2 ) then
+         smooth = y2
       else
-
          ! Do a cubic spline interpolation
-         Tarr(1) = log10(T1)
-         Tarr(2) = log10(T2)
-         karr(1) = log10(k1)
-         karr(2) = log10(k2)
-         call SPLINE(2,Tarr,karr,B,C,D)
-         smooth_opacity_T = 10.d0**(SEVAL(2,log10(T),Tarr,karr,B,C,D))
+         xarr(1) = log10(x1)
+         xarr(2) = log10(x2)
+         yarr(1) = log10(y1)
+         yarr(2) = log10(y2)
+         call SPLINE(2,xarr,yarr,B,C,D)
+         smooth = 10.d0**(SEVAL(2,log10(x),xarr,yarr,B,C,D))
 c         weight = (T-T1)/(T-T2)
-c         smooth_opacity_T = (k1*exp(weight) + k2*exp(1.d0/weight))/
+c         smooth = (k1*exp(weight) + k2*exp(1.d0/weight))/
 c     $        (exp(weight)+exp(1.d0/weight))
       end if
       
@@ -1376,11 +1501,11 @@ c     $        (exp(weight)+exp(1.d0/weight))
       integer i,nused
       logical isKramer, isHion, isescattering
       real*8 sumweights
-      real*8 smooth_opacity_T
+      real*8 smooth
 
       ext_Req = -1.d30
 
-      write(*,*) "Extrapolating Req"
+c      write(*,*) "Extrapolating Req"
 
       ! T_o Kramer, T Kramer
       opacities(1) = (T/T_o)**(-0.5d0) * opac_o
@@ -1425,13 +1550,13 @@ c     range (which is almost certain).
       if ( isKramer(T) ) then
          ! If it's Kramer, then it is also e- scattering. Need to weight.
          if ( isKramer(T_o) ) then
-            ext_Req = smooth_opacity_T(T,1.d4,1.d6,opacities(1),
+            ext_Req = smooth(T,1.d4,1.d6,opacities(1),
      $           opacities(3))
          else if ( Z.ge.1.d-3) then
-            ext_Req = smooth_opacity_T(T,1.d4,1.d6,opacities(5),
+            ext_Req = smooth(T,1.d4,1.d6,opacities(5),
      $           opacities(3))
          else
-            ext_Req = smooth_opacity_T(T,1.d4,1.d6,opacities(6),
+            ext_Req = smooth(T,1.d4,1.d6,opacities(6),
      $           opacities(3))
          end if
 
@@ -1451,7 +1576,7 @@ c     range (which is almost certain).
      $        (Rbound1.gt.R .or. R.gt.Rbound2) .and.
      $        0.001d0.le.Z .and. Z.le.0.02d0 ) then
             if ( 3.d3.le.T_o .and. T_o.le. 6.d3 ) then ! Trust the opacityfiles
-               write(*,*) "Gap 1"
+c               write(*,*) "Gap 1"
                ext_Req = opacities(7)
             end if
 
@@ -1461,7 +1586,7 @@ c     range (which is almost certain).
      $           (Rbound1.gt.R .or. R.gt.Rbound2) .and.
      $           (0.001d0.gt.Z .or. Z.gt.0.02d0) ) then
             if ( 3.d3.le.T_o .and. T_o.le.6.d3 ) then ! Trust the opacityfiles
-               write(*,*) "Gap 2"
+c               write(*,*) "Gap 2"
                ext_Req = opacities(7)
             end if
 
@@ -1469,7 +1594,7 @@ c     range (which is almost certain).
          ! Gap 3
          else if(6.d3.lt.T .and. T.lt.1.d4)then
             if ( 6.d3.lt.T_o .and. T_o.lt.1.d4 ) then ! Trust the opacityfiles
-               write(*,*) "Gap 3"
+c               write(*,*) "Gap 3"
                ext_Req = opacities(7)
             end if
             
@@ -1477,14 +1602,14 @@ c     range (which is almost certain).
          ! Gap 4
          else if(T.lt.3.d3) then
             if ( T_o .lt. 3.d3 ) then ! Trust the opacityfiles
-               write(*,*) "Gap 4"
+c               write(*,*) "Gap 4"
                ext_Req = opacities(7)
             end if
 
             
          ! Gap 5
          else if(1.d8.lt.T) then
-            write(*,*) "Gap 5"
+c            write(*,*) "Gap 5"
             if ( 1.d8.lt.T_o ) then ! Trust the opacityfiles
                ext_Req = opacities(7)
             else                ! Just use analytic e- scattering

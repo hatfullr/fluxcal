@@ -73,6 +73,7 @@ c11   continue
             call getLocalQuantities(xpos,ypos,x)
             write(6,*) '   rho = ',rhocgs/rhounit_out
             write(6,*) '   T = ',dble(t6*1d6)/tempunit_out
+            depth = x
             opacstart = getOpacity(dble(t6*1d6),rhocgs,xh)
             write(6,*) '   opacity = ',opacstart/kunit_out
             write(6,*) '   xhp = ',xhp/runit_out
@@ -86,6 +87,7 @@ c11   continue
             write(6,*) '   z+h = ',(x+h)/runit_out
             call getLocalQuantities(xpos,ypos,x+sign(max(abs(htemp),
      $           0.1d0*abs(h)),h))
+            depth = x+sign(max(abs(htemp),0.1d0*abs(h)),h)
             write(6,*) '   rho = ',rhocgs/rhounit_out
             write(6,*) '   T = ',dble(t6*1d6)/tempunit_out
             write(6,*) '   opacity = ',getOpacity(dble(t6*1d6),rhocgs,
@@ -139,6 +141,7 @@ c11   continue
                write(6,*) '   z = ',zpos/runit_out
                write(6,*) '   rho = ',rhocgs/rhounit_out
                write(6,*) '   T = ',dble(t6*1d6)/tempunit_out
+               depth = zpos
                write(6,*) '   opacity = ',getOpacity(dble(t6*1d6),
      $              rhocgs,xh)/kunit_out
                write(6,*) '   xhp = ',xhp/runit_out
@@ -159,6 +162,7 @@ c11   continue
             findopac : do j=1,1000
                zpos = zpos + dz
                call getLocalQuantities(xpos,ypos,zpos)
+               depth = zpos
                opacity = getOpacity(dble(t6*1d6),rhocgs,xh)
                
                ! Double the step size in the -z direction until we find
@@ -177,6 +181,7 @@ c11   continue
 
                      zpos = zpos - dz
                      call getLocalQuantities(xpos,ypos,zpos)
+                     depth = zpos - dz
                      opacity = getOpacity(dble(t6*1d6),rhocgs,xh)
                      
                   end do

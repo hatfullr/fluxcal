@@ -24,12 +24,8 @@ c      external usetable2,usetabledust2
       integer lastpart
       common/lastparticle/ lastpart
 
-      integer writefile
-      common/writefilee/writefile
-
-      real*8 nnbfrac,nnb,dr2,hp2
-      integer i,j,k,nnbr,nnbi,nnbitot
-      real*8 neighborslist(1000)
+      integer i
+      real*8 r2
 
 
 c     1990: Table 3 of http://articles.adsabs.harvard.edu/cgi-bin/nph-iarticle_query?1990PASP..102.1181B&amp;data_type=PDF_HIGH&amp;whole_paper=YES&amp;type=PRINTER&amp;filetype=.pdf
@@ -71,11 +67,27 @@ c     where zp() is a zero-point magnitude.
       call getLocalQuantities(XPOS,YPOS,s)
 
       ZPOS=s
+      depth=s
       
 c     t6 is the temperature in millions of degrees Kelvin
 
       if(t6.gt.0) then
          opacit = getOpacity(t6*1d6,rhocgs,xh)
+c         if(opacit.eq.-1.d30) then
+c            write(*,*) "derivs.f"
+c            write(*,*) "xpos,ypos,zpos = ",xpos/runit_out,
+c     $           ypos/runit_out,
+c     $           zpos/runit_out
+c            
+c            do i=1,n
+c               r2=(x(i)-xpos)**2.d0+(y(i)-ypos)**2.d0+(z(i)-zpos)**2.d0
+c               if ( r2.lt.4.d0*hp(i)**2.d0 ) then
+c                  write(*,*) "i = ",i
+c               end if
+c            end do
+c            
+c            stop
+c         end if
 
          if(opacit.le.1d30) then
             dtauds(1)=-opacit*rhocgs ! NEGATIVE SIGN IS BECAUSE STEP IS IN NEGATIVE DIRECTION
@@ -113,28 +125,6 @@ c            dtauds(4+ifilter)=0.d0
 c         enddo
       endif
 
-      
-      ! Figure out the Nnb fraction at this location
 
-      do i=1,1000
-         neighborslist(i) = 0.d0
-      end do
-      
-      nnbr = 0
-      nnbi = 0
-      nnbitot = 0
-      do i=1,n
-         dr2 = (xpos-x(i))**2.d0 + (ypos-y(i))**2.d0 + (zpos-z(i))**2.d0
-         if ( dr2.le.hp(i)**2.d0 ) then
-            neighborslist(nnbr) = neighbors(i)
-            nnbr = nnbr + 1
-c            nnbitot = nnbitot + neighbors(i)
-         end if
-      end do
-
-      nnbfrac = float(nnbr) / (sum(neighborslist)/float(nnbr))
-      write(*,*) "nnbr,nnbitot,nnbfrac = ",nnbr,nnbitot,nnbfrac
-      write(writefile,'(3E15.7)') rhocgs,t6*1d6,nnbfrac
-      
       return
       end subroutine
