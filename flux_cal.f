@@ -16,8 +16,8 @@
 
       call init                 ! Initialize
 
-c$$$      writefile = 11            ! Remove later
-c$$$      open(writefile,file="rhoT_dist.dat",status="unknown") ! Remove later
+c      writefile = 11            ! Remove later
+c      open(writefile,file="opacity_calls.dat",status="unknown") ! Remove later
       
       imax = 999
       
@@ -191,6 +191,6 @@ c        ****************************************************************
       write(*,*) ""
  500  format(A20," ",f15.7," ",A4)
 
-c$$$      close(writefile)          ! Remove later
+c      close(writefile)          ! Remove later
       
       end program

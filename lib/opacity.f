@@ -233,8 +233,6 @@ C Global variable(s):
          end do
       end do
 
-
-
       if(ross) then
 C     Initialize Rosseland opacities
 C     Initialization of all necessary data for a chosen dust model:

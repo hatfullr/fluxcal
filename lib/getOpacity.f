@@ -99,6 +99,9 @@ c         write(*,*) "log10(opacity) = ",log10(opacity)
       end if
       
 c$$$c     Remove the following later:
+c$$$      write(writefile,'(3E15.7,I10)'),log10(rhocgs),log10(tem),
+c$$$     $     log10(getOpacity),n
+c$$$      
 c$$$      if ( n.gt.0 ) then
 c$$$
 c$$$         ! Find distance to closest contributing particle
@@ -1106,9 +1109,18 @@ c     Returns the opacity, not log opacity.
             numtabused = numtabused + 1
          end if
 
-
+         
+         
          opacities(1) = smooth(myT,10.d0**logT_blend2(1),
      $        10.d0**logT_blend1(2),opacity_P,opacity_R)
+
+c         calculate_table_opacity = opacities(1)
+c         return
+
+c         if(myT.lt.10.d0**(2)) then
+c            write(*,*) "This is happening", log10(myrho),log10(myT)
+c            write(*,*) opacities(1),opacity_P,opacity_R
+c         end if
 
 c         ! We need to stitch the Planck and Rosseland files together
 c         ! prior to considering any blending

@@ -35,7 +35,7 @@ rhomax = np.amax(rho1)
 
 my_cm = plt.cm.get_cmap('nipy_spectral')
 
-my_cm.set_bad('white')
+my_cm.set_bad('magenta')
 
 wspace = 0.3
 left = 0.15
@@ -93,20 +93,20 @@ logrhos[7] = -7.+1.e-8
 
 color = 'r'
 
-ax.plot([logrhos[0],logrhos[1]],[logTs[0],logTs[1]],color=color)
-ax.plot([logrhos[0],logrhos[2]],[logTs[0],logTs[2]],color=color)
-ax.plot([logrhos[1],logrhos[3]],[logTs[1],logTs[2]],color=color)
-ax.plot([logrhos[2],logrhos[3]],[logTs[2],logTs[3]],color=color)
-ax.plot([logrhos[3],logrhos[5]],[logTs[3],logTs[5]],color=color)
-ax.plot([logrhos[4],logrhos[5]],[logTs[4],logTs[5]],color=color)
-ax.plot([logrhos[5],logrhos[7]],[logTs[5],logTs[7]],color=color)
-ax.plot([logrhos[6],logrhos[7]],[logTs[6],logTs[7]],color=color)
-ax.plot([logrhos[6],logrhos[4]],[logTs[6],logTs[4]],color=color)
+#ax.plot([logrhos[0],logrhos[1]],[logTs[0],logTs[1]],color=color)
+#ax.plot([logrhos[0],logrhos[2]],[logTs[0],logTs[2]],color=color)
+#ax.plot([logrhos[1],logrhos[3]],[logTs[1],logTs[2]],color=color)
+#ax.plot([logrhos[2],logrhos[3]],[logTs[2],logTs[3]],color=color)
+#ax.plot([logrhos[3],logrhos[5]],[logTs[3],logTs[5]],color=color)
+#ax.plot([logrhos[4],logrhos[5]],[logTs[4],logTs[5]],color=color)
+#ax.plot([logrhos[5],logrhos[7]],[logTs[5],logTs[7]],color=color)
+#ax.plot([logrhos[6],logrhos[7]],[logTs[6],logTs[7]],color=color)
+#ax.plot([logrhos[6],logrhos[4]],[logTs[6],logTs[4]],color=color)
 
-ax.plot([-14.75,0.1],[3.75,8.7],color=color)
-ax.plot([-5.75,-14.75],[3.75,3.75],color=color)
-ax.plot([-5.75,9.1],[3.75,8.7],color=color)
-ax.plot([0.1,9.1],[8.7,8.7],color=color)
+#ax.plot([-14.75,0.1],[3.75,8.7],color=color)
+#ax.plot([-5.75,-14.75],[3.75,3.75],color=color)
+#ax.plot([-5.75,9.1],[3.75,8.7],color=color)
+#ax.plot([0.1,9.1],[8.7,8.7],color=color)
 
 plt.savefig("check_sanity_rho.png",dpi=300)
 

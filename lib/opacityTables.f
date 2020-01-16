@@ -293,7 +293,7 @@ c$$$c     This is for printing out an opacity file for debugging purposes
 c$$$
 c$$$      testlogTmin = 0.d0
 c$$$      testlogTmax = 10.d0
-c$$$      testlogrhomin = -30.d0
+c$$$      testlogrhomin = log10(rhoPlanckRossmin)
 c$$$      testlogrhomax = 15.d0
 c$$$      
 c$$$      do j=1,nrows_opac_table
