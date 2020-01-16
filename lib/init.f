@@ -809,7 +809,6 @@ c     Catch some runtime errors
             write(*,*) "WARNING (init.f): Not using any "//
      $           "Rosseland opacities."
          end if
-            
          call init_lowT_opac(use_planck,use_rosseland,
      $        opacityfiles(1),opacityfiles(2),0) ! in opacity.f
       end if

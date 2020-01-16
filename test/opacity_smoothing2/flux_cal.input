@@ -184,15 +184,15 @@
       ! Define the rho for which any rho <= this value forces opacity to equal
       ! 0.d0. Default is 1.d-19, which is the minimum density allowed by the cop
       ! subroutine.
-      opacity_rho_cutoff=1.d-30
+      opacity_rho_cutoff=2.d-18
 
       ! The smoothing window in the temperature direction for opacities. A
       ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do not
       ! make this larger than 1.d4, as this is the minimum distance in T 
       ! required to calculate e- scattering and kramer opacities in the range
       ! 1.d4 < T < 1.d8.
-      smoothing_window_T = 0.d0
-      smoothing_window_rho = 10.d0
+      smoothing_window_T = 2000.d0
+      !smoothing_window_rho = 10.d0
 
       ! Define the opacity files you would like to be read in, as well as how
       ! you would like the code to transition between them. You must give the
