@@ -84,19 +84,16 @@ c      write(*,*) "logR, logtem = ",logR,logtem
          getOpacity = calculate_table_opacity(
      $        10.d0**(0.5d0*(logRmaxs(1)+logRmins(1))),
      $        10.d0**logTmins(1))
-c         write(*,*) "log10(opacity) = ",log10(opacity)
       else
-      
          opacity = calculate_table_opacity(10.d0**logR,tem)
-
-         if ( opacity.eq.-1.d30 ) then
-            call extrapolate_opacity(tem,rhocgs,xhy,opacity)
-         end if
-
-
-      
-         getOpacity = opacity
       end if
+      
+      if ( opacity.eq.-1.d30 ) then
+         call extrapolate_opacity(tem,rhocgs,xhy,opacity)
+      end if
+      
+      getOpacity = opacity
+
       
 c$$$c     Remove the following later:
 c$$$      write(writefile,'(3E15.7,I10)'),log10(rhocgs),log10(tem),
@@ -755,6 +752,21 @@ c     Do not edit these values. If you do, also edit opacityTables.f
          end if
       end if
 
+c     This is a very specific case written for Natasha
+c     Here, we avoid extrapolating to the right of the MESA opacityfile
+c     Find which opacityfile is the MESA opacityfile
+      do i=1, SIZE(opacityfiles)
+         if(trim(adjustl(opacityfiles(i))).eq.
+     $        'gs98_z0.02_x0.7.data')then
+            if(closest_opacityfileR.eq.i) then
+               if(closestR.eq.logRmaxs(i) ) then
+                  opacity = 0.d0
+                  return
+               end if
+            end if
+         end if
+      end do
+      
       call analytic_extrap(logR,logtem,closest_opacityfileR,
      $     closest_opacityfileT,closest_opacityfile,closestR,closestT,
      $     cornerR,cornerT,xhy,opacity)
@@ -1109,8 +1121,6 @@ c     Returns the opacity, not log opacity.
             numtabused = numtabused + 1
          end if
 
-         
-         
          opacities(1) = smooth(myT,10.d0**logT_blend2(1),
      $        10.d0**logT_blend1(2),opacity_P,opacity_R)
 
