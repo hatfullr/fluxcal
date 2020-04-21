@@ -3,6 +3,7 @@
 make clean
 
 if [ $? -eq 0 ]; then
+    mkdir build
     make -j | tee build/compilation.output
     if [[ $? -ne 0 ]] && [[ "$(tail -n1 build/compilation.output)" != "<builtin>: recipe for target 'mathlib/odeint.o' failed" ]] && [[ "$(tail -n1 build/compilation.output)" != "<builtin>: recipe for target 'mathlib/rkqs.o' failed" ]]; then
 	echo ""
