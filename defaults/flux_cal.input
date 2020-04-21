@@ -17,7 +17,7 @@
       ! The directory flux_cal was installed to. This is used to find the
       ! included tabulated equation of state 'sph.eos' and other data
       ! tables required for flux_cal to run.
-      flux_cal_dir = '../'
+      flux_cal_dir='../'
 
       
 
