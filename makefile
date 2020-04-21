@@ -49,7 +49,6 @@ math_obj = $(mathlib)/odeint.o           \
 	   $(mathlib)/toms526.o          \
 	   $(mathlib)/tseval_f90.o       \
 	   $(mathlib)/simps.o            \
-	   $(mathlib)/trap.o             \
 
 # Optical depth objects
 opdep_obj = $(opdeplib)/optical_depth.o            \
