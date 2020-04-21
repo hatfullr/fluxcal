@@ -16,7 +16,7 @@
       write(*,*)"|        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | "
       write(*,*)"\___________________________________________________/ "
       write(*,*)"|                                                   | "
-      write(*,*)"|  FluxCal Copyright (C) 2018. Written by,          | "
+      write(*,*)"|  FluxCal Copyright (C) 2020. Written by,          | "
       write(*,*)"|                                                   | "
       write(*,*)"|   Roger Hatfull      [University of Alberta]      | "
       write(*,*)"|   Natasha Ivanova    [University of Alberta]      | "
