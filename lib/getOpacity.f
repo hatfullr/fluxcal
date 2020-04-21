@@ -5,7 +5,7 @@ c     INPUT:
 c     tem    - temperature
 c     rhocgs - density in cgs
 c     xhy    - hydrogen fraction
-      
+
       real*8 tem,rhocgs,xhy,logR,logtem,logrho
       real*8 opacity,tempopacity
       integer i,j
@@ -84,16 +84,23 @@ c      write(*,*) "logR, logtem = ",logR,logtem
          getOpacity = calculate_table_opacity(
      $        10.d0**(0.5d0*(logRmaxs(1)+logRmins(1))),
      $        10.d0**logTmins(1))
+c         write(*,*) "log10(opacity) = ",log10(opacity)
       else
          opacity = calculate_table_opacity(10.d0**logR,tem)
       end if
-      
+         
       if ( opacity.eq.-1.d30 ) then
          call extrapolate_opacity(tem,rhocgs,xhy,opacity)
       end if
-      
+
+         
       getOpacity = opacity
 
+
+      if(getOpacity.ne.getOpacity) then
+         write(*,*) "tem, rhocgs = ",tem,rhocgs
+         stop
+      end if
       
 c$$$c     Remove the following later:
 c$$$      write(writefile,'(3E15.7,I10)'),log10(rhocgs),log10(tem),
@@ -752,25 +759,24 @@ c     Do not edit these values. If you do, also edit opacityTables.f
          end if
       end if
 
-c     This is a very specific case written for Natasha
-c     Here, we avoid extrapolating to the right of the MESA opacityfile
-c     Find which opacityfile is the MESA opacityfile
-      do i=1, SIZE(opacityfiles)
-         if(trim(adjustl(opacityfiles(i))).eq.
-     $        'gs98_z0.02_x0.7.data')then
-            if(closest_opacityfileR.eq.i) then
-               if(closestR.eq.logRmaxs(i) ) then
-                  opacity = 0.d0
-                  return
-               end if
-            end if
-         end if
-      end do
+      
       
       call analytic_extrap(logR,logtem,closest_opacityfileR,
      $     closest_opacityfileT,closest_opacityfile,closestR,closestT,
      $     cornerR,cornerT,xhy,opacity)
 
+
+      if(opacity.ne.opacity) then
+         write(*,*) "logR, logtem = ",logR,logtem
+         write(*,*) "closest_opacityfileR, closest_opacityfileT,",
+     $        "closest_opacityfile = ",closest_opacityfileR,
+     $        closest_opacityfileT,closest_opacityfile
+         write(*,*) "closestR, closestT = ",closestR, closestT
+         write(*,*) "cornerR, cornerT = ",cornerR, cornerT
+         write(*,*) "xhy = ",xhy
+         stop
+      end if
+      
       end subroutine
 
 
@@ -1121,6 +1127,8 @@ c     Returns the opacity, not log opacity.
             numtabused = numtabused + 1
          end if
 
+         
+         
          opacities(1) = smooth(myT,10.d0**logT_blend2(1),
      $        10.d0**logT_blend1(2),opacity_P,opacity_R)
 

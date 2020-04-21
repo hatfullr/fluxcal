@@ -3,16 +3,15 @@
       common/taugrid/xpos,ypos
       real*8 rhocgs,xhp,gcgs,pcgs,tcgs,ucgs
       real xh,t6
-      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
+      common/localQuantities/ rhocgs,xh,t6,xhp,ucgs,gcgs,pcgs,tcgs
       real*8 munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
-     $     runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
-     $     rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $     Lunit_out
+     $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
+     $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
+     $      Lunit_out,kunit_out,sunit_out
       common/units/ munit,runit,tunit,vunit,Eunit,rhounit,muunit,gunit,
-     $     runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
-     $     rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
-     $     Lunit_out
-
+     $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
+     $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
+     $      Lunit_out,kunit_out,sunit_out
       integer j,k
       real*8 zpos,dz,rhostart,factor,opacstart,opacity
       
@@ -68,7 +67,9 @@ c11   continue
          ! This occurs 
          if(x+sign(max(abs(htemp),0.1d0*abs(h)),h).eq.x)then
             write(6,*) 'stepsize underflow in rkqs'
-            write(6,*) 'xpos, ypos = ',xpos/runit_out,ypos/runit_out
+            write(6,*) 'xpos, ypos = ',xpos,ypos
+            write(6,*) "abs(htemp) = ",abs(htemp)
+            write(6,*) "0.1d0*abs(h) = ",0.1d0*abs(h)
             write(6,*) 'Before step (z):'
             write(6,*) '   z    = ',x/runit_out
             call getLocalQuantities(xpos,ypos,x)

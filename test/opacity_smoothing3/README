@@ -1,0 +1,13 @@
+Here, we are trying to fix the low T opacities bug.
+
+When I force the code to use nothing but unsmoothed, unextrapolated, low T
+opacities in getOpacity, the bug still persists. Thus, the bug has nothing to do
+with smoothing nor with extrapolation.
+
+Inside of getOpacity, we call the cop subroutine. Therefore, it must be that the
+bug exists inside of the cop subroutine.
+
+To be extra sure, I will use the cop subroutine directly as we write the file
+from opacityTables.f.
+
+Using the cop subroutine directly, I see the bug disappear, I think.

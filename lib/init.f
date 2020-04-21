@@ -134,6 +134,15 @@
       ! fracaccuracy, grid refinement stops.
       fracaccuracy=0.01d0
 
+      ! Choose which integrator to use.
+      ! 0 = fourth order adaptive stepsize Runge-Kutta
+      ! 1 = pseduo-adaptive Simpson's Rule
+      ! 0 is probably faster than 1 but may encounter errors. 1 is 
+      ! probably slower, but you can directly control its accuracy
+      ! using simps_h, simps_alpha, simps_fracacc, and MAXSTP.
+      integrator=1
+
+      ! These are for the Runge--Kutta integrator (integrator=0).
       ! step1 is the step size the integrator should take when it is
       ! near tau of 1
       step1=1d0
@@ -141,11 +150,24 @@
       step3=1d4
       step4=1d15
 
-      ! The maximum number of steps the integrator will take before failing
+      ! These are for the Simpson's Rule integrator (integrator=1).
+      ! simps_h is the maximum stepsize the integrator will take. Set to
+      ! 0.d0 to calculate simps_h for each line of sight based on the
+      ! maximum and minumum z there and MAXSTP.
+      ! simps_alpha is the factor by which the stepsize is reduced when
+      ! the current iteration will cause tau_thin > taulimit.
+      ! simps_fracacc is the desired precision in tau.
+      simps_h = 0.d0
+      simps_alpha = 0.5d0
+      simps_fracacc = 1.d-3
+      
+      ! The maximum number of steps the integrator will take before failing.
+      ! We recommend MAXSTP=10000 for integrator=0.
       MAXSTP=10000
 
       ! Optical depth at which to stop the integration. Only applies to
-      ! get_fluxes and get_integration_at_pos.
+      ! get_fluxes and get_integration_at_pos. Set to 1.d30 to integrate
+      ! through the entirety of the fluid on each line of sight.
       taulimit=1.d1
 
       ! Optical depth by which the integrator will detect that a region

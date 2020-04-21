@@ -1,4 +1,6 @@
 &input
+! This input file contains all the user-controlled variables with their
+! default values assigned to them.
 !-----------------------------------------------------------------------
 
 
@@ -94,6 +96,15 @@
       ! fracaccuracy, grid refinement stops.
       fracaccuracy=0.01d0
 
+      ! Choose which integrator to use.
+      ! 0 = fourth order adaptive stepsize Runge-Kutta
+      ! 1 = pseduo-adaptive Simpson's Rule
+      ! 0 is probably faster than 1 but may encounter errors. 1 is 
+      ! probably slower, but you can directly control its accuracy
+      ! using simps_h, simps_alpha, simps_fracacc, and MAXSTP.
+      integrator=1
+
+      ! These are for the Runge--Kutta integrator (integrator=0).
       ! step1 is the step size the integrator should take when it is
       ! near tau of 1
       step1=1d0
@@ -101,11 +112,24 @@
       step3=1d4
       step4=1d15
 
-      ! The maximum number of steps the integrator will take before failing
+      ! These are for the Simpson's Rule integrator (integrator=1).
+      ! simps_h is the maximum stepsize the integrator will take. Set to
+      ! 0.d0 to calculate simps_h for each line of sight based on the
+      ! maximum and minumum z there and MAXSTP.
+      ! simps_alpha is the factor by which the stepsize is reduced when
+      ! the current iteration will cause tau_thin > taulimit.
+      ! simps_fracacc is the desired precision in tau.
+      simps_h = 0.d0
+      simps_alpha = 0.5d0
+      simps_fracacc = 1.d-3
+      
+      ! The maximum number of steps the integrator will take before failing.
+      ! We recommend MAXSTP=10000 for integrator=0.
       MAXSTP=10000
 
       ! Optical depth at which to stop the integration. Only applies to
-      ! get_fluxes and get_integration_at_pos.
+      ! get_fluxes and get_integration_at_pos. Set to 1.d30 to integrate
+      ! through the entirety of the fluid on each line of sight.
       taulimit=1.d1
 
       ! Optical depth by which the integrator will detect that a region
@@ -144,6 +168,18 @@
       opacity_oob_warning=.true.
       opacity_analytic_warning=.true.
 
+      ! Define the rho for which any rho <= this value forces opacity to equal
+      ! 0.d0. Default is 1.d-19, which is the minimum density allowed by the cop
+      ! subroutine.
+      opacity_rho_cutoff=1.d-19
+
+      ! The smoothing window in the temperature direction for opacities. A
+      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do not
+      ! make this larger than 1.d4, as this is the minimum distance in T 
+      ! required to calculate e- scattering and kramer opacities in the range
+      ! 1.d4 < T < 1.d8.
+      smoothing_window_T = 1000.d0
+      smoothing_window_rho = 10.d0
       
       ! Define the opacity files you would like to be read in, as well as how
       ! you would like the code to transition between them. You must give the
@@ -189,7 +225,7 @@
       logRmins(1)=-1.d30        ! This does nothing. Limits are set in code
       logRmaxs(1)=-1.d30        ! This does nothing. Limits are set in code
       logT_blend1(1)=-1.d30     ! No blending at lower T bound
-      logT_blend2(1)=2.995635d0 ! Start blending from Planck to Rosseland
+      logT_blend2(1)=2.995635d0 ! Start blending from Planck to Rosseland 
       logR_blend1(1)=-1.d30     ! No blending at lower R bound
       logR_blend2(1)=-1.d30     ! No blending at upper R bound
    
@@ -198,7 +234,7 @@
       logTmaxs(2)=-1.d30       ! This does nothing. Limits are set in code
       logRmins(2)=-1.d30        ! This does nothing. Limits are set in code
       logRmaxs(2)=-1.d30        ! This does nothing. Limits are set in code
-      logT_blend1(2)=3.041393d0 ! Stop blending from Planck to Rosseland
+      logT_blend1(2)=3.041393d0 ! Stop blending from Planck to Rosseland 
       logT_blend2(2)=-1.d30     ! Start blending from Rosseland to user files
       logR_blend1(2)=-1.d30     ! No blending at lower R bound
       logR_blend2(2)=-1.d30     ! No blending at upper R bound
@@ -353,8 +389,12 @@
       eosfile='sph.eos'
       filtersfile='filters.dat'
       outfile='flux_cal.output'
- 
 
+
+      
+      !### Internal uses
+      ! The debug flag is used internally to make debugging easier.
+      debug=.false.
 
       
 !-----------------------------------------------------------------------

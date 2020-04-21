@@ -102,9 +102,11 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      get_integration_at_pos,get_info_of_particle,
      $      get_closest_particles,get_integration_at_all_pos,
      $      get_true_luminosity
-      real*8 step1,step2,step3,step4
-      integer MAXSTP
+      real*8 step1,step2,step3,step4,simps_h,simps_alpha,
+     $      simps_fracacc
+	integer MAXSTP
       common/steps/ step1,step2,step3,step4,MAXSTP
+      common/simpsonrule/simps_h,simps_alpha,simps_fracacc
       real*8 Tplanck
       common/opacity_controls/ Tplanck
       real*8 taulimit,posx,posy
@@ -151,7 +153,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      logTmaxs,logRmins,logRmaxs,logT_blend1,logT_blend2,
      $      logR_blend1,logR_blend2,MAXSTP,opacity_oob_error,
      $      opacity_oob_warning,opacity_analytic_warning,opacity_rho_cutoff,
-     $      debug,smoothing_window_T,smoothing_window_rho
+     $      debug,smoothing_window_T,smoothing_window_rho,
+     $      simps_h,simps_alpha,simps_fracacc,integrator
 	
       common/inputfilenames/ filtersfile,trackfile,eosfile
 
@@ -172,7 +175,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common/splitlums/ natalum,sphlum,natalumhi,natalumlo
 
 
-      real*8 getOpacity,useeostable
+      real*8 getOpacity
+      real*8 useeostable
 
       real*8 get_teff,getLocalAngle
       real*8 fourPointArea, fourPointArea2
@@ -247,4 +251,6 @@ c     slops for envelope fitting
 
       real*8 rhoPlanckRossmin, rhoPlanckRossmax
       parameter(rhoPlanckRossmin=2.d-18,rhoPlanckRossmax=1.d-7)
-      
+
+      integer integrator
+      common/integrator_type/ integrator

@@ -118,6 +118,7 @@ c     I want to make sure the penultimate step (the step right before the photos
         if((xint+h-x2)*(xint+h-x1).gt.0.d0) h=x2-xint
 c     write(*,*) xpos/runit,ypos/runit
 
+c        write(*,*) "yscal(1:4) = ",yscal(1:4)
         call rkqs(yint,dydx,nvar,xint,h,eps,yscal,hdid,hnext,derivs)
 
 c        call getLocalQuantities(xpos,ypos,xint)
@@ -140,7 +141,7 @@ c     $       3.d0*log10(tcgs/tempunit_out) + 18.d0
      $          gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
      $          opacit,yint(1),lastpart
         end if
-        
+
         if(hdid.eq.h)then
           nok=nok+1
         else

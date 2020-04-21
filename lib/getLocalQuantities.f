@@ -20,6 +20,17 @@ c      write(*,*) "hzmap = ",hzmap
          iz=1
       end if
 
+      if ( iz.le.0 .or. iz.gt.nzmap .or.
+     $     iy.le.0 .or. iy.gt.nymap .or.
+     $     ix.le.0 .or. ix.gt.nxmap ) then
+         write(*,*) "ERROR: getLocalQuantities is trying to "//
+     $        "calculate values at a positions that is outside "//
+     $        "the integration grid."
+         write(*,*) "ix,iy,iz,nxmap,nymap,nzmap = ",ix,iy,iz,
+     $        nxmap,nymap,nzmap
+         error stop "getLocalQuantities.f"
+      end if
+      
 c      if(iy.gt.60 .and. innit.eq.5) then
 c         write(*,*) ix,iy,iz, realiz
 c         write(*,*) hzmap, nzmap, zmax(ix,iy),zmin(ix,iy)

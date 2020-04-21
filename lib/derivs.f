@@ -90,6 +90,8 @@ c            stop
 c         end if
 
          if(opacit.le.1d30) then
+c            write(*,*) "opacit, rhocgs, dtauds(1) = ",opacit,rhocgs,
+c     $           -opacit*rhocgs
             dtauds(1)=-opacit*rhocgs ! NEGATIVE SIGN IS BECAUSE STEP IS IN NEGATIVE DIRECTION
             dtauds(2)=dtauds(1)
             dtauds(4)=(t6*1d6)**4*exp(-tau(1))*dtauds(1) ! dtauds(1)and hence dtauds(4) are NEGATIVE

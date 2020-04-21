@@ -24,6 +24,8 @@ c     sphoto   = z-location of the
       real*8 rn,mymaxdz,maxz,rv,rc,deltar2
       real*8 Tpractical
 
+      external getLocalQuantities
+
       Tthick4 = 0.d0
       Tthin4 = 0.d0
       sphoto = 0.d0
@@ -66,15 +68,42 @@ c
 c      if(mu .eq. 0.d0) then
 c         mu = 1.d-30
 c      end if
-
+c      write(*,*) "Inside getTpractical.f ",z1,zstop
       if(z1.ne.zstop)then
-         call odeint(taustart,4+numfilters,z1,zstop,
-     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs,
-     $        rkqs)
-         
-         Tthin4=taustart(4)     ! int_0^tau T^4 e^(-tau') dtau'
-         tau_thin = taustart(1) ! Attenuation factor
+c         write(*,*) "Running getTpractical.f with integrator = ",
+c     $        integrator
 
+         if ( z1.lt.zstop ) then
+            write(*,*) "ERROR: Should have z1 > zstop always. "//
+     $           "This means the integrator is starting at a z "//
+     $           "position that is less than the z position it "//
+     $           "expects to stop at. "//
+     $           "Check your input file for accidental negative "//
+     $           "signs in quantities that relate to integration."//
+     $           " Remember, dtau = -kappa*rho*dz, so dz should "//
+     $           "always be negative, as kappa and rho are always "//
+     $           "positive."
+            error stop "getTpractical.f"
+         end if
+         
+         if (integrator.eq.0) then
+            call odeint(taustart,4+numfilters,z1,zstop,
+     $           eps,0.25d0*myh1,myh1,nok,nbad,derivs,
+     $           rkqs)
+            
+            Tthin4=taustart(4)  ! int_0^tau T^4 e^(-tau') dtau'
+            tau_thin = taustart(1) ! Attenuation factor
+         else if (integrator.eq.1) then
+            call simpson(xpos,ypos,z1,zstop,Tthin4,tau_thin,kount1)
+         else
+            write(*,*) "ERROR: integrator =",integrator," not "//
+     $           "recognized."
+            error stop "getTpractical.f"
+         end if
+c         call trapezoidal(xpos,ypos,z1,zstop,NZMAP,
+c     $        getLocalQuantities,Tthin4,tau_thin,kount1)
+
+         ! kount1 <= 1 always with Simpson Rule integrator
          if(kount1.gt.1) then   ! Integrator didn't reach an optically thick particle
             sa=s(kount1-1)      ! z-position w/ optical depth tau_tot<tau_thick_integrator
             sb=s(kount1)        ! z-position w/ optical depth tau_tot>=tau_thick_integrator
