@@ -239,11 +239,11 @@
       logR_blend1(2)=-1.d30     ! No blending at lower R bound
       logR_blend2(2)=-1.d30     ! No blending at upper R bound
       
-      opacityfiles(3)=''
-      logTmins(3)=-1.d30
-      logTmaxs(3)=-1.d30
-      logRmins(3)=-1.d30
-      logRmaxs(3)=-1.d30
+      opacityfiles(3)='gs98_z0.02_x0.7.data'
+      logTmins(3)=3.75d0
+      logTmaxs(3)=8.7d0
+      logRmins(3)=-8.d0
+      logRmaxs(3)=1.d0
       logT_blend1(3)=-1.d30
       logT_blend2(3)=-1.d30
       logR_blend1(3)=-1.d30
