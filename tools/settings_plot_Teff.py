@@ -19,7 +19,7 @@ Tefflim = (0.,10000.)
 # Set the following to None to prompt the user
 usebb = False              # Use blackbody spectrum.
 spatialaxesadapt = None   # Use adaptive spatial limits.
-colorbaradapt = False      # Use adaptive colorbar limits.
+colorbaradapt = None      # Use adaptive colorbar limits.
 filepattern = None        # Search pattern for data files.
 paperfriendly = False      # Paper friendly plot [Experimental].
 

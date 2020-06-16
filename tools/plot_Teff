@@ -53,14 +53,20 @@ elif os.path.isfile(defaultfile):
     print("Importing default settings")
     from settings_plot_Teff import *
 
+args = sys.argv[1:]
+    
 files = []
 while len(files) == 0:
     if filepattern is None:
-        filepattern = input("Enter file name(s) or patterns: ")
+        if args:
+            filepattern = args
+        else:
+            filepattern = input("Enter file name(s) or patterns: ")
     try:
         filepattern = filepattern.split()
     except AttributeError:
         pass
+    
     for pattern in filepattern:
         fs = sorted(glob.glob(pattern))
         if len(fs) > 0:
@@ -68,6 +74,7 @@ while len(files) == 0:
                 files.append(i)
         else:
             print("ERROR: One or more file pattern not found")
+            if args: sys.exit()
             files = []
             filepattern = None
             break
@@ -112,7 +119,7 @@ if colorbaradapt == None:
             else:
                 print("ERROR: Please respond with 'y' or 'n'.")
 
-"""            
+"""
 if((spatialaxesadapt == None) and (colorbaradapt == None)):
     loop = True
     while loop:

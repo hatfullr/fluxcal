@@ -90,9 +90,8 @@ c     Condense the "closest" and "maxdzs" arrays into 1D arrays
          end do
       end do
       
-c     This is a sorting algorithm I found online to sort an array and
-c     only worry about unique values. Thus, we get rid of repeated
-c     particle IDs
+c     This is a sorting algorithm to sort an array and only worry
+c     about unique values. Thus, we get rid of repeated particle IDs
       m=0
       min_val = minval(closest1D)
       max_val = maxval(closest1D)

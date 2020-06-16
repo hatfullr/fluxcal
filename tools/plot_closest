@@ -16,7 +16,13 @@ try:
 except NameError:
     pass
 
-user_input = input("Enter file name(s) or patterns: ").split(" ")
+args = sys.argv[1:]
+
+if args:
+    user_input = args
+else:
+    user_input = input("Enter file name(s) or patterns: ").split(" ")
+    
 files = []
 for pattern in user_input:
     for i in sorted(glob.glob(pattern)):

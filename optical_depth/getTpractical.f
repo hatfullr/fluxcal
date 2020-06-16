@@ -24,6 +24,8 @@ c     sphoto   = z-location of the
       real*8 rn,mymaxdz,maxz,rv,rc,deltar2
       real*8 Tpractical
 
+      external getLocalQuantities
+
       Tthick4 = 0.d0
       Tthin4 = 0.d0
       sphoto = 0.d0
@@ -36,9 +38,13 @@ c     Integrate down to the optically thick particle or until
 c     accumulated tau is equal to tau_thick_integrator.
       ! Initialize the integrator
       nrhs=0
-      do ifilter=1,numfilters+4
-         taustart(ifilter)=0.d0
-      enddo
+c     We might want this later
+c      do ifilter=1,numfilters+4
+c         taustart(ifilter)=0.d0
+c      enddo
+      do i=1,size(taustart)
+         taustart(i)=0.d0
+      end do
 
 cc     Find the particle kernel closest to xpos,ypos,z1
 c      maxz = -1.d30
@@ -62,27 +68,60 @@ c
 c      if(mu .eq. 0.d0) then
 c         mu = 1.d-30
 c      end if
+c      write(*,*) "Inside getTpractical.f ",z1,zstop
+      if(z1.ne.zstop)then
+c         write(*,*) "Running getTpractical.f with integrator = ",
+c     $        integrator
 
-      call odeint(taustart,4+numfilters,z1,zstop,
-     $     eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
-     $     rkqs)
-
-      Tthin4=taustart(4) ! int_0^tau T^4 e^(-tau') dtau'
-      tau_thin = taustart(1)    ! Attenuation factor
-
-      if(kount1.gt.1) then      ! Integrator didn't reach an optically thick particle
-         sa=s(kount1-1)         ! z-position w/ optical depth tau_tot<tau_thick_integrator
-         sb=s(kount1)           ! z-position w/ optical depth tau_tot>=tau_thick_integrator
+         if ( z1.lt.zstop ) then
+            write(*,*) "ERROR: Should have z1 > zstop always. "//
+     $           "This means the integrator is starting at a z "//
+     $           "position that is less than the z position it "//
+     $           "expects to stop at. "//
+     $           "Check your input file for accidental negative "//
+     $           "signs in quantities that relate to integration."//
+     $           " Remember, dtau = -kappa*rho*dz, so dz should "//
+     $           "always be negative, as kappa and rho are always "//
+     $           "positive."
+            error stop "getTpractical.f"
+         end if
          
-         ! Interpolate to find position where optical tau_tot=tau_thick_integrator:
-         sphoto=(sa*(tau(1,kount1)-1.d0)
-     $        +sb*(1.d0-tau(1,kount1-1)))/
-     $        (tau(1,kount1)-tau(1,kount1-1))
-      else if (thick_p.gt.0) then ! Integrator reached an optically thick particle
-         sphoto=zthick
-         Tthick4 = Teff(thick_p)**4.d0 * exp(-tau_thin)
+         if (integrator.eq.0) then
+            call odeint(taustart,4+numfilters,z1,zstop,
+     $           eps,0.25d0*myh1,myh1,nok,nbad,derivs,
+     $           rkqs)
+            
+            Tthin4=taustart(4)  ! int_0^tau T^4 e^(-tau') dtau'
+            tau_thin = taustart(1) ! Attenuation factor
+         else if (integrator.eq.1) then
+            call simpson(xpos,ypos,z1,zstop,Tthin4,tau_thin,kount1)
+         else
+            write(*,*) "ERROR: integrator =",integrator," not "//
+     $           "recognized."
+            error stop "getTpractical.f"
+         end if
+c         call trapezoidal(xpos,ypos,z1,zstop,NZMAP,
+c     $        getLocalQuantities,Tthin4,tau_thin,kount1)
+
+         ! kount1 <= 1 always with Simpson Rule integrator
+         if(kount1.gt.1) then   ! Integrator didn't reach an optically thick particle
+            sa=s(kount1-1)      ! z-position w/ optical depth tau_tot<tau_thick_integrator
+            sb=s(kount1)        ! z-position w/ optical depth tau_tot>=tau_thick_integrator
+         
+            ! Interpolate to find position where optical tau_tot=tau_thick_integrator:
+            sphoto=(sa*(tau(1,kount1)-1.d0)
+     $           +sb*(1.d0-tau(1,kount1-1)))/
+     $           (tau(1,kount1)-tau(1,kount1-1))
+         else if (thick_p.gt.0) then ! Integrator reached an optically thick particle
+            sphoto=zthick
+            Tthick4 = Teff(thick_p)**4.d0 * exp(-tau_thin)
+         end if
+      else                      ! Integrator started and stopped at an optically thick particle
+         Tthick4 = Teff(thick_p)**4.d0 ! No attenuation
+         Tthin4 = 0.d0
       end if
 
+         
       Tpractical = (Tthick4 + Tthin4)**0.25d0
       
 cc     zstop = max(z0,zthick)
@@ -99,13 +138,13 @@ c         do ifilter=1,numfilters+4
 c            taustart(ifilter)=0.d0
 c         enddo
 cc     call odeint(taustart,4+numfilters,z1,zstop,
-cc     $           eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+cc     $           eps,0.25d0*myh1,myh1,nok,nbad,derivs,
 cc     $           rkqs)
 c         
 c         ! Integrate with bounds set to the beginning to the surface of
 c         ! the thick particle.
 c         call odeint(taustart,4+numfilters,z1,zthick,
-c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs,
 c     $        rkqs)
 c         Tthin=taustart(4)**0.25d0 ! int_0^tau T^4 e^(-tau') dtau'
 c         tau_thin = taustart(1) ! Attenuation factor
@@ -167,7 +206,7 @@ c         enddo
 c
 c         ! Integrate with bounds set across all fluid
 c         call odeint(taustart,4+numfilters,z1,z0,
-c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs2,
+c     $        eps,0.25d0*myh1,myh1,nok,nbad,derivs,
 c     $        rkqs)
 c         tau_thin = taustart(1) ! Attenuation factor
 c         nphoto = taustart(3)
@@ -203,7 +242,7 @@ c
          write(*,*) "tau_thin = ",tau_thin
          write(*,*) "Tthin4 = ",Tthin4
          write(*,*) "Tthick4 = ",Tthick4
-         error stop
+         error stop "getTpractical.f"
       end if
       
       end subroutine

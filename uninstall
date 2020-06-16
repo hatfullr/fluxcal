@@ -8,15 +8,19 @@ mycheck () {
     fi
 }
 
+echo "Removing linked executable"
+echo "\rm -f $HOME/bin/flux_cal"
+\rm -f $HOME/bin/flux_cal
+mycheck
 echo "Removing linked plotting tools"
-echo "\rm $HOME/bin/plot_Teff"
-\rm $HOME/bin/plot_Teff
+echo "\rm -f $HOME/bin/plot_Teff"
+\rm -f $HOME/bin/plot_Teff
 mycheck
-echo "\rm $HOME/bin/plot_closest"
-\rm $HOME/bin/plot_closest
+echo "\rm -f $HOME/bin/plot_closest"
+\rm -f $HOME/bin/plot_closest
 mycheck
-echo "\rm $HOME/bin/plot_lc"
-\rm $HOME/bin/plot_lc
+echo "\rm -f $HOME/bin/plot_lc"
+\rm -f $HOME/bin/plot_lc
 mycheck
 echo ""
 echo "Uninstallation completed successfully."

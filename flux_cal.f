@@ -11,8 +11,14 @@
       character*255 newoutfile
       real*8 dummy
 
+      integer writefile         ! Remove later
+      common/writefilee/writefile ! Remove later
+
       call init                 ! Initialize
 
+c      writefile = 11            ! Remove later
+c      open(writefile,file="opacity_calls.dat",status="unknown") ! Remove later
+      
       imax = 999
       
  230  format(3A22)
@@ -185,4 +191,6 @@ c        ****************************************************************
       write(*,*) ""
  500  format(A20," ",f15.7," ",A4)
 
+c      close(writefile)          ! Remove later
+      
       end program

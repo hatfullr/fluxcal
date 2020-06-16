@@ -12,7 +12,10 @@
       character*255 myfname
       real*8 TpracticalXYthin,TpracticalXYthick
       integer nan
-
+      real start_time,finish_time
+      
+      call cpu_time(start_time)
+      
       nan = 0
       ! Set the visible surface areas of each particle to zero
       do ip=1,nmax
@@ -39,7 +42,12 @@
       avgxhp=0.d0
 c      if(dimenFileAlreadyExists) then
 c         write(*,*) "Integrating through each point on the driving grid"
-c      end if
+c     end if
+      max_step_size = 0.d0
+      min_step_size = 0.d0
+      min_steps_taken = MAXSTP
+      max_steps_taken = 0
+      
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
@@ -48,29 +56,15 @@ c      end if
             TpracticalXYthick=0.d0
 
             if(zmin(i,j).lt.1d30)then
-
+               nstp = 0
+c               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
+c     $              zmax(i,j)/runit_out
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TOTALTpracticalXY(i,j),
      $              tauthin(i,j),zintpos(i,j))
-
-c               TOTALTpracticalXY(i,j) = TpracticalXYthin +
-c     $              TpracticalXYthick
-               
-c               if(TpracticalXYthin.gt.0)then
-c                  ! Optically thick region made by thin particles
-c                  TOTALTpracticalXY(i,j)=TpracticalXYthin
-c               else if(TpracticalXYthick.gt.0) then
-c                  ! Thick particle w/ no thick region in front
-c                  TOTALTpracticalXY(i,j)=TpracticalXYthick
-c               else
-c                  ! Optically thin everywhere
-c                  TOTALTpracticalXY(i,j)=0.d0
-c               end if
-
-c               if(tauthin(i,j).gt.0.d0) then
-c                  write(*,*) "Optically thin material at ",i,j,xpos,ypos
-c               end if
+               min_steps_taken = min(min_steps_taken,nstp)
+               max_steps_taken = max(max_steps_taken,nstp)
                
                if(thick_part(i,j).gt.0) then
 c     This idea didn't work, but it was a good idea, so save it in case we want it in the future.
@@ -133,111 +127,112 @@ c
 c     taustart(4+ifilter) has the same dimensions as the Planck function
 c     Bnu=2*planck*crad/wavelengthcm(ifilter)**3d0/
 c     $                 (exp(exponent)-1.d0)
-c     derivs2 is using cgs units to get taustart(4+ifilter), and this is
+c     derivs is using cgs units to get taustart(4+ifilter), and this is
 c     erg/s/cm^2/Hz/sr  (where sr=steradian)
 c                  
 c     Use Planck blackbody spectrum for presumed reasonable temperature for
 c     optically thin material
-                  do ifilter=1,numfilters
-                     exponent=coeff/(wavelength(ifilter)*t6)
-                     eexponent=exp(exponent)
-                     denominator=eexponent-1
-                     fluxdensityXY(I,J,ifilter)=taustart(4+ifilter)+
-     $                    (2*planck*crad/
-     $                    wavelength(ifilter)**3d0/
-     $                    denominator)
-                  end do
+
+c     We might want this later
+c                  do ifilter=1,numfilters
+c                     exponent=coeff/(wavelength(ifilter)*t6)
+c                     eexponent=exp(exponent)
+c                     denominator=eexponent-1
+c                     fluxdensityXY(I,J,ifilter)=taustart(4+ifilter)+
+c     $                    (2*planck*crad/
+c     $                    wavelength(ifilter)**3d0/
+c     $                    denominator)
+c                  end do
 
                   ! If there is a photosphere:
                   ! If thick_part(i,j) > 0,
                   ! OR if tauthin >= tau_thick
-                  if(TOTALTpracticalXY(I,J).gt.0.d0) then !"detectable photopshere"
-c                  if((envfit.and.(thick_part(i,j) .gt. 0)) .or. ! envfit is turned on and thick particle
-c     $                 (tauthin(i,j) .ge. tau_thick_integrator).or.
-c     $                 (tauthin(i,j) .ge. tau_thick_envfit)) then   ! "detectable photosphere"
-c                     write(*,*) thick_part(i,j), tauthin, tau_thick
                      
-                     if(I.lt.IMINGLOW) IMINGLOW=I
-                     if(I.gt.IMAXGLOW) IMAXGLOW=I
-                     if(J.lt.JMINGLOW) JMINGLOW=J
-                     if(J.gt.JMAXGLOW) JMAXGLOW=J
-                    
-                     
-                     ccphoto=ccphoto+1
-                     TphotoXY(I,J) = TOTALTpracticalXY(i,j)
+                  if(I.lt.IMINGLOW) IMINGLOW=I
+                  if(I.gt.IMAXGLOW) IMAXGLOW=I
+                  if(J.lt.JMINGLOW) JMINGLOW=J
+                  if(J.gt.JMAXGLOW) JMAXGLOW=J
 
-                     ! This part of the code may not work because the main part of the code
-                     ! that drove this has been removed.
-                     ! nphoto is part of the legacy code
-                     na=tau(3,kount1-1) ! tau(3) = # of smoothing lengths into the surface
-                     nb=tau(3,kount1)
-                     nphoto=(na*(tau(1,kount1)-1.d0)
-     $                    +nb*(1.d0-tau(1,kount1-1)))/
-     $                    (tau(1,kount1)-tau(1,kount1-1))
-                     
-                     do insl=1,nsl
-                        if(nphoto.ge.insl) then
-                           goodtphoto4avg(insl)=goodtphoto4avg(insl)
-     $                          +TphotoXY(I,J)**4
-                           goodccphoto(insl)=goodccphoto(insl)+1
-                        endif
-                     enddo
-                     do insl=0,nsl
-                        if(nphoto.ge.insl) then
-                           do ilogwavelength=ilogwavelengthmin,
-     $                          ilogwavelengthmax
-                              
-c     log of wavelength in micrometers:
-                              logwavelength=0.01d0*ilogwavelength
-c     wavelength is in centimeters
-                              wavelengthcm=10.d0**logwavelength * 1d-4 
-                              
-                              exponent=planck*crad/
-     $                             (wavelengthcm*boltz*TphotoXY(I,J))
-                              spectrum(ilogwavelength,insl)=
-     $                             spectrum(ilogwavelength,insl)
-     $                             +wavelengthcm**(-5d0)/(exp(exponent)
-     $                             -1.d0)
-                           enddo
-                        endif
-                     enddo
-
-                     call getLocalvz(XPOS,YPOS,sphoto,localvx,localvy,
-     $                    localvz)
-               
-                     costheta=
-     $                   -localvz/sqrt(localvx**2+localvy**2+localvz**2)
-                     if(costheta.gt.costhetamax)then
-                        costhetamax=costheta
-                        xcosthetamax=XPOS
-                        ycosthetamax=YPOS
-                        zcosthetamax=sphoto
-                     endif
-                     
-                     vzavg=vzavg+localvz*TphotoXY(I,J)**4 ! will now weight vz average based on cbrightness
-                     vz2avg=vz2avg+localvz**2*TphotoXY(I,J)**4 ! will now weight vz average basecd on brightness
-                     localvr=(localvx*XPOS+localvy*YPOS+localvz*sphoto)/
-     $                    (XPOS**2+YPOS**2+sphoto**2)**0.5d0
-                     vravg=vravg+localvr
-                     vr2avg=vr2avg+localvr**2
-                     
-                  else
-                     TphotoXY(I,J) = 0.d0
-                  end if
+c     We might want this later
+c                     ccphoto=ccphoto+1
+c                     TphotoXY(I,J) = TOTALTpracticalXY(i,j)
+c
+c                     ! This part of the code may not work because the main part of the code
+c                     ! that drove this has been removed.
+c                     ! nphoto is part of the legacy code
+c                     na=tau(3,kount1-1) ! tau(3) = # of smoothing lengths into the surface
+c                     nb=tau(3,kount1)
+c                     nphoto=(na*(tau(1,kount1)-1.d0)
+c     $                    +nb*(1.d0-tau(1,kount1-1)))/
+c     $                    (tau(1,kount1)-tau(1,kount1-1))
+c                     
+c                     do insl=1,nsl
+c                        if(nphoto.ge.insl) then
+c                           goodtphoto4avg(insl)=goodtphoto4avg(insl)
+c     $                          +TphotoXY(I,J)**4
+c                           goodccphoto(insl)=goodccphoto(insl)+1
+c                        endif
+c                     enddo
+c                     do insl=0,nsl
+c                        if(nphoto.ge.insl) then
+c                           do ilogwavelength=ilogwavelengthmin,
+c     $                          ilogwavelengthmax
+c                              
+cc     log of wavelength in micrometers:
+c                              logwavelength=0.01d0*ilogwavelength
+cc     wavelength is in centimeters
+c                              wavelengthcm=10.d0**logwavelength * 1d-4 
+c                              
+c                              exponent=planck*crad/
+c     $                             (wavelengthcm*boltz*TphotoXY(I,J))
+c                              spectrum(ilogwavelength,insl)=
+c     $                             spectrum(ilogwavelength,insl)
+c     $                             +wavelengthcm**(-5d0)/(exp(exponent)
+c     $                             -1.d0)
+c                           enddo
+c                        endif
+c                     enddo
+c
+c                     call getLocalvz(XPOS,YPOS,sphoto,localvx,localvy,
+c     $                    localvz)
+c               
+c                     costheta=
+c     $                   -localvz/sqrt(localvx**2+localvy**2+localvz**2)
+c                     if(costheta.gt.costhetamax)then
+c                        costhetamax=costheta
+c                        xcosthetamax=XPOS
+c                        ycosthetamax=YPOS
+c                        zcosthetamax=sphoto
+c                     endif
+c                     
+c                     vzavg=vzavg+localvz*TphotoXY(I,J)**4 ! will now weight vz average based on cbrightness
+c                     vz2avg=vz2avg+localvz**2*TphotoXY(I,J)**4 ! will now weight vz average basecd on brightness
+c                     localvr=(localvx*XPOS+localvy*YPOS+localvz*sphoto)/
+c     $                    (XPOS**2+YPOS**2+sphoto**2)**0.5d0
+c                     vravg=vravg+localvr
+c                     vr2avg=vr2avg+localvr**2
+c                     
+c                  else
+c                     TphotoXY(I,J) = 0.d0
                end if
-
-                  
             else
                TOTALTpracticalXY(i,j)=0.d0
-               do ifilter=1,numfilters
-                  fluxdensityXY(I,J,ifilter)=0d0
-               enddo
-               TphotoXY(I,J) = 0.d0
+c     We might want this later
+c               do ifilter=1,numfilters
+c                  fluxdensityXY(I,J,ifilter)=0d0
+c               enddo
+c               TphotoXY(I,J) = 0.d0
             end if
-            TthermXY(I,J)=0.d0
-            TXY(I,J)=TphotoXY(I,J)
+c     We might want this later
+c            TthermXY(I,J)=0.d0
+c            TXY(I,J)=TphotoXY(I,J)
 
          end do
       end do
+
+      call cpu_time(finish_time)
+c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
+c     $     TOTALTpracticalXY(i/2,j/2)
+c      write(*,*) "integrateTau took ",finish_time-start_time
 
       end subroutine

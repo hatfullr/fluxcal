@@ -1,11 +1,16 @@
-# Using FluxCal
+# FluxCal
 
-## Installation
+## Installing FluxCal
 
 ### Dependencies
 FluxCal uses `gfortran` to compile its code. Install using,
 ```
 sudo apt install gfortran
+```
+To use the plotting scripts in the `tools` directory, you will need either [Python](https://www.python.org/downloads/) (2 or 3) and [matplotlib](https://matplotlib.org/),
+```
+python -m pip install -U pip
+python -m pip install -U matplotlib
 ```
 
 ### Linux
@@ -16,8 +21,8 @@ cd fluxcal
 ./install
 ```
 DO NOT RUN AS ROOT. This script will unzip the required included data files,
-build `flux_cal`, and link the plotting suite to your home directory. We strongly
-recommend you perform a file integrity check by running
+build `flux_cal`, and link both the executable and the plotting suite to your
+home directory. We strongly recommend you perform a file integrity check,
 ```
 ./integrity_check
 ```
@@ -29,9 +34,10 @@ FluxCal has not been tested on Windows machines, but it might still work. Try
 [installing the Ubuntu terminal on Windows 10](https://tutorials.ubuntu.com/tutorial/tutorial-ubuntu-on-windows#0), then continue installation as though you were using
 Linux.
 
-## Uninstallation
-To uninstall FluxCal, run the script `uninstall`, then do
+### Uninstalling FluxCal
+To uninstall FluxCal, run the script `uninstall` and remove the FluxCal directory,
 ```
+./uninstall
 cd ..
 rm -rf fluxcal
 ```
@@ -46,14 +52,13 @@ To run FluxCal, try the following
 ```
 mkdir fluxcaltest
 cd fluxcaltest
-ln -s <fluxcal-directory>/flux_cal .
 cp <fluxcal-directory>/defaults/flux_cal.input .
 cp <datafile> .
 ```
 Now edit `flux_cal.input` appropriately, save the file, and run `flux_cal`
 with
 ```
-./flux_cal
+flux_cal
 ```
 You can find a premade input file to test with in `<fluxcal-directory>/test/standard_check/original/fluxcal_0000.dat`. Do not move this file.
 
@@ -101,6 +106,12 @@ If you encounter this error, try compiling again,
 This may fail up to 10 times before finally succeeding. Hopefully this error
 disappears with future `gfortran` releases. We do not recommend downgrading
 your GNU compiler suite, as this is generally harmful.
+
+By default, the `make` script in the main FluxCal directory attempts to
+automatically retry compilation if it encounters this error. We think this
+error may be related to how the GNU compiler handles memory allocation. It
+seems that introducing the `getLocalQuantities subroutine` into odeint.f or
+rkqs.f can cause this error.
 
 
 ## Failing standard_check test

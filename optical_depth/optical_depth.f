@@ -193,13 +193,19 @@ c         prepareIntegrationCalled=.false. ! Remake the integrating grid
 c         goto 41
 c      endif
      
- 100  format(A19," = ",ES22.14,", ",ES22.14)
- 101  format(A19," = ",I22,", ",I22)
+ 100  format(A25," = ",ES22.14,", ",ES22.14)
+ 101  format(A25," = ",I22,", ",I22)
       write(*,*) "Grid details:"
-      write(*,100) "xminmap,xmaxmap",xminmap/runit_out,xmaxmap/runit_out
-      write(*,100) "yminmap,ymaxmap",yminmap/runit_out,ymaxmap/runit_out
-      write(*,100) "hxmap,hymap    ",hxmap/runit_out,hymap/runit_out
-      write(*,101) "nxmap,nymap    ",nxmap,nymap
+      write(*,100) "xminmap,xmaxmap      ",xminmap/runit_out,
+     $     xmaxmap/runit_out
+      write(*,100) "yminmap,ymaxmap      ",yminmap/runit_out,
+     $     ymaxmap/runit_out
+      write(*,100) "hxmap,hymap          ",hxmap/runit_out,
+     $     hymap/runit_out
+      write(*,101) "nxmap,nymap          ",nxmap,nymap
+      write(*,100) "minstpsize,maxstpsize",min_step_size,max_step_size
+      write(*,101) "minNstp,maxNstp      ",min_steps_taken,
+     $     max_steps_taken
 c      call writeDimenFile
       write(*,*) ""
       
@@ -210,20 +216,28 @@ c     $     real(TOTALpracticalLUM)
      $     TOTALpracticalLUM/Lunit_out
       write(*,'(A,ES22.14)')' Maximum Teff=',TMAX/tempunit_out
       write(*,'(A,ES22.14)')' Average Teff=',avgt/numcell/tempunit_out
-      
-      call peakWavelengths
 
+c     We might want this later
+c      call peakWavelengths
 
       if (mlog.eq.1) then
 C     Transform to log scale:
          do j=1,nymap
             do i=1,nxmap
-               if (TXY(I,J).ge.TMIN) then
-c                  if(TXY(I,J).eq.TMAX) print *, 'MAX AT',i,j
-                  TXY(I,J)=LOG10(TXY(I,J))
+               if(TOTALTpracticalXY(i,j).ge.TMIN) then
+                  if(TOTALTpracticalXY(i,j).eq.TMAX)
+     $                 write(*,*) "MAX AT",i,j
+                  TOTALTpracticalXY(i,j)=log10(TOTALTpracticalXY(i,j))
                else
-                  TXY(I,J)=0.d0
+                  TOTALTpracticalXY(i,j)=0.d0
                end if
+c     We might want this later
+c               if (TXY(I,J).ge.TMIN) then
+cc                  if(TXY(I,J).eq.TMAX) print *, 'MAX AT',i,j
+c                  TXY(I,J)=LOG10(TXY(I,J))
+c               else
+c                  TXY(I,J)=0.d0
+c               end if
             end do
          end do
       end if

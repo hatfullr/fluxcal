@@ -25,10 +25,13 @@ c     really a column. For example, "x(i),y(i),z(i),am(i),..."
 c      character*255 fname
       logical fileexists
       real*8 opacit
-      integer i, do_debug
+      integer i, j,do_debug
       real*8 moutsideTEOS,eoutsideTEOS,mintempoutsideTEOS
       real*8 maxtempoutsideTEOS,minrhooutsideTEOS,maxrhooutsideTEOS
-      
+      real*8 myxhi
+      real*8 dr2,hp2
+      logical exists
+
       if(nnit.le.9999) then
          write(infname,"('fluxcal_',i4.4,'.dat')") nnit
       else if(nnit.le.99999) then
@@ -88,11 +91,20 @@ c      character*255 fname
             entropy(i) = 0.d0
          end if
 
-         call getOpacitySub(x(i),y(i),z(i),tempp(i),
-     $        rho(i),0.d0,Rform,opacit)
-         opac_sph(i)=opacit
+         if(a(i).ne.0.d0) then
+            depth = 2.d0*hp(i)
+            myxhi = -0.6d0+0.2d0*metallicity
+     $           +0.8d0*1.67262158d-24/wmeanmolecular(i)
+            opac_sph(i) = getOpacity(tempp(i),rho(i),myxhi)
+c            if(opac_sph(i).eq.-1.d30) then
+c               write(*,*) "read_fluxcal.f"
+c               stop
+c            end if
+         else
+            opac_sph(i) = 0.d0
+         end if
 c         if(tempp(i).le.8000) write(*,*) "OPACITY", tempp(i), opacit
-         tauA(i) = taucoef*am(i)*opacit/hp(i)**2.d0
+         tauA(i) = taucoef*am(i)*opac_sph(i)/hp(i)**2.d0
 
 c     If the user wants to use get_teff, and particle i is optically
 c     thick, store get_teff for use in getTpractical.f
@@ -138,5 +150,45 @@ c                 if(i.eq.172258) do_debug=1
       end if
 
       n=i-1
+
+
+      
+c$$$      ! Calculate nnb for each particle (remove later!)
+c$$$      write(*,*) "Calculating the number of neighbors for each"//
+c$$$     $     " particle. If you can see this, you have a debugging"//
+c$$$     $     " version of FluxCal! Abort immediately!"
+c$$$
+c$$$      inquire(file="neighbors.dat",exist=exists)
+c$$$      if ( exists ) then
+c$$$         open(22,file="neighbors.dat",status="old",action="read")
+c$$$         do i=1,n
+c$$$            read(22,*) neighbors(i)
+c$$$         end do
+c$$$      else
+c$$$         open(22,file="neighbors.dat",status="unknown",action="write")
+c$$$
+c$$$         do i=1,n
+c$$$            neighbors(i) = 0
+c$$$            hp2 = (2.d0*hp(i))**2.d0
+c$$$            
+c$$$            do j=1,i
+c$$$               dr2 = (x(i)-x(j))**2.d0+(y(i)-y(j))**2.d0+(z(i)-z(j))**2.d0
+c$$$               if ( dr2 .le. hp2 ) then
+c$$$                  neighbors(i) = neighbors(i) + 1
+c$$$               end if
+c$$$            end do
+c$$$            
+c$$$            do j=i+1,n
+c$$$               dr2 = (x(i)-x(j))**2.d0+(y(i)-y(j))**2.d0+(z(i)-z(j))**2.d0
+c$$$               if ( dr2 .le. hp2 ) then
+c$$$                  neighbors(i) = neighbors(i) + 1
+c$$$               end if
+c$$$            end do
+c$$$            write(22,*) neighbors(i)
+c$$$         end do
+c$$$      end if
+c$$$      
+c$$$ 222  close(22)
+c$$$      write(*,*) "moving on..."
       
       end subroutine

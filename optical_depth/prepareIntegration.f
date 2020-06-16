@@ -16,23 +16,24 @@ c     L346 to L468
       JMINGLOW=NYMAP+1
       IMAXGLOW=0
       JMAXGLOW=0
-      rmid=0.d0
-      r2mid=0.d0
-      costhetamax=-1d30
-      vzavg=0.d0
-      vz2avg=0.d0
-      vravg=0.d0
-      vr2avg=0.d0
-      dssav=1d30
-      nphotoavg=0.d0
-      warning=0
-
-      do insl=1,nsl
-         goodtphoto4avg(insl)=0
-         goodccphoto(insl)=0
-      enddo
-
-      ccphoto=0
+c     We might want this later
+c      rmid=0.d0
+c      r2mid=0.d0
+c      costhetamax=-1d30
+c      vzavg=0.d0
+c      vz2avg=0.d0
+c      vravg=0.d0
+c      vr2avg=0.d0
+c      dssav=1d30
+c      nphotoavg=0.d0
+c      warning=0
+c      
+c      do insl=1,nsl
+c         goodtphoto4avg(insl)=0
+c         goodccphoto(insl)=0
+c      enddo
+c
+c      ccphoto=0
 
       if(dimenFileAlreadyExists) then
          write(*,*) "Creating the driving grid"
@@ -47,6 +48,11 @@ c            count = count+1
             zmax(i,j)=-1d30
             zmax_thick(i,j)=-1d30
             thick_part(i,j)=0
+            ! This is intended to, by default, let the integrator
+            ! take a very large step if there is no fluid on the LOS.
+            ! h1(i,j) receives a value not equal to h1(i,j) when
+            ! fluid is found along the LOS.
+            h1(i,j)=1.d30
          enddo
       enddo
 
@@ -70,15 +76,13 @@ c            count = count+1
      $                 -(x(ip)-xpos)**2-(y(ip)-ypos)**2)**0.5d0
                   ! Protect against infinitessimally small integration
                   if(maxdz.gt.0) then
-                     if(Z(IP)-maxdz.lt.zmin(i,j)) then
-                        zmin(i,j)=Z(IP)-maxdz
+                     if(z(ip)-maxdz.lt.zmin(i,j)) then
+                        zmin(i,j)=z(ip)-maxdz
                         h1(i,j)=hp(ip)
-                     endif
-c                     if(Z(IP)+maxdz.gt.zmax(i,j)) then
-c                        count=count+1
-c                        closest(count) = IP
-c                     end if
+                     end if
+
                      zmax(i,j)=max(zmax(i,j),Z(IP)+maxdz)
+                     
                      if(Teff(ip).gt.0.d0) then
 c                     if(envfit.and.
 c     $                    (tauA(ip) .gt. tau_thick_envfit)) then
@@ -145,7 +149,7 @@ c     Find 3d density grid for quick look-up later
                      uxyz(i,j,iz)=uxyz(i,j,iz)+am(ip)*wpc*a(ip)
                      hpxyz(i,j,iz)=hpxyz(i,j,iz)+am(ip)*wpc*hp(ip)
                      xhi=-0.6d0+0.2d0*metallicity
-     $                    +0.8d0*1.67262158d-24/wmeanmolecular(Ip)
+     $                    +0.8d0*1.67262158d-24/wmeanmolecular(ip)
                      xhxyz(i,j,iz)=xhxyz(i,j,iz)+am(ip)*wpc*xhi
                      gxyz(i,j,iz)=gxyz(i,j,iz)+am(ip)*wpc*
      $                    localg(ip)

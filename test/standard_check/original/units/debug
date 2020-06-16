@@ -22,7 +22,7 @@
  \___________________/                                 
                                                        
  ** Initializing **
- Using default baseunits file '../../../..//defaults/flux_cal.baseunits'.
+ Using default baseunits file '../../../../defaults/flux_cal.baseunits'.
  
        gram   = 0.1000E+01   arad        = 0.7566E-14
        sec    = 0.1000E+01   gravconst   = 0.6674E-07
@@ -48,7 +48,7 @@
  start  =      0    anglexdeg =  0.000    
  finish =      0    angleydeg =  0.000    
  step   =      0    anglezdeg =  0.000    
- flux_cal_dir = '../../../../'
+ flux_cal_dir = '../../../..'
  
  nkernel              =          0
  yscalconst           = 0.6000E-01
@@ -62,9 +62,10 @@
  tau_thick_envfit     = 0.1000E+02
  envfit               =          T
  
- Topac_Planck         = 0.1000E+04
+ use_rosseland              = T
+ use_planck                 = T
+ Tplanck              = 0.1000E+04
  metallicity          = 0.2000E-01
- Rform                = 0.1000E+31
  
  get_fluxes                 = T
  get_true_luminosity        = F
@@ -75,17 +76,19 @@
  track_particles            = F
  get_info_of_particle       = F
  
- eosfile         = 'sph.eos'
- opacityfile     = 'sph.opacities_ferguson_yes_grains_and_molecules'
- opacitydustfile = 'sph.opacities_yes_grains_and_molecules_ncooling2'
- filtersfile     = 'filters.dat'
- outfile         = 'flux_cal.output'
+ eosfile               = 'sph.eos'
+ opacityfile_planck    = 'kP_h2001.dat'
+ opacityfile_rosseland = 'kR_h2001.dat'
+ filtersfile           = 'filters.dat'
+ outfile               = 'flux_cal.output'
  
  Reading SPH eos file
- Reading opacity file
- Reading opacity file for dust
+ WARNING: Could not find 'kR_h2001.dat'. Checking the defaults directory in '../../../../defaults'.
+ Found 'kR_h2001.dat' in '../../../../defaults/kR_h2001.dat'.
+ WARNING: Could not find 'kP_h2001.dat'. Checking the defaults directory in '../../../../defaults'.
+ Found 'kP_h2001.dat' in '../../../../defaults/kP_h2001.dat'.
  Dust model: "normal" silicates; homogeneous spheres
- Reading cold opacity file
+ Dust model: "normal" silicates; homogeneous spheres
  Reading envfit cold opacity file
  Creating envfit density lookup table
  Reading envfit nabla file
@@ -116,9 +119,9 @@
  Calculating the flux at each grid point
  Writing 'teffs00000_000_000_000.dat'
  
- Luminosity =  2.68433461869692E+37
- Average Teff =  2.97285852440526E+03
- Effective visible area =  7.78064348922434E+26
+ Luminosity =  3.20171749690334E+37
+ Average Teff =  2.83729764770887E+03
+ Effective visible area =  7.40690078886858E+26
  
  Writing to 'flux_cal.output'
  

@@ -19,10 +19,29 @@ echo "Removing old files"
 rm -f GNUFortran.txt
 check
 for i in ${dirlist[@]}; do
-    rmfilelist=( $(find $i -type f ! -name 'fluxcal_0000.dat' -and ! -name 'dimen*.dat' -and ! -name 'flux_cal' -and ! -name 'flux_cal.input' -and ! -name 'fluxcal.particles') )
+    rmfilelist=( $(find $i -type f ! -name 'fluxcal_0000.dat' -and ! -name 'dimen*.dat' -and ! -name 'flux_cal' -and ! -name 'fluxcal.particles' -and ! -name 'make_input_file') )
     rm -f ${rmfilelist[@]}
     check
 done
+
+
+
+# Now remake the input files
+\cd $curdir/default
+$curdir/default/make_input_file
+\cd $curdir
+for i in $(find $curdir -name "make_input_file"); do
+    \cd $(dirname $i)
+    ./make_input_file
+    check
+    \cd $curdir
+done
+
+
+
+echo "Writing GNU Fortran version information to GNUFortran.txt"
+$(which gfortran) --version > GNUFortran.txt
+
 
 count=0
 for i in ${dirlist[@]}; do
@@ -36,7 +55,6 @@ done
 
 \cd $curdir
 
-echo "Writing GNU Fortran version information to GNUFortran.txt"
-$(which gfortran) --version > GNUFortran.txt
+
 
 echo "Done"

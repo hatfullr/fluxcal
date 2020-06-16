@@ -22,7 +22,7 @@
  \___________________/                                 
                                                        
  ** Initializing **
- Using default baseunits file '../../../../..//defaults/flux_cal.baseunits'.
+ Using default baseunits file '../../../../../defaults/flux_cal.baseunits'.
  
        gram   = 0.1000E+01   arad        = 0.7566E-14
        sec    = 0.1000E+01   gravconst   = 0.6674E-07
@@ -32,10 +32,10 @@
        crad   = 0.2998E+11   planck      = 0.6626E-26
        sigma  = 0.5671E-04   
  
- runit        = 0.6960E+11   munit       = 0.1989E+34
- tunit        = 0.1594E+04   vunit       = 0.4368E+08
- Eunit        = 0.3794E+49   rhounit     = 0.5900E+01
- muunit       = 0.1000E+01   gunit       = 0.2741E+05
+ runit        = 0.1000E+01   munit       = 0.1000E+01
+ tunit        = 0.1000E+01   vunit       = 0.1000E+01
+ Eunit        = 0.1000E+01   rhounit     = 0.1000E+01
+ muunit       = 0.1000E+01   gunit       = 0.1000E+01
  
  runit_out    = 0.1000E+01   munit_out   = 0.1000E+01
  tunit_out    = 0.1000E+01   vunit_out   = 0.1000E+01
@@ -48,7 +48,7 @@
  start  =      0    anglexdeg =  0.000    
  finish =      0    angleydeg =  0.000    
  step   =      0    anglezdeg =  0.000    
- flux_cal_dir = '../../../../../'
+ flux_cal_dir = '../../../../..'
  
  nkernel              =          0
  yscalconst           = 0.6000E-01
@@ -62,9 +62,10 @@
  tau_thick_envfit     = 0.1000E+02
  envfit               =          T
  
- Topac_Planck         = 0.1000E+04
+ use_rosseland              = T
+ use_planck                 = T
+ Tplanck              = 0.1000E+04
  metallicity          = 0.2000E-01
- Rform                = 0.1000E+31
  
  get_fluxes                 = T
  get_true_luminosity        = F
@@ -75,17 +76,19 @@
  track_particles            = F
  get_info_of_particle       = F
  
- eosfile         = 'sph.eos'
- opacityfile     = 'sph.opacities_ferguson_yes_grains_and_molecules'
- opacitydustfile = 'sph.opacities_yes_grains_and_molecules_ncooling2'
- filtersfile     = 'filters.dat'
- outfile         = 'flux_cal.output'
+ eosfile               = 'sph.eos'
+ opacityfile_planck    = 'kP_h2001.dat'
+ opacityfile_rosseland = 'kR_h2001.dat'
+ filtersfile           = 'filters.dat'
+ outfile               = 'flux_cal.output'
  
  Reading SPH eos file
- Reading opacity file
- Reading opacity file for dust
+ WARNING: Could not find 'kR_h2001.dat'. Checking the defaults directory in '../../../../../defaults'.
+ Found 'kR_h2001.dat' in '../../../../../defaults/kR_h2001.dat'.
+ WARNING: Could not find 'kP_h2001.dat'. Checking the defaults directory in '../../../../../defaults'.
+ Found 'kP_h2001.dat' in '../../../../../defaults/kP_h2001.dat'.
  Dust model: "normal" silicates; composite spherical particles
- Reading cold opacity file
+ Dust model: "normal" silicates; composite spherical particles
  Reading envfit cold opacity file
  Creating envfit density lookup table
  Reading envfit nabla file
@@ -97,10 +100,10 @@
  Creating 'flux_cal.output'
  Reading 'fluxcal_0000.dat'
  WARNING: Some particles are outside the TEOS. Their cumulative properties are:
-          Mass =    2.1785809124877634E+030
-          Internal energy =    1.3555730833110886E+045
-          min(rho,T) = (   6353.2589829857006      ,   105812519.65035529      )
-          max(rho,T) = (   91063.812363240824      ,   512948559.60340023      )
+          Mass =    1.4921408610080305     
+          Internal energy =   0.16865862270733065     
+          min(rho,T) = (   2.3013980940994941E-012 ,   2.6000446292507828E-012 )
+          max(rho,T) = (   15433.262722797739      ,   1.5073612385884668E-006 )
  
  Establishing the grid
  Reading pre-existing dimen file 'dimen00000_000_000_000.dat'
@@ -116,9 +119,9 @@
  Calculating the flux at each grid point
  Writing 'teffs00000_000_000_000.dat'
  
- Luminosity =  1.15755430902345E+38
- Average Teff =  2.97929446248474E+03
- Effective visible area =  7.78630625741142E+26
+ Luminosity =  0.00000000000000E+00
+ Average Teff =  0.00000000000000E+00
+ Effective visible area =  0.00000000000000E+00
  
  Writing to 'flux_cal.output'
  

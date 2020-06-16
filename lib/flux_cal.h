@@ -1,10 +1,10 @@
       implicit none
-      integer nmax,nnmax,ntab,maxstp
-      PARAMETER (NMAX=420000,NNMAX=128,maxstp=10000)
+      integer nmax,nnmax,ntab
+      PARAMETER (NMAX=420000,NNMAX=128) ! Also in odeint.f
 c      PARAMETER (NMAX=301000,NNMAX=128)
 c      PARAMETER (NMAX=221000,NNMAX=1000)
 c      PARAMETER (NMAX=180000,NNMAX=100)
-      PARAMETER (NTAB=100000)                                           
+      PARAMETER (NTAB=100000)
       real*8 hmin,hmax
       integer n,nout,nit
       common/intpar/ hmin,hmax,n
@@ -25,6 +25,9 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 wtab(ntab),ctab
       common/wtabul/ wtab,ctab
 
+      integer neighbors(nmax) ! Remove later
+      common/neigh/ neighbors ! Remove later
+	
       real*8 mu
       common/surfaceangle/ mu
 	
@@ -39,9 +42,46 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 wavelength(numfiltersmax),absoluteflux(numfiltersmax)
       common /splotfilters/ wavelength,absoluteflux,numfilters
       common /filternames/ filtername
-c      integer i
-      character*255 opacityfile,opacitydustfile,filtersfile,trackfile,
-     $      eosfile
+
+      logical opacity_oob_error,opacity_oob_warning,opacity_analytic_warning
+
+      real*8 boundfree,freefree,escattering,negativeHion
+
+      common/OOB_opacity_behavior/ opacity_oob_error,opacity_oob_warning,
+     $      opacity_analytic_warning
+	
+      integer numopacityfiles
+      parameter (numopacityfiles=9)
+      character*255 opacityfiles(numopacityfiles)
+      common/common_opacityfiles/ opacityfiles
+      real*8 logTmins(numopacityfiles), logTmaxs(numopacityfiles)
+      common/common_Tminsmaxs/ logTmins,logTmaxs
+      real*8 logRmins(numopacityfiles), logRmaxs(numopacityfiles)
+      common/common_Rminsmaxs/ logRmins, logRmaxs
+      real*8 logT_blend1(numopacityfiles),
+     $      logT_blend2(numopacityfiles),
+     $      logR_blend1(numopacityfiles),
+     $      logR_blend2(numopacityfiles)
+      common/blending/ logT_blend1, logT_blend2,
+     $      logR_blend1, logR_blend2
+      integer nrows_opac_table,ncols_opac_table
+      parameter (nrows_opac_table=300,ncols_opac_table=300)
+      integer nrows_tables(numopacityfiles), ncols_tables(numopacityfiles)
+      real*8 logopacitytables(numopacityfiles,
+     $      nrows_opac_table,ncols_opac_table)
+      real*8 logTs(numopacityfiles,nrows_opac_table),
+     $     logRs(numopacityfiles,ncols_opac_table)
+
+      real*8 opacity_rho_cutoff
+
+      common/rhocutoff/ opacity_rho_cutoff
+	
+      common/TandR/ logTs, logRs
+      common/tabledimens/ nrows_tables, ncols_tables
+      common/opacity_hiT_tables/ logopacitytables
+      
+      character*255 opacityfile_rosseland,opacityfile_planck,
+     $      filtersfile,trackfile,eosfile
       real*8 yscalconst,fracaccuracy,metallicity
       integer nkernel
       common/kernels/ nkernel
@@ -55,20 +95,20 @@ c      integer i
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
      $      Lunit_out,kunit_out,sunit_out
 
-      real*8 Rform
-      common/dust/Rform
       integer start,finish,step
       common/filevars/ start,finish,step
-      logical rossonly,get_particles_at_pos,
+      logical get_particles_at_pos,
      $      track_particles,binary_tracking_file,get_fluxes,
      $      get_integration_at_pos,get_info_of_particle,
      $      get_closest_particles,get_integration_at_all_pos,
      $      get_true_luminosity
-      common/opacitytype/ rossonly
-      real*8 step1,step2,step3,step4
-      common/steps/ step1,step2,step3,step4
-      real*8 Topac_Planck
-      common/Topacity_Planck/ Topac_Planck
+      real*8 step1,step2,step3,step4,simps_h,simps_alpha,
+     $      simps_fracacc
+	integer MAXSTP
+      common/steps/ step1,step2,step3,step4,MAXSTP
+      common/simpsonrule/simps_h,simps_alpha,simps_fracacc
+      real*8 Tplanck
+      common/opacity_controls/ Tplanck
       real*8 taulimit,posx,posy
       real*8 tau_thick_envfit,tau_thick_integrator,tau_thick
       common/tauthick/ tau_thick_integrator,tau_thick_envfit,tau_thick
@@ -88,26 +128,35 @@ c      integer i
       common/time/ t
       character*3 dust_model
       character*1 dust_topology, dust_shape
-      common/colddust/ dust_model,dust_topology,dust_shape
+      common/dust/ dust_model,dust_topology,dust_shape
+      logical debug
+      common/dbg/ debug
       logical track_all
       common/trackall/ track_all
+      real*8 smoothing_window_T,smoothing_window_rho
+      common/smoothingwindow/ smoothing_window_T,smoothing_window_rho
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
      $      rhounit_out,muunit_out,gunit_out,tempunit_out,punit_out,
      $      Lunit_out,dust_model,dust_topology,dust_shape,
-     $      nkernel,opacityfile,opacitydustfile,filtersfile,metallicity,
-     $      Rform,anglexdeg,angleydeg,anglezdeg,start,finish,step,
-     $      rossonly,step1,step2,step3,step4,taulimit,
+     $      nkernel,opacityfile_rosseland,opacityfile_planck,filtersfile,
+     $      metallicity,anglexdeg,angleydeg,anglezdeg,start,finish,step,
+     $      step1,step2,step3,step4,taulimit,
      $      get_particles_at_pos,posx,posy,track_particles,trackfile,
      $      binary_tracking_file,get_fluxes,envfit,
      $      get_integration_at_pos,get_integration_at_all_pos,
      $      get_info_of_particle,info_particle,
      $      outfile,tau_thick_envfit,eosfile,get_true_luminosity,
      $      get_closest_particles,flux_cal_dir,tau_thick_integrator,
-     $      tau_thick,track_all,kunit_out,sunit_out
-      common/inputfilenames/ opacityfile,opacitydustfile,filtersfile,
-     $      trackfile,eosfile
+     $      tau_thick,track_all,kunit_out,sunit_out,opacityfiles,logTmins,
+     $      logTmaxs,logRmins,logRmaxs,logT_blend1,logT_blend2,
+     $      logR_blend1,logR_blend2,MAXSTP,opacity_oob_error,
+     $      opacity_oob_warning,opacity_analytic_warning,opacity_rho_cutoff,
+     $      debug,smoothing_window_T,smoothing_window_rho,
+     $      simps_h,simps_alpha,simps_fracacc,integrator
+	
+      common/inputfilenames/ filtersfile,trackfile,eosfile
 
       real*8 yscalfactor(numfiltersmax)
       common /yscales/ yscalfactor
@@ -126,9 +175,8 @@ c      integer i
       common/splitlums/ natalum,sphlum,natalumhi,natalumlo
 
 
-      real*8 getOpacity,useeostable
-      external usetable,usetabledust
-      external usetable2,usetabledust2
+      real*8 getOpacity
+      real*8 useeostable
 
       real*8 get_teff,getLocalAngle
       real*8 fourPointArea, fourPointArea2
@@ -190,3 +238,19 @@ c     slops for envelope fitting
       real*8 rhooutsideTEOS,aoutsideTEOS
       common/outsideTEOS/ rhooutsideTEOS,aoutsideTEOS
 
+      real*8 max_step_size,min_step_size
+      integer min_steps_taken,max_steps_taken
+      integer nstp
+      common/boundsteptaken/ max_step_size,min_step_size,min_steps_taken,
+     $      max_steps_taken,nstp
+
+      real*8 taylor_expansion
+	
+      real*8 depth
+      common/depthtracker/ depth
+
+      real*8 rhoPlanckRossmin, rhoPlanckRossmax
+      parameter(rhoPlanckRossmin=2.d-18,rhoPlanckRossmax=1.d-7)
+
+      integer integrator
+      common/integrator_type/ integrator

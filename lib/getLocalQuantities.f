@@ -20,6 +20,17 @@ c      write(*,*) "hzmap = ",hzmap
          iz=1
       end if
 
+      if ( iz.le.0 .or. iz.gt.nzmap .or.
+     $     iy.le.0 .or. iy.gt.nymap .or.
+     $     ix.le.0 .or. ix.gt.nxmap ) then
+         write(*,*) "ERROR: getLocalQuantities is trying to "//
+     $        "calculate values at a positions that is outside "//
+     $        "the integration grid."
+         write(*,*) "ix,iy,iz,nxmap,nymap,nzmap = ",ix,iy,iz,
+     $        nxmap,nymap,nzmap
+         error stop "getLocalQuantities.f"
+      end if
+      
 c      if(iy.gt.60 .and. innit.eq.5) then
 c         write(*,*) ix,iy,iz, realiz
 c         write(*,*) hzmap, nzmap, zmax(ix,iy),zmin(ix,iy)
@@ -28,7 +39,6 @@ c      write(*,*) "I am here"
       if((rhoxyz(ix,iy,iz+1).le.0.d0).or.
      $     (rhoxyz(ix,iy,iz).le.0.d0)) then ! One or both cells are empty
 c        Find a more precise value for boundary cases
-
          rhocgs = 0.d0
          ucgs = 0.d0
          xhp = 0.d0
@@ -48,17 +58,27 @@ c        Find a more precise value for boundary cases
 c            write(*,*) "I finished in spot"
             return
          else if((rhoxyz(ix,iy,iz).le.0.d0).and.
-     $           (rhoxyz(ix,iy,iz+1).gt.0.d0)) then !Only behind is empty
+     $           (rhoxyz(ix,iy,iz+1).gt.0.d0)) then ! Only behind is empty
             ip = last_part(ix,iy,iz+1)
+c            write(*,*) "Behind is empty"
          else if((rhoxyz(ix,iy,iz+1).le.0.d0).and.
-     $           (rhoxyz(ix,iy,iz).gt.0.d0)) then   !Only front is empty
+     $           (rhoxyz(ix,iy,iz).gt.0.d0)) then   ! Only front is empty
             ip = last_part(ix,iy,iz)
+c            write(*,*) "Front is empty"
          end if
 
+         ! It is still possible to have a case in which both the cell in front
+         ! and the cell behind are not empty, but we are still in empty space.
+         ! This is an unavoidable situation and the only way to fix it is to
+         ! change the computation method from smoothing over a pre-made grid
+         ! to doing simply direct calculations at each integration step.
+         
          if(a(ip).gt.0.d0) then ! Not a sink particle
+c            write(*,*) "Not a sink particle"
             r2 = (x(ip)-myx)**2.d0+(y(ip)-myy)**2.d0
      $           +(z(ip)-myz)**2.d0
             if(r2 .lt. 4.d0*hp(ip)**2.d0) then ! We're inside
+c               write(*,*) "We're inside the last particle"
                index = int(ctab*r2/hp(ip)**2.d0)+1
                wpc = wtab(index)/hp(ip)**3.d0
                rhocgs = am(ip)*wpc
@@ -71,6 +91,9 @@ c            write(*,*) "I finished in spot"
                pcgs = am(ip)*wpc*pp(ip)
                tcgs = am(ip)*wpc*tempp(ip)
                lastpart = ip
+            else
+c               write(*,*) "We are outside of the last particle"
+c               write(*,*) "rhocgs = ",rhocgs/rhounit_out
             end if
          end if
       else
@@ -101,6 +124,7 @@ c     Take a weighted average between the two nearest grid cells
          gcgs=0.d0
          pcgs=0.d0
          tcgs=0.d0
+c         write(*,*) "Returning like a good boy"
          return
       end if
 

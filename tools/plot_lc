@@ -76,7 +76,12 @@ def read_file(filename):
             linenum += 1
     return data
 
-user_input = input("Enter file name(s) or patterns: ").split(" ")
+args = sys.argv[1:]
+
+if args:
+    user_input = args
+else:
+    user_input = input("Enter file name(s) or patterns: ").split(" ")
 
 files = []
 for pattern in user_input:

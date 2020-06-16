@@ -1,0 +1,8 @@
+#!/bin/bash
+
+\cp ../default/flux_cal.input .
+
+
+sed -i 's/get_fluxes=.false./get_fluxes=.true./g' flux_cal.input
+sed -i 's/get_closest_particles=.false./get_closest_particles=.true./g' flux_cal.input
+sed -i 's/anglezdeg=0.d0/anglezdeg=90.d0/g' flux_cal.input

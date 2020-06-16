@@ -1,0 +1,8 @@
+#!/bin/bash
+
+\cp ../default/flux_cal.input .
+
+
+sed -i 's/get_fluxes=.false./get_fluxes=.true./g' flux_cal.input
+sed -i 's/metallicity=0.02d0/metallicity=0.50d0/g' flux_cal.input
+

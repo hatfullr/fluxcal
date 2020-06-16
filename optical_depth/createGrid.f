@@ -43,15 +43,64 @@ cc     Use a 3x3 grid for starters:
 c      NXMAPnext=3
 c      NYMAPnext=3
 
- 102  format(" ",A5," ",A15  ," ",A15  ," ",A5," ",A15  ," ",A15  ," ",
-     $     A5," ",A15," ",A10)
- 103  format(" ",i5," ",ES15.7," ",ES15.7," ",i5," ",ES15.7," ",
-     $     ES15.7," ",i5," ",ES15.7," ",A10)
-      write(*,102) "iter","xmin","hx","Nx","ymin","hy","Ny","<F>",
+ 102  format(
+     $     " ",A5,              !iter
+     $     " ",A11,             !xmin
+     $     " ",A11,             !hx
+     $     " ",A5,              !Nx
+     $     " ",A11,             !ymin
+     $     " ",A11,             !hy
+     $     " ",A5,              !Ny
+     $     " ",A12,             !|minstpsize|
+     $     " ",A12,             !|maxstpsize|
+     $     " ",A8,              !minNstp
+     $     " ",A8,              !maxNstp
+     $     " ",A11,             !<F>
+     $     " ",A10              !reason
+     $     )
+ 103  format(
+     $     " ",i5,              !iter
+     $     " ",ES11.4,          !xmin
+     $     " ",ES11.4,          !hx
+     $     " ",i5,              !Nx
+     $     " ",ES11.4,          !ymin
+     $     " ",ES11.4,          !hy
+     $     " ",i5,              !Ny
+     $     " ",ES12.5,          !|minstpsize|
+     $     " ",ES12.5,          !|maxstpsize|
+     $     " ",i8,              !minNstp
+     $     " ",i8,              !maxNstp
+     $     " ",ES11.4,          !<F>
+     $     " ",A10              !reason
+     $     )
+      write(*,102)
+     $     "iter",
+     $     "xmin",
+     $     "hx",
+     $     "Nx",
+     $     "ymin",
+     $     "hy",
+     $     "Ny",
+     $     "|minstpsize|",
+     $     "|maxstpsize|",
+     $     "minNstp",
+     $     "maxNstp",
+     $     "<F>",
      $     "reason"
-      write(*,102) repeat("-",5), repeat("-",15), repeat("-",15),
-     $     repeat("-",5), repeat("-",15), repeat("-",15),
-     $     repeat("-",5), repeat("-",15), repeat("-",10)
+      write(*,102)
+     $     repeat("-",5),       !iter
+     $     repeat("-",11),      !xmin
+     $     repeat("-",11),      !hx
+     $     repeat("-",5),       !Nx
+     $     repeat("-",11),      !ymin
+     $     repeat("-",11),      !hy
+     $     repeat("-",5),       !Ny
+     $     repeat("-",12),      !|minstpsize|
+     $     repeat("-",12),      !|maxstpsize|
+     $     repeat("-",8),       !minNstp
+     $     repeat("-",8),       !maxNstp
+     $     repeat("-",11),      !<F>
+     $     repeat("-",10)       !reason
       
       counter = 1
       lastnumcell = int(1.d-30)
@@ -165,12 +214,14 @@ c     print *,'no convergence yet...try again'
 
          if(TOTALflux.eq.0) then
             write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $           yminmap/runit_out,hymap/runit_out,nymap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $           max_step_size,min_steps_taken,max_steps_taken,
      $           0.d0,"Finished  "
             goto 42
          else
             write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $           yminmap/runit_out,hymap/runit_out,nymap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $           max_step_size,min_steps_taken,max_steps_taken,
      $           TOTALflux/numcell,reason
          end if
 
@@ -181,11 +232,13 @@ c     print *,'no convergence yet...try again'
 
       if(TOTALflux.eq.0) then
          write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $        yminmap/runit_out,hymap/runit_out,nymap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $        max_step_size,min_steps_taken,max_steps_taken,
      $        0.d0,"Finished  "
       else
          write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $        yminmap/runit_out,hymap/runit_out,nymap,
+     $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $        max_step_size,min_steps_taken,max_steps_taken,
      $        TOTALflux/numcell,"Finished  "
       end if
 

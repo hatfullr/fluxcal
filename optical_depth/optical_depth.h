@@ -3,7 +3,7 @@
       real*8 XPOS, YPOS, TMAX, TMIN, anglex, angley, anglez
       COMMON/TAUGRID/XPOS,YPOS
       integer mlog
-      PARAMETER (MLOG=1)
+      PARAMETER (MLOG=0)
 
 C NXMAP and NYMAP ARE NOW SET IN THE CODE
       integer NXMAPMAX,NYMAPMAX,NZMAP
@@ -45,7 +45,7 @@ c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
       integer ifilter !,numfiltersmax
       real*8 dssav,eps,s,tau,taustart(NVARMAX)
       COMMON /path/ kmax,kount,dssav,s(KMAXX),tau(NVARMAX,KMAXX)
-      external derivs2,rkqs,derivs3
+      external derivs,rkqs
       integer NXMAP, NYMAP
       real*8 HXMAP, HYMAP
       integer IP
@@ -147,10 +147,8 @@ c     Things Roger Hatfull added
       integer intout
       common/intoutput/ intout
 
-      real*8 rayout1(10,maxstp)
-      integer rayout2(maxstp),nstp
-      common/rayout/ rayout1,rayout2,nstp
-
       logical prepareIntegrationCalled
       common/called/ prepareIntegrationCalled
+
+      
        

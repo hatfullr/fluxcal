@@ -7,7 +7,8 @@ endif
 
 FFLAGS = -O4 -ffixed-line-length-132 -mcmodel=large
 
-LIB = -L/usr/lib
+LIB = /usr/lib
+BUILD_DIR = build
 
 executable = flux_cal
 
@@ -16,31 +17,38 @@ llib = lib
 opdeplib = optical_depth
 findTefflib = find_teff
 
+# These need to be built first
+math_modules = $(mathlib)/bilinear_interpolation.o \
+	       $(mathlib)/toms760.o                \
+
+
 # Library objects
-lib_obj = $(llib)/usekappatable.o      \
-          $(llib)/getTemperature.o     \
-          $(llib)/derivs2.o            \
-          $(llib)/kernels.o            \
-          $(llib)/init.o               \
-          $(llib)/getOpacity.o         \
-          $(llib)/read_fluxcal.o       \
-          $(llib)/getLocalQuantities.o \
-          $(llib)/getLocalvz.o         \
-          $(llib)/useeostable.o        \
-          $(llib)/readineostable.o     \
-          $(llib)/trackParticles.o     \
-          $(llib)/getOpacitySub.o      \
-	  $(llib)/opacities_cold.o     \
-          $(llib)/quicksort.o          \
-          $(llib)/makeOutputFile.o     \
-          $(llib)/output.o             \
-          $(llib)/getLocalAngle.o      \
+lib_obj = $(llib)/getTemperature.o      \
+          $(llib)/derivs.o              \
+          $(llib)/kernels.o             \
+          $(llib)/init.o                \
+          $(llib)/getOpacity.o          \
+          $(llib)/read_fluxcal.o        \
+          $(llib)/getLocalQuantities.o  \
+          $(llib)/getLocalvz.o          \
+          $(llib)/useeostable.o         \
+          $(llib)/readineostable.o      \
+          $(llib)/trackParticles.o      \
+          $(llib)/quicksort.o           \
+          $(llib)/makeOutputFile.o      \
+          $(llib)/output.o              \
+          $(llib)/getLocalAngle.o       \
+	  $(llib)/opacity.o             \
+	  $(llib)/opacityTables.o       \
 
 # Math objects
-math_obj = $(mathlib)/odeint.o        \
-           $(mathlib)/rkck.o          \
-           $(mathlib)/rkqs.o          \
-           $(mathlib)/fourPointArea.o \
+math_obj = $(mathlib)/odeint.o           \
+           $(mathlib)/rkck.o             \
+           $(mathlib)/rkqs.o             \
+	   $(mathlib)/interp.o           \
+	   $(mathlib)/toms526.o          \
+	   $(mathlib)/tseval_f90.o       \
+	   $(mathlib)/simps.o            \
 
 # Optical depth objects
 opdep_obj = $(opdeplib)/optical_depth.o            \
@@ -69,12 +77,18 @@ findTeff_obj = $(findTefflib)/get_slop.o                \
                $(findTefflib)/rho_out_pt.o              \
                $(findTefflib)/ini_slops.o               \
 
-# All objects
-process_obj = $(executable).o $(lib_obj) $(math_obj) $(opdep_obj) $(findTeff_obj)
+# All modules
+modules = $(math_modules)
 
-$(executable): $(process_obj)
-	$(FC) -o $(executable) $(process_obj) $(LIB)
+# All objects
+process_obj = $(modules) $(lib_obj) $(math_obj) $(opdep_obj) $(findTeff_obj)
+
+$(executable): $(executable).o $(process_obj)
+	$(FC) $(FFLAGS) -o $(executable) $(executable).o $(process_obj) -L$(LIB) -I$(BUILD_DIR) 
+	@\mv $(executable).o $(process_obj) $(BUILD_DIR)/.
+	@\mv $(shell find . -name "*.mod") $(BUILD_DIR)/.
 
 # Delete all made stuff
 clean:
-	@\rm -rf $(process_obj) $(executable)
+	@\rm -f $(BUILD_DIR)/* $(executable) $(process_obj)
+
