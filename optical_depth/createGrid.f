@@ -155,6 +155,10 @@ c     $     TOTALflux/numcell,reason
       deltai=IMAXGLOW-IMINGLOW
       deltaj=JMAXGLOW-JMINGLOW
       reason = ""
+c      reasons(1) = deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy))
+c      reasons(2) = deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy))
+c      reasons(3) = abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
+c     $     fracaccuracy*TOTALflux/numcell
       if( (deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy)) .or. 
      $     deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy)) .or.
 c     $     abs(TOTALpracticalLUM-lastTOTALLUM).gt.
@@ -168,14 +172,9 @@ c     $     fracaccuracy*TOTALpracticalLUM)
 !     previous grid size.
 c     print *,'no convergence yet...try again'
 
-         if(deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy))) then
-            reason = "Nx cells"
-         else if(deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy))) then
-            reason = "Ny cells"
-         else if(abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
-     $           fracaccuracy*TOTALflux/numcell) then
-            reason = "F cnvgnce"
-         end if
+c     Default to complaining about F convergence, otherwise complain about
+c     not having enough grid cells in X or Y directions
+         reason = "F cnvgnce"
          
          ! In case there are two well-separated stars, don't start
          ! making smaller grids too quickly:
@@ -200,13 +199,16 @@ c     print *,'no convergence yet...try again'
          hytmp=(ymaxmapnext-yminmapnext)/(nymap-1)
          if(hxtmp.gt.hytmp .and. nxmap.lt.nxmapmax) then
             nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,nxmapmax)
+            reason = "Nx cells"
          else if(hytmp.gt.hxtmp .and. nymap.lt.nymapmax) then
             nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+7,nymapmax)
+            reason = "Ny cells"
          else
             nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+6,nxmapmax)
             nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,nymapmax)
+            reason = "Nxy cells"
          endif
-         
+
          !lasttotallum = totallum ! Record for comparison
          lasttotallum = TOTALpracticalLUM
          lasttotalflux = TOTALflux
