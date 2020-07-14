@@ -145,9 +145,9 @@ c               write(*,*) "Final iteration."
             Tthin4_3 = (t6d6)**4.d0*exp(-tau_thin)*dtaudz3
 
 c     For debugging:
-c            write(*,'(2I5,4E15.7,"     ",4E15.7,"     ",3E15.7)')
+c            write(*,'(2I5,4E15.7,"     ",5E15.7,"     ",3E15.7)')
 c     $           nstp,k,zpos,mystep,zpos+mystep,z2,
-c     $           dtaudz1,dtaudz2,dtaudz3,tau_thin,
+c     $           dtaudz1,dtaudz2,dtaudz3,tau_thin,Tthin4,
 c     $           taulimit,tau_min_acceptable,tau_max_acceptable
 
             ! Reject this integration step if tau is going to exceed the
