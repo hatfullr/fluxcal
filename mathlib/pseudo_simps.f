@@ -1,4 +1,4 @@
-      subroutine simpson(xpos,ypos,z1,z2,Tthin4,tau_thin,kount1)
+      subroutine pseudo_simpson(xpos,ypos,z1,z2,Tthin4,tau_thin,kount1)
 c     In this Simpson's rule integrator, we want to be able to stop where
 c     tau_thin ~ tau_limit. To do so, we will use a modified version of the
 c     Composite Simpson's rule, which is normally written as
@@ -43,25 +43,25 @@ c      write(*,*) ""
          if ( MAXSTP .lt. 2 ) then
             write(*,*) "ERROR: MAXSTP = ",MAXSTP," but "//
      $           "must be >= 2."
-            error stop "simps.f"
+            error stop "pseudo_simps.f"
          end if
          h = 0.5d0*abs(z2-z1)/float(MAXSTP-2)
       else
          h = simps_h
          ! Prevent stepsizes that give a total number of steps less than 2
          if ( abs(h) .gt. abs(0.5d0*(z2-z1)) ) then
-            write(*,*) "WARNING (simps.f): Integration stepsize |h| >"//
-     $           " |(z2-z1)/2|, so only one step would be taken. |h| "//
-     $           "will be set to |(z2-z1)/2|, but this will result in"//
-     $           " inaccurate results."
+            write(*,*) "WARNING (pseudo_simps.f): Integration "//
+     $           "stepsize |h|> |(z2-z1)/2|, so only one step would "//
+     $           "be taken. |h| will be set to |(z2-z1)/2|, but this "//
+     $           "will result in inaccurate results."
             h = sign(h,abs(0.5d0*(z2-z1)))
          end if
       end if
       
       if ( simps_alpha.ge.1.d0 .or. simps_alpha.le.0.d0 ) then
-         write(*,*) "ERROR (simps.f): Must have stepsize modifier "//
-     $        "0 < simps_alpha < 1."
-         error stop "simps.f"
+         write(*,*) "ERROR (pseudo_simps.f): Must have stepsize "//
+     $        "modifier 0 < simps_alpha < 1."
+         error stop "pseudo_simps.f"
       end if
 
 c     Make sure sign is correct on stepsizes
@@ -111,7 +111,7 @@ c     Prevent min_step_size from being the default 0
          ! Catch an edge case where we could infinitely loop if the stepsize is zero.
          if ( mystep .eq. 0 ) then
             write(*,*) "Failed to find a small enough stepsize"
-            error stop "simps.f"
+            error stop "pseudo_simps.f"
          end if
 
          do while (nstp .lt. MAXSTP)
@@ -207,7 +207,7 @@ c     $           taulimit,tau_min_acceptable,tau_max_acceptable
          write(*,*) "Try increasing simps_h, MAXSTP, "//
      $        "simps_alpha, or simps_fracacc. You can also try using "//
      $        "a smaller taulimit."
-         error stop "simps.f"
+         error stop "pseudo_simps.f"
       end if
 
       return
