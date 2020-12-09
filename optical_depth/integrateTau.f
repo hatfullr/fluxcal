@@ -43,10 +43,10 @@
 c      if(dimenFileAlreadyExists) then
 c         write(*,*) "Integrating through each point on the driving grid"
 c     end if
-      max_step_size = 0.d0
-      min_step_size = 0.d0
-      min_steps_taken = MAXSTP
-      max_steps_taken = 0
+      min_step_size = 1.d30
+      max_step_size = -1
+      min_steps_taken = 2147483647
+      max_steps_taken = -1
       
       DO J=1,NYMAP
          DO I=1,NXMAP

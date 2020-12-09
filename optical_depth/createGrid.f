@@ -152,6 +152,12 @@ c     $     TOTALflux/numcell,reason
       ! optical depth greater than tau_thick at a cell, we reset the min
       ! and max glowing cell positions to encompass that grid cell.
 
+      ! IMINGLOW is the minimum cell index in the x direction for which
+      ! we detect a photosphere, and IMAXGLOW is the maximum. Same for
+      ! JMINGLOW and JMAXGLOW but in the y direction.
+      ! Thus, deltai and deltaj are the number of cells within which
+      ! we have detected photospheres.
+
       deltai=IMAXGLOW-IMINGLOW
       deltaj=JMAXGLOW-JMINGLOW
       reason = ""
@@ -161,11 +167,13 @@ c      reasons(3) = abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
 c     $     fracaccuracy*TOTALflux/numcell
       if( (deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy)) .or. 
      $     deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy)) .or.
+c      if ((deltai.le.0.5*nxmap .or.
+c     $     deltaj.le.0.5*nymap .or.
 c     $     abs(TOTALpracticalLUM-lastTOTALLUM).gt.
 c     $     fracaccuracy*TOTALpracticalLUM)
-     $     abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
-     $     fracaccuracy*TOTALflux/numcell)
-     $     .and.(nxmap.lt.nxmapmax .or. nymap.lt.nymapmax) ) then
+     $     abs((TOTALflux/numcell)-(lastTOTALflux/lastnumcell)).gt.
+     $     fracaccuracy*TOTALflux/numcell) .and.
+     $     (nxmap.lt.nxmapmax .or. nymap.lt.nymapmax) ) then
 !     The code gets inside this if statement if not enough of the grid
 !     has "glowing" cells, or if the total luminosity is not in
 !     sufficient agreement with the total luminosity calculated from the
@@ -176,22 +184,22 @@ c     Default to complaining about F convergence, otherwise complain about
 c     not having enough grid cells in X or Y directions
          reason = "F cnvgnce"
          
-         ! In case there are two well-separated stars, don't start
-         ! making smaller grids too quickly:
-         if(IMAXGLOW-IMINGLOW.le.2) then
-            IMINGLOW=min(IMINGLOW,2)
-            IMAXGLOW=max(IMAXGLOW,NXMAP-1)
-         endif
-         if(JMAXGLOW-JMINGLOW.le.2) then
-            JMINGLOW=min(JMINGLOW,2)
-            JMAXGLOW=max(JMAXGLOW,NYMAP-1)
-         endif
+c         ! In case there are two well-separated stars, don't start
+c         ! making smaller grids too quickly:
+c         if(IMAXGLOW-IMINGLOW.le.2) then
+c            IMINGLOW=min(IMINGLOW,2)
+c            IMAXGLOW=max(IMAXGLOW,NXMAP-1)
+c         endif
+c         if(JMAXGLOW-JMINGLOW.le.2) then
+c            JMINGLOW=min(JMINGLOW,2)
+c            JMAXGLOW=max(JMAXGLOW,NYMAP-1)
+c         endif
             
          ! Decide upon appropriate boundaries for the next grid:
-         xmaxmapnext=min(Imaxglow*hxmap+xminmap + 3*hymap ,xmax)
-         xminmapnext=max((Iminglow-2)*hxmap+xminmap - 3*hymap ,xmin)
-         ymaxmapnext=min(Jmaxglow*hymap+yminmap + 3*hxmap ,ymax)
-         yminmapnext=max((Jminglow-2)*hymap+yminmap - 3*hxmap ,ymin)
+         xmaxmapnext=min(IMAXGLOW*hxmap+xminmap + 3*hymap ,xmax)
+         xminmapnext=max((IMINGLOW-2)*hxmap+xminmap - 3*hymap ,xmin)
+         ymaxmapnext=min(JMAXGLOW*hymap+yminmap + 3*hxmap ,ymax)
+         yminmapnext=max((JMINGLOW-2)*hymap+yminmap - 3*hxmap ,ymin)
          
          ! Determine whether we should resolve the x or y direction
          ! better in the next grid:

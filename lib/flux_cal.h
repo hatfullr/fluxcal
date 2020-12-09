@@ -102,14 +102,18 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      get_integration_at_pos,get_info_of_particle,
      $      get_closest_particles,get_integration_at_all_pos,
      $      get_true_luminosity
-      real*8 step1,step2,step3,step4,simps_h,simps_alpha,
-     $      simps_fracacc
-	integer MAXSTP
+      real*8 step1,step2,step3,step4,simps_alpha,
+     $      simps_max_frac_dF,simps_max_dtau,simps_max_dz,
+     $      simps_min_frac_dF,simps_min_dtau,simps_min_dz,simps_F_cutoff
+      logical simps_max_step_error,simps_max_step_warning
+      integer MAXSTP
       common/steps/ step1,step2,step3,step4,MAXSTP
-      common/simpsonrule/simps_h,simps_alpha,simps_fracacc
+      common/simpsonrule/simps_alpha,simps_min_dz,simps_max_dz,
+     $      simps_min_frac_dF,simps_max_frac_dF,simps_min_dtau,
+     $      simps_max_dtau,simps_max_step_error,simps_max_step_warning
       real*8 Tplanck
       common/opacity_controls/ Tplanck
-      real*8 taulimit,posx,posy
+      real*8 taulimit,posx,posy,taulimit_threshold
       real*8 tau_thick_envfit,tau_thick_integrator,tau_thick
       common/tauthick/ tau_thick_integrator,tau_thick_envfit,tau_thick
       integer info_particle
@@ -118,7 +122,7 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       character*255 flux_cal_dir
       common/inputstuff/ taulimit,posx,posy,get_particles_at_pos,
      $      track_particles,binary_tracking_file,get_fluxes,
-     $      get_info_of_particle,envfit,
+     $      get_info_of_particle,envfit,taulimit_threshold,
      $      get_closest_particles,flux_cal_dir
       common/getint/ get_integration_at_pos,get_integration_at_all_pos,
      $      get_true_luminosity
@@ -152,9 +156,12 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      tau_thick,track_all,kunit_out,sunit_out,opacityfiles,logTmins,
      $      logTmaxs,logRmins,logRmaxs,logT_blend1,logT_blend2,
      $      logR_blend1,logR_blend2,MAXSTP,opacity_oob_error,
-     $      opacity_oob_warning,opacity_analytic_warning,opacity_rho_cutoff,
-     $      debug,smoothing_window_T,smoothing_window_rho,
-     $      simps_h,simps_alpha,simps_fracacc,integrator
+     $      opacity_oob_warning,opacity_analytic_warning,
+     $      opacity_rho_cutoff,debug,smoothing_window_T,
+     $      smoothing_window_rho,simps_alpha,simps_max_frac_dF,integrator,
+     $      simps_max_step_error,simps_max_step_warning,simps_max_dtau,
+     $      taulimit_threshold,simps_max_dz,simps_min_dz,
+     $      simps_min_frac_dF,simps_min_dtau,simps_F_cutoff
 	
       common/inputfilenames/ filtersfile,trackfile,eosfile
 
@@ -239,11 +246,16 @@ c     slops for envelope fitting
       common/outsideTEOS/ rhooutsideTEOS,aoutsideTEOS
 
       real*8 max_step_size,min_step_size
-      integer min_steps_taken,max_steps_taken
+      integer min_steps_taken,max_steps_taken,ndtau_increase,
+     $      ndF_increase,ndz_increase,
+     $      ndtau_decrease,ndF_decrease,ndz_decrease,ndtaulimit_decrease,
+     $      ndtaulimit_increase
       integer nstp
       common/boundsteptaken/ max_step_size,min_step_size,min_steps_taken,
-     $      max_steps_taken,nstp
-
+     $      max_steps_taken,nstp,ndtau_increase,ndF_increase,ndz_increase,
+     $      ndtau_decrease,ndF_decrease,ndz_decrease,ndtaulimit_decrease,
+     $      ndtaulimit_increase
+      
       real*8 taylor_expansion
 	
       real*8 depth

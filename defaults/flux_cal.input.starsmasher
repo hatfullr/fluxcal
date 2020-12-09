@@ -77,7 +77,7 @@
       ! 0 is cubic spline
       ! 1 is Wendland 3,3
       ! 2 is Wendland C4
-      nkernel=0
+      nkernel=2
 
 
 
@@ -98,10 +98,10 @@
 
       ! Choose which integrator to use.
       ! 0 = fourth order adaptive stepsize Runge-Kutta
-      ! 1 = pseduo-adaptive Simpson's Rule
-      ! 0 is probably faster than 1 but may encounter errors. 1 is 
-      ! probably slower, but you can directly control its accuracy
-      ! using simps_h, simps_alpha, simps_fracacc, and MAXSTP.
+      ! 1 = Simpson's rule (default)
+      ! 0 is probably fastest but may encounter errors. 1 is probably
+      ! slower, but you can directly control its accuracy using the
+      ! variables below.
       integrator=1
 
       ! These are for the Runge--Kutta integrator (integrator=0).
@@ -112,25 +112,76 @@
       step3=1d4
       step4=1d15
 
-      ! These are for the Simpson's Rule integrator (integrator=1).
-      ! simps_h is the maximum stepsize the integrator will take. Set to
-      ! 0.d0 to calculate simps_h for each line of sight based on the
-      ! maximum and minumum z there and MAXSTP.
-      ! simps_alpha is the factor by which the stepsize is reduced when
-      ! the current iteration will cause tau_thin > taulimit.
-      ! simps_fracacc is the desired precision in tau.
-      simps_h = 0.d0
-      simps_alpha = 0.5d0
-      simps_fracacc = 1.d-3
-      
-      ! The maximum number of steps the integrator will take before failing.
-      ! We recommend MAXSTP=10000 for integrator=0.
-      MAXSTP=10000
+      ! These control the precision of the Simpson's Rule integrator
+      ! (integrator=1). simps_max_frac_dF is the maximum by which the
+      ! integrated flux is allowed to change with each step, and the
+      ! step size is continually refined until dF is less than or equal
+      ! to simps_max_frac_dF. The same is true for optical depth, but
+      ! with simps_max_dtau as the controller instead. If you set any of
+      ! these to 0.d0, no maximum is imposed (not recommended for
+      ! simps_max_frac_dF and simps_max_dtau). All the above is equally
+      ! true for the minimum values, but it is okay to set the minimum
+      ! to zero, as there are safeguards in place against stepsize
+      ! underflows.
+      !
+      ! Each limit must be given in cgs units.
+      simps_min_dz=0            ! (default=0)
+      simps_max_dz=0            ! (default=0)
 
-      ! Optical depth at which to stop the integration. Only applies to
-      ! get_fluxes and get_integration_at_pos. Set to 1.d30 to integrate
-      ! through the entirety of the fluid on each line of sight.
+      simps_min_dtau=0          ! (default=0)
+      simps_max_dtau=1.d0       ! (default=1.d0)
+      
+      simps_min_frac_dF=0       ! (default=0)
+      simps_max_frac_dF=0       ! (default=0)
+      
+      ! This controls the threshold for the value that is checked
+      ! against simps_min_frac_dF and simps_max_frac_dF. We calculate
+      ! that value as |dF/(F+simps_F_cutoff)|. This effectively sets a
+      ! "cutoff" value for the flux, such that contributions to the
+      ! integrated flux are ignored when they are below simps_F_cutoff.
+      ! We advise against setting this to some very small number like
+      ! 1.d-30 because the stepsize will become arbitrarily small and
+      ! the integrator=1 routine is not good at escaping extremely small
+      ! stepsizes.
+      simps_F_cutoff=1.d-4      ! (default=1.d-4)
+            
+      ! This is the fractional amount by which the stepsize is changed
+      ! for the Simpson's Rule integrator (integrator=1). That is, when
+      ! the stepsize must be decreased, we take dz=simps_alpha*dz, and
+      ! when it must be increased, we take dz=(1.d0+simps_alpha)*dz. We
+      ! choose 0.5d0 by default such that the stepsize is halved when
+      ! it is too large and increased by 1.5 when too small.
+      simps_alpha=0.5d0
+      
+      ! The maximum number of steps the integrator will take before
+      ! failing. We recommend MAXSTP=10000 for integrator=0. For
+      ! integrator=1, MAXSTP is used to make an initial guess on the
+      ! first stepsize. The first stepsize depends on if simps_min_dz
+      ! and/or simps_max_dz are non-zero (turned on). We first take the
+      ! initial guess of dz=(z2-z1)/abs(MAXSTP), and then make sure
+      ! that guess fits within simps_min_dz and simps_max_dz. If it is
+      ! outside this domain, we set dz to either simps_min_dz or
+      ! simps_max_dz depending on which is closer.
+      !
+      ! When MAXSTP<0, there is no upper limit on the number of
+      ! integration steps for each line of sight. If you do want to
+      ! impose a limit, set MAXSTP to a positive value and set
+      ! simps_max_step_error=.true. (default). We suggest MAXSTP=-2
+      ! (default) for integrator=1. Neither an error nor a warning will
+      ! be thrown when MAXSTP<0, so simps_max_step_error and
+      ! simps_max_step_warning can be set to anything.
+      MAXSTP=-2
+      simps_max_step_error=.true.
+      simps_max_step_warning=.false.
+            
+      ! Optical depth at which to stop the integration. Only applies if
+      ! get_fluxes or get_integration_at_pos are .true.. Set to 0 to
+      ! integrate through the entirety of the fluid on each line of
+      ! sight. The value of taulimit_threshold determines how close to
+      ! taulimit the integrator must be to stop integration (1.d-6
+      ! default, and only works with integrator=1).
       taulimit=1.d1
+      taulimit_threshold=1.d-6
 
       ! Optical depth by which the integrator will detect that a region
       ! is optically thick.
@@ -143,23 +194,26 @@
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
       envfit=.true.
+      
 
 
 
 
       
       !### Opacities
-      ! When opacityfiles are not present or when a given (rho,T) lies outside
-      ! the domain of the opacityfiles, FluxCal uses analytic approximations
-      ! to calculate the boundfree, freefree, electron scatter, and negative H
-      ! ion opacities, as done in Onno Pols notes on Stellar Evolution.
+      ! When opacityfiles are not present or when a given (rho,T) lies
+      ! outside the domain of the opacityfiles, FluxCal uses analytic
+      ! approximations to calculate the boundfree, freefree, electron
+      ! scatter, and negative H ion opacities, as done in Onno Pols notes
+      ! on Stellar Evolution.
       ! astro.ru.nl/~onnop/education/stev_utrecht_notes/chapter5-6.pdf
       
-      ! Decide to throw either an error, warning, both, or neither when (rho,T)
-      ! is out of bounds for both the opacityfiles and any available analytic
-      ! approximations in the code. When using the analytic approximations,
-      ! a warning will always be thrown. By default, the opacity is set to 0.d0
-      ! when out of bounds of both the opacityfiles and analytic approximations.
+      ! Decide to throw either an error, warning, both, or neither when
+      ! (rho,T) is out of bounds for both the opacityfiles and any
+      ! available analytic approximations in the code. When using the
+      ! analytic approximations, a warning will always be thrown. By
+      ! default, the opacity is set to 0.d0 when out of bounds of both the
+      ! opacityfiles and analytic approximations.
       !
       ! Setting opacity_analytic_warning to .false. suppresses the warnings
       ! given when FluxCal uses analytic approximations to calculate the 
@@ -168,28 +222,29 @@
       opacity_oob_warning=.true.
       opacity_analytic_warning=.true.
 
-      ! Define the rho for which any rho <= this value forces opacity to equal
-      ! 0.d0. Default is 1.d-19, which is the minimum density allowed by the cop
-      ! subroutine.
+      ! Define the rho for which any rho <= this value forces opacity to
+      ! equal 0.d0. Default is 1.d-19, which is the minimum density allowed
+      ! by the cop subroutine.
       opacity_rho_cutoff=1.d-19
 
       ! The smoothing window in the temperature direction for opacities. A
-      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do not
-      ! make this larger than 1.d4, as this is the minimum distance in T 
-      ! required to calculate e- scattering and kramer opacities in the range
-      ! 1.d4 < T < 1.d8.
+      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do
+      ! not make this larger than 1.d4, as this is the minimum distance in
+      ! T required to calculate e- scattering and kramer opacities in the
+      ! range 1.d4 < T < 1.d8.
       smoothing_window_T = 1000.d0
       smoothing_window_rho = 10.d0
       
-      ! Define the opacity files you would like to be read in, as well as how
-      ! you would like the code to transition between them. You must give the
-      ! maximum and minimum logT and logR values (logTmins, logTmaxs,
-      ! logRmins, and logRmaxs). Set these to -1.d30 to use up to the maximum
-      ! and minimum in the file. You must also give the point at which you want
-      ! opacity blending to begin (logT_blend1, logT_blend2, logR_blend1,
-      ! logR_blend2). Blending will always occur in the region between mins and
-      ! blend1 and between blend2 and maxs. No blending is done between blend1
-      ! and blend2. Set blend values to -1.d30 to turn off the blending region.
+      ! Define the opacity files you would like to be read in, as well as
+      ! how you would like the code to transition between them. You must
+      ! give the maximum and minimum logT and logR values (logTmins,
+      ! logTmaxs, logRmins, and logRmaxs). Set these to -1.d30 to use up to
+      ! the maximum and minimum in the file. You must also give the point
+      ! at which you want opacity blending to begin (logT_blend1,
+      ! logT_blend2, logR_blend1, logR_blend2). Blending will always occur
+      ! in the region between mins and blend1 and between blend2 and maxs.
+      ! No blending is done between blend1 and blend2. Set blend values to
+      ! -1.d30 to turn off the blending region.
       !
       ! logR = logRho - 3*logT + 18
       !
@@ -230,12 +285,12 @@
       logR_blend2(1)=-1.d30     ! No blending at upper R bound
    
       opacityfiles(2)='kR_h2001.dat' ! Rosseland opacities (lowT)
-      logTmins(2)=2.995635d0    ! Not using Rosseland opacities below this T
+      logTmins(2)=2.995635d0    ! Not using Rosseland opacities below this
       logTmaxs(2)=-1.d30       ! This does nothing. Limits are set in code
       logRmins(2)=-1.d30        ! This does nothing. Limits are set in code
       logRmaxs(2)=-1.d30        ! This does nothing. Limits are set in code
       logT_blend1(2)=3.041393d0 ! Stop blending from Planck to Rosseland 
-      logT_blend2(2)=-1.d30     ! Start blending from Rosseland to user files
+      logT_blend2(2)=-1.d30     ! Start blending from Ross. to user files
       logR_blend1(2)=-1.d30     ! No blending at lower R bound
       logR_blend2(2)=-1.d30     ! No blending at upper R bound
       
