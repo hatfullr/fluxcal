@@ -1171,14 +1171,14 @@ c         end if
          if ( opacities(1).ne.0.d0 ) then
             weightT = 1.d0
             if ( logT_blend1(1).ne.logTmins(1) .and.
-     $           logmyT.le.logT_blend1(1) .and.
-     $           logmyT.ge.logTmins(1) )then
+     $           logmyT.lt.logT_blend1(1) .and.
+     $           logmyT.gt.logTmins(1) )then
                weightT = weightT * (1.d0 - ((logT_blend1(1)-logmyT)/
      $              (logT_blend1(1)-logTmins(1))))
             end if
             if ( logT_blend2(2).ne.logTmaxs(2) .and.
-     $           logmyT.ge.logT_blend2(2) .and.
-     $           logmyT.le.logTmaxs(2) )then
+     $           logmyT.gt.logT_blend2(2) .and.
+     $           logmyT.lt.logTmaxs(2) )then
                weightT = weightT * (1.d0 - ((logmyT-logT_blend2(2))/
      $              (logTmaxs(2)-logT_blend2(2))))
             end if
@@ -1199,8 +1199,8 @@ c      write(*,*) "logmyT, logmyR = ",logmyT,logmyR
          if(len(trim(adjustl(opacityfiles(i)))).eq.0) cycle
          
          ! Check to see if we are in bounds
-         if ( logmyT.le.logTmaxs(i) .and. logmyT.ge.logTmins(i) .and.
-     $        logmyR.le.logRmaxs(i) .and. logmyR.ge.logRmins(i) ) then
+         if ( logmyT.lt.logTmaxs(i) .and. logmyT.gt.logTmins(i) .and.
+     $        logmyR.lt.logRmaxs(i) .and. logmyR.gt.logRmins(i) ) then
 
             ! Calculate the opacity
             opacities(i-1) = bilinear_interpolate(
@@ -1215,14 +1215,14 @@ c      write(*,*) "logmyT, logmyR = ",logmyT,logmyR
             weightT = 1.d0
             ! Lower T blending region
             if ( logT_blend1(i).ne.logTmins(i) .and.
-     $           logmyT.le.logT_blend1(i) ) then
+     $           logmyT.lt.logT_blend1(i) ) then
                weightT = weightT * (1.d0 - ((logT_blend1(i)-logmyT)/
      $              (logT_blend1(i)-logTmins(i))))
             end if
 
             ! Upper T blending region
             if ( logT_blend2(i).ne.logTmaxs(i) .and.
-     $           logmyT.ge.logT_blend2(i) ) then
+     $           logmyT.gt.logT_blend2(i) ) then
                weightT = weightT * (1.d0 - ((logmyT-logT_blend2(i))/
      $              (logTmaxs(i)-logT_blend2(i))))
             end if
@@ -1230,14 +1230,14 @@ c      write(*,*) "logmyT, logmyR = ",logmyT,logmyR
             weightR = 1.d0
             ! Lower R blending region
             if ( logR_blend1(i).ne.logRmins(i) .and.
-     $           logmyR.le.logR_blend1(i) ) then
+     $           logmyR.lt.logR_blend1(i) ) then
                weightR = weightR * (1.d0 - ((logR_blend1(i)-logmyR)/
      $              (logR_blend1(i)-logRmins(i))))
             end if
 
             ! Upper R blending region
             if ( logR_blend2(i).ne.logRmaxs(i) .and.
-     $           logmyR.ge.logR_blend2(i) ) then
+     $           logmyR.gt.logR_blend2(i) ) then
                weightR = weightR * (1.d0 - ((logmyR-logR_blend2(i))/
      $              (logRmaxs(i)-logR_blend2(i))))
             end if
