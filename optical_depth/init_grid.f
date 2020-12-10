@@ -27,8 +27,8 @@ c     Initialize the file names for this iteration
       end if
 
 c     Use a 3x3 grid for starters:
-      NXMAPnext=3
-      NYMAPnext=3
+      NXMAPnext=min_Nx          ! default = 3
+      NYMAPnext=min_Ny          ! default = 3
       
 c     Find boundaries of the fluid:
       xmin=1d30
@@ -84,13 +84,13 @@ c      enddo
          ! Use these to set hxmap and hymap
          xmaxmap=xminmap+hxmap*(nxmap-1)
          ymaxmap=yminmap+hymap*(nymap-1)
-         if(nxmap.gt.nxmapmax) then ! Too many cells on x axis
-            nxmap=nxmapmax
+         if(nxmap.gt.max_Nx) then ! Too many cells on x axis
+            nxmap=max_Nx
             hxmap=(xmaxmap-xminmap)/dble(nxmap-1)
             print *,'Reset nxmap=',nxmap,' hxmap=',hxmap
          endif
-         if(nymap.gt.nymapmax) then ! Too many cells on y axis
-            nymap=nymapmax
+         if(nymap.gt.max_Ny) then ! Too many cells on y axis
+            nymap=max_Ny
             hymap=(ymaxmap-yminmap)/dble(nymap-1)
             print *,'Reset nymap=',nymap,' hymap=',hymap
          endif

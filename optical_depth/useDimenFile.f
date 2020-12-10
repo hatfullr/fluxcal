@@ -30,13 +30,13 @@ c     already exists. If so, read from it. If not, throw an error.
       close(73)
       xmaxmap=xminmap+hxmap*(nxmap-1)
       ymaxmap=yminmap+hymap*(nymap-1)
-      if(nxmap.gt.nxmapmax) then
-         nxmap=nxmapmax
+      if(nxmap.gt.max_Nx) then
+         nxmap=max_Nx
          hxmap=(xmaxmap-xminmap)/(nxmap-1)
          print *,'Reset nxmap=',nxmap,' hxmap=',hxmap
       endif
-      if(nymap.gt.nymapmax) then
-         nymap=nymapmax
+      if(nymap.gt.max_Ny) then
+         nymap=max_Ny
          hymap=(ymaxmap-yminmap)/(nymap-1)
          print *,'Reset nymap=',nymap,' hymap=',hymap
       endif

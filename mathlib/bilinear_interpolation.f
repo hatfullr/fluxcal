@@ -72,7 +72,7 @@ c     From https://github.com/cfinch/Shocksolution_Examples/blob/master/FORTRAN/
       
       i = binarysearch(x_len, x_array, x)
       j = binarysearch(y_len, y_array, y)
-      
+
       x1 = x_array(i)
       x2 = x_array(i+1)
       

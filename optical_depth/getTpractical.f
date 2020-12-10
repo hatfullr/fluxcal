@@ -90,7 +90,6 @@ c     $        integrator
             call odeint(taustart,4+numfilters,z1,zstop,
      $           eps,0.25d0*myh1,myh1,nok,nbad,derivs,
      $           rkqs)
-            
             Tthin4=taustart(4)  ! int_0^tau T^4 e^(-tau') dtau'
             tau_thin = taustart(1) ! Attenuation factor
          else if (integrator.eq.1) then
@@ -100,8 +99,6 @@ c     $        integrator
      $           "recognized."
             error stop "getTpractical.f"
          end if
-c         call trapezoidal(xpos,ypos,z1,zstop,NZMAP,
-c     $        getLocalQuantities,Tthin4,tau_thin,kount1)
 
          ! kount1 <= 1 always with Simpson Rule integrator
          if(kount1.gt.1) then   ! Integrator didn't reach an optically thick particle

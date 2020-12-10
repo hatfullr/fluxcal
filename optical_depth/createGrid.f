@@ -5,6 +5,7 @@
       integer i,j
       integer lastnumcell
       character*10 reason
+      real*8 aspect
       
 cc     Find boundaries of the fluid:
 c      xmin=1d30
@@ -103,7 +104,7 @@ c      NYMAPnext=3
      $     repeat("-",10)       !reason
       
       counter = 1
-      lastnumcell = int(1.d-30)
+      lastnumcell = 0
       
       reason = "init"
 
@@ -152,59 +153,74 @@ c     $     TOTALflux/numcell,reason
       ! optical depth greater than tau_thick at a cell, we reset the min
       ! and max glowing cell positions to encompass that grid cell.
 
+      ! IMINGLOW is the minimum cell index in the x direction for which
+      ! we detect a photosphere, and IMAXGLOW is the maximum. Same for
+      ! JMINGLOW and JMAXGLOW but in the y direction.
+      ! Thus, deltai and deltaj are the number of cells within which
+      ! we have detected photospheres.
+
       deltai=IMAXGLOW-IMINGLOW
       deltaj=JMAXGLOW-JMINGLOW
       reason = ""
+c      reasons(1) = deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy))
+c      reasons(2) = deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy))
+c      reasons(3) = abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
+c     $     fracaccuracy*TOTALflux/numcell
       if( (deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy)) .or. 
      $     deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy)) .or.
+c      if ((deltai.le.0.5*nxmap .or.
+c     $     deltaj.le.0.5*nymap .or.
 c     $     abs(TOTALpracticalLUM-lastTOTALLUM).gt.
 c     $     fracaccuracy*TOTALpracticalLUM)
-     $     abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
-     $     fracaccuracy*TOTALflux/numcell)
-     $     .and.(nxmap.lt.nxmapmax .or. nymap.lt.nymapmax) ) then
+     $     abs((TOTALflux/numcell)-(lastTOTALflux/lastnumcell)).gt.
+     $     fracaccuracy*TOTALflux/numcell) .and.
+     $     (nxmap.lt.max_Nx .or. nymap.lt.max_Ny) ) then
 !     The code gets inside this if statement if not enough of the grid
 !     has "glowing" cells, or if the total luminosity is not in
 !     sufficient agreement with the total luminosity calculated from the
 !     previous grid size.
 c     print *,'no convergence yet...try again'
 
-         if(deltai.le.max(NXMAP/2,nint(20*0.025d0/fracaccuracy))) then
-            reason = "Nx cells"
-         else if(deltaj.le.max(NYMAP/2,nint(20*0.025d0/fracaccuracy))) then
-            reason = "Ny cells"
-         else if(abs(TOTALflux/numcell-lastTOTALflux/lastnumcell).gt.
-     $           fracaccuracy*TOTALflux/numcell) then
-            reason = "F cnvgnce"
-         end if
+c        Default to complaining about F convergence, otherwise complain
+c        about not having enough grid cells in X or Y directions
+         reason = "F cnvgnce"
          
-         ! In case there are two well-separated stars, don't start
-         ! making smaller grids too quickly:
-         if(IMAXGLOW-IMINGLOW.le.2) then
-            IMINGLOW=min(IMINGLOW,2)
-            IMAXGLOW=max(IMAXGLOW,NXMAP-1)
-         endif
-         if(JMAXGLOW-JMINGLOW.le.2) then
-            JMINGLOW=min(JMINGLOW,2)
-            JMAXGLOW=max(JMAXGLOW,NYMAP-1)
-         endif
+c         ! In case there are two well-separated stars, don't start
+c         ! making smaller grids too quickly:
+c         if(IMAXGLOW-IMINGLOW.le.2) then
+c            IMINGLOW=min(IMINGLOW,2)
+c            IMAXGLOW=max(IMAXGLOW,NXMAP-1)
+c         endif
+c         if(JMAXGLOW-JMINGLOW.le.2) then
+c            JMINGLOW=min(JMINGLOW,2)
+c            JMAXGLOW=max(JMAXGLOW,NYMAP-1)
+c         endif
             
-         ! Decide upon appropriate boundaries for the next grid:
-         xmaxmapnext=min(Imaxglow*hxmap+xminmap + 3*hymap ,xmax)
-         xminmapnext=max((Iminglow-2)*hxmap+xminmap - 3*hymap ,xmin)
-         ymaxmapnext=min(Jmaxglow*hymap+yminmap + 3*hxmap ,ymax)
-         yminmapnext=max((Jminglow-2)*hymap+yminmap - 3*hxmap ,ymin)
+         ! Decide upon appropriate boundaries for the next grid.
+         ! The idea here is we increase the number of x cells and/or
+         ! y cells depending on the aspect ratio of the fluid. We weight
+         ! the x or y directions depending on how many "glowing" cells
+         ! we see there. A "glowing" cell is one for which we have
+         ! detected a photosphere.
+         xmaxmapnext=min(IMAXGLOW*hxmap+xminmap + 3*hymap ,xmax)
+         xminmapnext=max((IMINGLOW-2)*hxmap+xminmap - 3*hymap ,xmin)
+         ymaxmapnext=min(JMAXGLOW*hymap+yminmap + 3*hxmap ,ymax)
+         yminmapnext=max((JMINGLOW-2)*hymap+yminmap - 3*hxmap ,ymin)
          
          ! Determine whether we should resolve the x or y direction
          ! better in the next grid:
          hxtmp=(xmaxmapnext-xminmapnext)/(nxmap-1)
          hytmp=(ymaxmapnext-yminmapnext)/(nymap-1)
-         if(hxtmp.gt.hytmp .and. nxmap.lt.nxmapmax) then
-            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,nxmapmax)
-         else if(hytmp.gt.hxtmp .and. nymap.lt.nymapmax) then
-            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+7,nymapmax)
+         if(hxtmp.gt.hytmp .and. nxmap.lt.max_Nx) then
+            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,max_Nx)
+            reason = "Nx cells"
+         else if(hytmp.gt.hxtmp .and. nymap.lt.max_Ny) then
+            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+7,max_Ny)
+            reason = "Ny cells"
          else
-            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+6,nxmapmax)
-            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,nymapmax)
+            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+6,max_Nx)
+            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,max_Ny)
+            reason = "Nxy cells"
          endif
          
          !lasttotallum = totallum ! Record for comparison

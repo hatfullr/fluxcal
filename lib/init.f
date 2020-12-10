@@ -48,14 +48,14 @@
       !### Files to read
       ! flux_cal starts at file number 'start' and ends at file number
       ! 'finish', taking steps of 'step'. All values must be integers.
-      start=0
-      finish=0
+      start=100
+      finish=100
       step=0
 
       ! The directory flux_cal was installed to. This is used to find the
       ! included tabulated equation of state 'sph.eos' and other data
       ! tables required for flux_cal to run.
-      flux_cal_dir = '../'
+      flux_cal_dir='/home/hatfull/fluxcal_hatfull/'
 
       
 
@@ -63,7 +63,7 @@
       
       !### Runtime options
       ! Calculate the flux at each grid cell and record the data.
-      get_fluxes=.false.
+      get_fluxes=.true.
 
       ! Set this to true to create a data file containing all the
       ! particles whose surfaces are closest to the observer  along each
@@ -115,7 +115,7 @@
       ! 0 is cubic spline
       ! 1 is Wendland 3,3
       ! 2 is Wendland C4
-      nkernel=0
+      nkernel=2
 
 
 
@@ -134,12 +134,23 @@
       ! fracaccuracy, grid refinement stops.
       fracaccuracy=0.01d0
 
+      ! These control the resolution of the driving and integration grids.
+      ! We vary Nx and Ny to achieve convergence in the flux. You cannot
+      ! set max_Nx and max_Ny greater than 512 unless you change the
+      ! value of "NXMAPMAX" and "NYMAPMAX" in
+      ! optical_depth/optical_depth.h (not recommended).
+      min_Nx=3                  ! (default=3)
+      min_Ny=3                  ! (default=3)
+      max_Nx=512                ! (default=512)
+      max_Ny=512                ! (default=512)
+      
       ! Choose which integrator to use.
       ! 0 = fourth order adaptive stepsize Runge-Kutta
-      ! 1 = pseduo-adaptive Simpson's Rule
-      ! 0 is probably faster than 1 but may encounter errors. 1 is 
-      ! probably slower, but you can directly control its accuracy
-      ! using simps_h, simps_alpha, simps_fracacc, and MAXSTP.
+      ! 1 = Simpson's rule (default)
+      ! 2 = Pseudo Simpson's rule (deprecated)
+      ! 0 is probably fastest but may encounter errors. 1 is probably
+      ! slower, but you can directly control its accuracy using the
+      ! variables below.
       integrator=1
 
       ! These are for the Runge--Kutta integrator (integrator=0).
@@ -150,25 +161,76 @@
       step3=1d4
       step4=1d15
 
-      ! These are for the Simpson's Rule integrator (integrator=1).
-      ! simps_h is the maximum stepsize the integrator will take. Set to
-      ! 0.d0 to calculate simps_h for each line of sight based on the
-      ! maximum and minumum z there and MAXSTP.
-      ! simps_alpha is the factor by which the stepsize is reduced when
-      ! the current iteration will cause tau_thin > taulimit.
-      ! simps_fracacc is the desired precision in tau.
-      simps_h = 0.d0
-      simps_alpha = 0.5d0
-      simps_fracacc = 1.d-3
-      
-      ! The maximum number of steps the integrator will take before failing.
-      ! We recommend MAXSTP=10000 for integrator=0.
-      MAXSTP=10000
+      ! These control the precision of the Simpson's Rule integrator
+      ! (integrator=1). simps_max_frac_dF is the maximum by which the
+      ! integrated flux is allowed to change with each step, and the
+      ! step size is continually refined until dF is less than or equal
+      ! to simps_max_frac_dF. The same is true for optical depth, but
+      ! with simps_max_dtau as the controller instead. If you set any of
+      ! these to 0.d0, no maximum is imposed (not recommended for
+      ! simps_max_frac_dF and simps_max_dtau). All the above is equally
+      ! true for the minimum values, but it is okay to set the minimum
+      ! to zero, as there are safeguards in place against stepsize
+      ! underflows.
+      !
+      ! Each limit must be given in cgs units.
+      simps_min_dz=0            ! (default=0)
+      simps_max_dz=0            ! (default=0)
 
-      ! Optical depth at which to stop the integration. Only applies to
-      ! get_fluxes and get_integration_at_pos. Set to 1.d30 to integrate
-      ! through the entirety of the fluid on each line of sight.
+      simps_min_dtau=0          ! (default=0)
+      simps_max_dtau=1.d0       ! (default=1.d0)
+      
+      simps_min_frac_dF=0       ! (default=0)
+      simps_max_frac_dF=0       ! (default=0)
+      
+      ! This controls the threshold for the value that is checked
+      ! against simps_min_frac_dF and simps_max_frac_dF. We calculate
+      ! that value as |dF/(F+simps_F_cutoff)|. This effectively sets a
+      ! "cutoff" value for the flux, such that contributions to the
+      ! integrated flux are ignored when they are below simps_F_cutoff.
+      ! We advise against setting this to some very small number like
+      ! 1.d-30 because the stepsize will become arbitrarily small and
+      ! the integrator=1 routine is not good at escaping extremely small
+      ! stepsizes.
+      simps_F_cutoff=1.d-4      ! (default=1.d-4)
+            
+      ! This is the fractional amount by which the stepsize is changed
+      ! for the Simpson's Rule integrator (integrator=1). That is, when
+      ! the stepsize must be decreased, we take dz=simps_alpha*dz, and
+      ! when it must be increased, we take dz=(1.d0+simps_alpha)*dz. We
+      ! choose 0.5d0 by default such that the stepsize is halved when
+      ! it is too large and increased by 1.5 when too small.
+      simps_alpha=0.5d0
+      
+      ! The maximum number of steps the integrator will take before
+      ! failing. We recommend MAXSTP=10000 for integrator=0. For
+      ! integrator=1, MAXSTP is used to make an initial guess on the
+      ! first stepsize. The first stepsize depends on if simps_min_dz
+      ! and/or simps_max_dz are non-zero (turned on). We first take the
+      ! initial guess of dz=(z2-z1)/abs(MAXSTP), and then make sure
+      ! that guess fits within simps_min_dz and simps_max_dz. If it is
+      ! outside this domain, we set dz to either simps_min_dz or
+      ! simps_max_dz depending on which is closer.
+      !
+      ! When MAXSTP<0, there is no upper limit on the number of
+      ! integration steps for each line of sight. If you do want to
+      ! impose a limit, set MAXSTP to a positive value and set
+      ! simps_max_step_error=.true. (default). We suggest MAXSTP=-2
+      ! (default) for integrator=1. Neither an error nor a warning will
+      ! be thrown when MAXSTP<0, so simps_max_step_error and
+      ! simps_max_step_warning can be set to anything.
+      MAXSTP=-2
+      simps_max_step_error=.true.
+      simps_max_step_warning=.false.
+            
+      ! Optical depth at which to stop the integration. Only applies if
+      ! get_fluxes or get_integration_at_pos are .true.. Set to 0 to
+      ! integrate through the entirety of the fluid on each line of
+      ! sight. The value of taulimit_threshold determines how close to
+      ! taulimit the integrator must be to stop integration (1.d-6
+      ! default, and only works with integrator=1).
       taulimit=1.d1
+      taulimit_threshold=1.d-6
 
       ! Optical depth by which the integrator will detect that a region
       ! is optically thick.
@@ -181,23 +243,26 @@
       ! Decide to use the envelope fitting routine or not. Set this to
       ! .false. to use only the SPH temperatures.
       envfit=.true.
+      
 
 
 
 
       
       !### Opacities
-      ! When opacityfiles are not present or when a given (rho,T) lies outside
-      ! the domain of the opacityfiles, FluxCal uses analytic approximations
-      ! to calculate the boundfree, freefree, electron scatter, and negative H
-      ! ion opacities, as done in Onno Pols notes on Stellar Evolution.
+      ! When opacityfiles are not present or when a given (rho,T) lies
+      ! outside the domain of the opacityfiles, FluxCal uses analytic
+      ! approximations to calculate the boundfree, freefree, electron
+      ! scatter, and negative H ion opacities, as done in Onno Pols notes
+      ! on Stellar Evolution.
       ! astro.ru.nl/~onnop/education/stev_utrecht_notes/chapter5-6.pdf
       
-      ! Decide to throw either an error, warning, both, or neither when (rho,T)
-      ! is out of bounds for both the opacityfiles and any available analytic
-      ! approximations in the code. When using the analytic approximations,
-      ! a warning will always be thrown. By default, the opacity is set to 0.d0
-      ! when out of bounds of both the opacityfiles and analytic approximations.
+      ! Decide to throw either an error, warning, both, or neither when
+      ! (rho,T) is out of bounds for both the opacityfiles and any
+      ! available analytic approximations in the code. When using the
+      ! analytic approximations, a warning will always be thrown. By
+      ! default, the opacity is set to 0.d0 when out of bounds of both the
+      ! opacityfiles and analytic approximations.
       !
       ! Setting opacity_analytic_warning to .false. suppresses the warnings
       ! given when FluxCal uses analytic approximations to calculate the 
@@ -206,28 +271,29 @@
       opacity_oob_warning=.true.
       opacity_analytic_warning=.true.
 
-      ! Define the rho for which any rho <= this value forces opacity to equal
-      ! 0.d0. Default is 1.d-19, which is the minimum density allowed by the cop
-      ! subroutine.
+      ! Define the rho for which any rho <= this value forces opacity to
+      ! equal 0.d0. Default is 1.d-19, which is the minimum density allowed
+      ! by the cop subroutine.
       opacity_rho_cutoff=1.d-19
 
       ! The smoothing window in the temperature direction for opacities. A
-      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do not
-      ! make this larger than 1.d4, as this is the minimum distance in T 
-      ! required to calculate e- scattering and kramer opacities in the range
-      ! 1.d4 < T < 1.d8.
+      ! window of 0.d0 completely disables smoothing. Units in Kelvin. Do
+      ! not make this larger than 1.d4, as this is the minimum distance in
+      ! T required to calculate e- scattering and kramer opacities in the
+      ! range 1.d4 < T < 1.d8.
       smoothing_window_T = 1000.d0
       smoothing_window_rho = 10.d0
       
-      ! Define the opacity files you would like to be read in, as well as how
-      ! you would like the code to transition between them. You must give the
-      ! maximum and minimum logT and logR values (logTmins, logTmaxs,
-      ! logRmins, and logRmaxs). Set these to -1.d30 to use up to the maximum
-      ! and minimum in the file. You must also give the point at which you want
-      ! opacity blending to begin (logT_blend1, logT_blend2, logR_blend1,
-      ! logR_blend2). Blending will always occur in the region between mins and
-      ! blend1 and between blend2 and maxs. No blending is done between blend1
-      ! and blend2. Set blend values to -1.d30 to turn off the blending region.
+      ! Define the opacity files you would like to be read in, as well as
+      ! how you would like the code to transition between them. You must
+      ! give the maximum and minimum logT and logR values (logTmins,
+      ! logTmaxs, logRmins, and logRmaxs). Set these to -1.d30 to use up to
+      ! the maximum and minimum in the file. You must also give the point
+      ! at which you want opacity blending to begin (logT_blend1,
+      ! logT_blend2, logR_blend1, logR_blend2). Blending will always occur
+      ! in the region between mins and blend1 and between blend2 and maxs.
+      ! No blending is done between blend1 and blend2. Set blend values to
+      ! -1.d30 to turn off the blending region.
       !
       ! logR = logRho - 3*logT + 18
       !
@@ -268,20 +334,20 @@
       logR_blend2(1)=-1.d30     ! No blending at upper R bound
    
       opacityfiles(2)='kR_h2001.dat' ! Rosseland opacities (lowT)
-      logTmins(2)=2.995635d0    ! Not using Rosseland opacities below this T
+      logTmins(2)=2.995635d0    ! Not using Rosseland opacities below this
       logTmaxs(2)=-1.d30       ! This does nothing. Limits are set in code
       logRmins(2)=-1.d30        ! This does nothing. Limits are set in code
       logRmaxs(2)=-1.d30        ! This does nothing. Limits are set in code
       logT_blend1(2)=3.041393d0 ! Stop blending from Planck to Rosseland 
-      logT_blend2(2)=-1.d30     ! Start blending from Rosseland to user files
+      logT_blend2(2)=-1.d30     ! Start blending from Ross. to user files
       logR_blend1(2)=-1.d30     ! No blending at lower R bound
       logR_blend2(2)=-1.d30     ! No blending at upper R bound
       
-      opacityfiles(3)=''
-      logTmins(3)=-1.d30
-      logTmaxs(3)=-1.d30
-      logRmins(3)=-1.d30
-      logRmaxs(3)=-1.d30
+      opacityfiles(3)='gs98_z0.02_x0.7.data'
+      logTmins(3)=3.75d0
+      logTmaxs(3)=8.7d0
+      logRmins(3)=-8.d0
+      logRmaxs(3)=1.d0
       logT_blend1(3)=-1.d30
       logT_blend2(3)=-1.d30
       logR_blend1(3)=-1.d30
@@ -390,14 +456,14 @@
       !
       ! Be sure to give these in cgs. If you want to use other units,
       ! edit the flux_cal.baseunits file.
-      runit=1.d0                ! distance [cm]
-      munit=1.d0                ! mass [grams]
-      tunit=1.d0                ! time [s]
-      vunit=1.d0                ! velocity [cm/s]
-      Eunit=1.d0                ! energy [ergs]
-      rhounit=1.d0              ! density [grams/cm^3]
+      runit=6.9598d10           ! distance [cm]
+      munit=1.9892d33           ! mass [grams]
+      tunit=1.59353d3           ! time [s]
+      vunit=4.36754d7           ! velocity [cm/s]
+      Eunit=3.79447d48          ! energy [ergs]
+      rhounit=5.90049d0         ! density [grams/cm^3]
       muunit=1.d0               ! mean molecular weight [grams]
-      gunit=1.d0                ! local g [cm/s^2]
+      gunit=2.74079d4           ! local g [cm/s^2]
 
       ! Give the conversion factor from your input data units to what
       ! you desire the output units to be in. Internal (cgs) values will
@@ -529,15 +595,15 @@ c      end if
  98   format(A10," = ",I10,"   ",A10," = ",I10)
  99   format(A13," = ",E10.4,"   ",A11," = ",E10.4)
  999  format(A13," = ",E10.4)
- 100  format(A21," = ",E10.4)
- 101  format(A21," = ",I10)
+ 100  format(A23," = ",E10.4)
+ 101  format(A23," = ",I10)
  102  format(A27," = ",L1)
  103  format(A22," = '",A,"'")
  104  format("   ",A," = ",L1)
  105  format("   ",A," = ",E10.4)
  106  format("   ",A," = '",A,"'")
  107  format("   ",A," = ",I8)
- 108  format(A21," = ",L10)
+ 108  format(A23," = ",L10)
  109  format(A13," = '",A,"'")
  110  format(A13,"(",I1,") = '",A,"'")
  111  format(A15,"(",I1,") = ",E10.4)
@@ -575,20 +641,39 @@ c     Write everything to the terminal
       write(*,109) "flux_cal_dir",trim(adjustl(flux_cal_dir))
       
       write(*,*) ""
-      write(*,101) "nkernel             ",nkernel
-      write(*,100) "yscalconst          ",yscalconst
-      write(*,100) "fracaccuracy        ",fracaccuracy
-      write(*,100) "step1               ",step1
-      write(*,100) "step2               ",step2
-      write(*,100) "step3               ",step3
-      write(*,100) "step4               ",step4
-      write(*,101) "MAXSTP              ",MAXSTP
-      write(*,100) "taulimit            ",taulimit
-      write(*,100) "tau_thick_integrator",tau_thick_integrator
-      write(*,100) "tau_thick_envfit    ",tau_thick_envfit
-      write(*,108) "envfit              ",envfit
+      write(*,101) "nkernel               ",nkernel
+      write(*,100) "yscalconst            ",yscalconst
+      write(*,100) "fracaccuracy          ",fracaccuracy
+      write(*,101) "MAXSTP                ",MAXSTP
+      write(*,101) "min_Nx                ",min_Nx
+      write(*,101) "min_Ny                ",min_Ny
+      write(*,101) "max_Nx                ",max_Nx
+      write(*,101) "max_Ny                ",max_Ny
       write(*,*) ""
-      write(*,100) "metallicity         ",metallicity
+      if ( integrator .eq. 0 ) then
+         write(*,100) "step1                 ",step1
+         write(*,100) "step2                 ",step2
+         write(*,100) "step3                 ",step3
+         write(*,100) "step4                 ",step4
+      else if(integrator.eq.1) then
+         write(*,100) "simps_min_dz          ",simps_min_dz
+         write(*,100) "simps_max_dz          ",simps_max_dz
+         write(*,100) "simps_min_dtau        ",simps_min_dtau
+         write(*,100) "simps_min_dtau        ",simps_max_dtau
+         write(*,100) "simps_min_frac_dF     ",simps_min_frac_dF
+         write(*,100) "simps_max_frac_dF     ",simps_max_frac_dF
+         write(*,100) "simps_F_cutoff        ",simps_f_cutoff
+         write(*,108) "simps_max_step_error  ",simps_max_step_error
+         write(*,108) "simps_max_step_warning",simps_max_step_warning
+         write(*,100) "taulimit_threshold    ",taulimit_threshold
+      end if
+      write(*,*) ""
+      write(*,100) "taulimit              ",taulimit
+      write(*,100) "tau_thick_integrator  ",tau_thick_integrator
+      write(*,100) "tau_thick_envfit      ",tau_thick_envfit
+      write(*,108) "envfit                ",envfit
+      write(*,*) ""
+      write(*,100) "metallicity           ",metallicity
       
       write(*,*) ""
       write(*,102) "get_fluxes                ",get_fluxes
@@ -690,6 +775,71 @@ c     Catch some runtime errors
       if((step.eq.0).or.(start.eq.finish)) then
          finish=start
          step=1
+      end if
+
+      if (MAXSTP.eq.0) then
+         write(*,*) "Cannot have MAXSTP = 0"
+         error stop "init.f"
+      end if
+      if (abs(MAXSTP).eq.1) then
+         write(*,*) "Cannot have |MAXSTP| = 1"
+         error stop "init.f"
+      end if
+      if ( integrator.eq.1 ) then
+         if ( (simps_min_dz.ne.0 .and. simps_max_dz.ne.0) .and.
+     $        (dabs(simps_min_dz).gt.dabs(simps_max_dz)) ) then
+            write(*,*) "|simps_min_dz| > |simps_max_dz|"
+            write(*,*) "simps_min_dz = ",simps_min_dz
+            write(*,*) "simps_max_dz = ",simps_max_dz
+            error stop "init.f"
+         end if
+         if ( (simps_min_dtau.ne.0 .and. simps_max_dtau.ne.0) .and.
+     $        (dabs(simps_min_dtau).gt.dabs(simps_max_dtau)) ) then
+            write(*,*) "|simps_min_dtau| > |simps_max_dtau|"
+            write(*,*) "simps_min_dtau = ",simps_min_dtau
+            write(*,*) "simps_max_dtau = ",simps_max_dtau
+            error stop "init.f"
+         end if
+         if ( (simps_min_frac_dF.ne.0.and.simps_max_frac_dF.ne.0).and.
+     $        (dabs(simps_min_frac_dF).gt.dabs(simps_max_frac_dF)))then
+            write(*,*) "|simps_min_frac_dF| > |simps_max_frac_dF|"
+            write(*,*) "simps_min_frac_dF = ",simps_min_frac_dF
+            write(*,*) "simps_max_frac_dF = ",simps_max_frac_dF
+            error stop "init.f"
+         end if
+         if ( simps_min_frac_dF.ne.0 .and. simps_max_frac_dF.ne.0 .and.
+     $        simps_F_cutoff.eq.0 ) then
+            write(*,*) "Must give a non-zero value for simps_F_cutoff"//
+     $           " when simps_min_frac_dF != 0 and simps_max_frac_dF "//
+     $           "!= 0"
+            error stop "init.f"
+         end if
+         if ( taulimit.ne.0 .and. taulimit_threshold.le.0 ) then
+            write(*,*) "When taulimit=0, you must give a positive, "//
+     $           "non-zero value for taulimit_threshold"
+            error stop "init.f"
+         end if
+      end if
+
+      if (min_Nx.lt.3) then
+         write(*,*) "min_Nx = ",min_Nx
+         write(*,*) "Must have min_Nx >= 3"
+         error stop "init.f"
+      end if
+      if (min_Ny.lt.3) then
+         write(*,*) "min_Ny = ",min_Ny
+         write(*,*) "Must have min_Ny >= 3"
+         error stop "init.f"
+      end if
+      if (max_Nx.gt.NXMAPMAX) then
+         write(*,*) "max_Nx,NXMAPMAX = ",max_Nx,NXMAPMAX
+         write(*,*) "Must have max_Nx <= NXMAPMAX"
+         error stop "init.f"
+      end if
+      if (max_Ny.gt.NYMAPMAX) then
+         write(*,*) "max_Ny,NYMAPMAX = ",max_Ny,NYMAPMAX
+         write(*,*) "Must have max_Ny <= NYMAPMAX"
+         error stop "init.f"
       end if
 
       

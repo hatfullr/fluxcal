@@ -51,8 +51,7 @@ math_obj = $(mathlib)/odeint.o           \
 	   $(mathlib)/simps.o            \
 
 # Optical depth objects
-opdep_obj = $(opdeplib)/optical_depth.o            \
-            $(opdeplib)/createGrid.o               \
+opdep_obj = $(opdeplib)/createGrid.o               \
             $(opdeplib)/getFlux.o                  \
             $(opdeplib)/prepareIntegration.o       \
             $(opdeplib)/integrateTau.o             \
