@@ -134,6 +134,16 @@
       ! fracaccuracy, grid refinement stops.
       fracaccuracy=0.01d0
 
+      ! These control the resolution of the driving and integration grids.
+      ! We vary Nx and Ny to achieve convergence in the flux. You cannot
+      ! set max_Nx and max_Ny greater than 512 unless you change the
+      ! value of "NXMAPMAX" and "NYMAPMAX" in
+      ! optical_depth/optical_depth.h (not recommended).
+      min_Nx=3                  ! (default=3)
+      min_Ny=3                  ! (default=3)
+      max_Nx=512                ! (default=512)
+      max_Ny=512                ! (default=512)
+      
       ! Choose which integrator to use.
       ! 0 = fourth order adaptive stepsize Runge-Kutta
       ! 1 = Simpson's rule (default)
@@ -635,6 +645,10 @@ c     Write everything to the terminal
       write(*,100) "yscalconst            ",yscalconst
       write(*,100) "fracaccuracy          ",fracaccuracy
       write(*,101) "MAXSTP                ",MAXSTP
+      write(*,101) "min_Nx                ",min_Nx
+      write(*,101) "min_Ny                ",min_Ny
+      write(*,101) "max_Nx                ",max_Nx
+      write(*,101) "max_Ny                ",max_Ny
       write(*,*) ""
       if ( integrator .eq. 0 ) then
          write(*,100) "step1                 ",step1
@@ -805,6 +819,27 @@ c     Catch some runtime errors
      $           "non-zero value for taulimit_threshold"
             error stop "init.f"
          end if
+      end if
+
+      if (min_Nx.lt.3) then
+         write(*,*) "min_Nx = ",min_Nx
+         write(*,*) "Must have min_Nx >= 3"
+         error stop "init.f"
+      end if
+      if (min_Ny.lt.3) then
+         write(*,*) "min_Ny = ",min_Ny
+         write(*,*) "Must have min_Ny >= 3"
+         error stop "init.f"
+      end if
+      if (max_Nx.gt.NXMAPMAX) then
+         write(*,*) "max_Nx,NXMAPMAX = ",max_Nx,NXMAPMAX
+         write(*,*) "Must have max_Nx <= NXMAPMAX"
+         error stop "init.f"
+      end if
+      if (max_Ny.gt.NYMAPMAX) then
+         write(*,*) "max_Ny,NYMAPMAX = ",max_Ny,NYMAPMAX
+         write(*,*) "Must have max_Ny <= NYMAPMAX"
+         error stop "init.f"
       end if
 
       

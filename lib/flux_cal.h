@@ -1,4 +1,10 @@
       implicit none
+      integer NXMAPMAX,NYMAPMAX,NZMAP
+c      integer NXMAPMAX,NYMAPMAX,NZMAP
+c      PARAMETER (NXMAPMAX=999,NYMAPMAX=999,NZMAP=202)
+c      real*8 rhoxyz(NXMAPMAX,NYMAPMAX,NZMAP)
+      PARAMETER (NXMAPMAX=499,NYMAPMAX=499,NZMAP=416)
+c      PARAMETER (NXMAPMAX=512,NYMAPMAX=512,NZMAP=512)
       integer nmax,nnmax,ntab
       PARAMETER (NMAX=420000,NNMAX=128) ! Also in odeint.f
 c      PARAMETER (NMAX=301000,NNMAX=128)
@@ -139,6 +145,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       common/trackall/ track_all
       real*8 smoothing_window_T,smoothing_window_rho
       common/smoothingwindow/ smoothing_window_T,smoothing_window_rho
+      integer min_Nx,min_Ny,max_Nx,max_Ny
+      common/grid_resolution/min_Nx,min_Ny,max_Nx,max_Ny
       namelist/input/ yscalconst,munit,runit,tunit,vunit,
      $      fracaccuracy,Eunit,rhounit,muunit,gunit,
      $      runit_out,munit_out,tunit_out,vunit_out,Eunit_out,
@@ -161,7 +169,8 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      smoothing_window_rho,simps_alpha,simps_max_frac_dF,integrator,
      $      simps_max_step_error,simps_max_step_warning,simps_max_dtau,
      $      taulimit_threshold,simps_max_dz,simps_min_dz,
-     $      simps_min_frac_dF,simps_min_dtau,simps_F_cutoff
+     $      simps_min_frac_dF,simps_min_dtau,simps_F_cutoff,min_Nx,
+     $      min_Ny,max_Nx,max_Ny
 	
       common/inputfilenames/ filtersfile,trackfile,eosfile
 

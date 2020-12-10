@@ -70,7 +70,6 @@ c         end if
 c        ****************************************************************
          if(get_fluxes) then
             ! write(*,*) "Finding the fluxes at each grid point"
-!     call optical_depth
             call init_grid
 
             if(dimenFileAlreadyExists) then

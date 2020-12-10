@@ -5,6 +5,7 @@
       integer i,j
       integer lastnumcell
       character*10 reason
+      real*8 aspect
       
 cc     Find boundaries of the fluid:
 c      xmin=1d30
@@ -103,7 +104,7 @@ c      NYMAPnext=3
      $     repeat("-",10)       !reason
       
       counter = 1
-      lastnumcell = int(1.d-30)
+      lastnumcell = 0
       
       reason = "init"
 
@@ -173,15 +174,15 @@ c     $     abs(TOTALpracticalLUM-lastTOTALLUM).gt.
 c     $     fracaccuracy*TOTALpracticalLUM)
      $     abs((TOTALflux/numcell)-(lastTOTALflux/lastnumcell)).gt.
      $     fracaccuracy*TOTALflux/numcell) .and.
-     $     (nxmap.lt.nxmapmax .or. nymap.lt.nymapmax) ) then
+     $     (nxmap.lt.max_Nx .or. nymap.lt.max_Ny) ) then
 !     The code gets inside this if statement if not enough of the grid
 !     has "glowing" cells, or if the total luminosity is not in
 !     sufficient agreement with the total luminosity calculated from the
 !     previous grid size.
 c     print *,'no convergence yet...try again'
 
-c     Default to complaining about F convergence, otherwise complain about
-c     not having enough grid cells in X or Y directions
+c        Default to complaining about F convergence, otherwise complain
+c        about not having enough grid cells in X or Y directions
          reason = "F cnvgnce"
          
 c         ! In case there are two well-separated stars, don't start
@@ -195,7 +196,12 @@ c            JMINGLOW=min(JMINGLOW,2)
 c            JMAXGLOW=max(JMAXGLOW,NYMAP-1)
 c         endif
             
-         ! Decide upon appropriate boundaries for the next grid:
+         ! Decide upon appropriate boundaries for the next grid.
+         ! The idea here is we increase the number of x cells and/or
+         ! y cells depending on the aspect ratio of the fluid. We weight
+         ! the x or y directions depending on how many "glowing" cells
+         ! we see there. A "glowing" cell is one for which we have
+         ! detected a photosphere.
          xmaxmapnext=min(IMAXGLOW*hxmap+xminmap + 3*hymap ,xmax)
          xminmapnext=max((IMINGLOW-2)*hxmap+xminmap - 3*hymap ,xmin)
          ymaxmapnext=min(JMAXGLOW*hymap+yminmap + 3*hxmap ,ymax)
@@ -205,18 +211,18 @@ c         endif
          ! better in the next grid:
          hxtmp=(xmaxmapnext-xminmapnext)/(nxmap-1)
          hytmp=(ymaxmapnext-yminmapnext)/(nymap-1)
-         if(hxtmp.gt.hytmp .and. nxmap.lt.nxmapmax) then
-            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,nxmapmax)
+         if(hxtmp.gt.hytmp .and. nxmap.lt.max_Nx) then
+            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+7,max_Nx)
             reason = "Nx cells"
-         else if(hytmp.gt.hxtmp .and. nymap.lt.nymapmax) then
-            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+7,nymapmax)
+         else if(hytmp.gt.hxtmp .and. nymap.lt.max_Ny) then
+            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+7,max_Ny)
             reason = "Ny cells"
          else
-            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+6,nxmapmax)
-            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,nymapmax)
+            nxmapnext=min(2*max(IMAXGLOW-IMINGLOW,0)+6,max_Nx)
+            nymapnext=min(2*max(JMAXGLOW-JMINGLOW,0)+6,max_Ny)
             reason = "Nxy cells"
          endif
-
+         
          !lasttotallum = totallum ! Record for comparison
          lasttotallum = TOTALpracticalLUM
          lasttotalflux = TOTALflux

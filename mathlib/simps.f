@@ -253,7 +253,6 @@ c     Prevent stepsize underflow and overflow
          write(*,*) "ndtau_increase = ",ndtau_increase
          write(*,*) "ndF_increase   = ",ndF_increase
          write(*,*) "tau_thin = ",tau_thin
-         write(*,*) ""
       end if
       
       if (1.d0/dz.eq.0) then    ! Detect stepsize overflow

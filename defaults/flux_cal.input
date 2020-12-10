@@ -96,6 +96,16 @@
       ! fracaccuracy, grid refinement stops.
       fracaccuracy=0.01d0
 
+      ! These control the resolution of the driving and integration grids.
+      ! We vary Nx and Ny to achieve convergence in the flux. You cannot
+      ! set max_Nx and max_Ny greater than 512 unless you change the
+      ! value of "NXMAPMAX" and "NYMAPMAX" in
+      ! optical_depth/optical_depth.h (not recommended).
+      min_Nx=3                  ! (default=3)
+      min_Ny=3                  ! (default=3)
+      max_Nx=512                ! (default=512)
+      max_Ny=512                ! (default=512)
+      
       ! Choose which integrator to use.
       ! 0 = fourth order adaptive stepsize Runge-Kutta
       ! 1 = Simpson's rule (default)

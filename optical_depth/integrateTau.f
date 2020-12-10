@@ -1,4 +1,5 @@
       subroutine integrateTau
+      USE OMP_LIB
       include 'optical_depth.h'
       real*8 pressure,g_sph,rpos,m_sph
       real*8 avgrpos,avgxhp
@@ -47,7 +48,7 @@ c     end if
       max_step_size = -1
       min_steps_taken = 2147483647
       max_steps_taken = -1
-      
+
       DO J=1,NYMAP
          DO I=1,NXMAP
             XPOS=(I-1)*HXMAP+XMINMAP ! x-coordinate of line of sight
@@ -59,6 +60,15 @@ c     end if
                nstp = 0
 c               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
 c     $              zmax(i,j)/runit_out
+               if ( debug ) then
+                  write(*,*) ""
+                  write(*,*) "Inspecting grid cell i,j = ",i,j
+                  write(*,*) "zmin(i,j),zmax(i,j)=",
+     $                 zmin(i,j)/runit_out,zmax(i,j)/runit_out
+                  write(*,*) "thick_part(i,j)=",thick_part(i,j)
+                  write(*,*) "zmax_thick(i,j)=",
+     $                 zmax_thick(i,j)/runit_out
+               end if
                call getTpractical(zmin(i,j),zmax(i,j),
      $              zmax_thick(i,j),thick_part(i,j),h1(i,j),
      $              TOTALTpracticalXY(i,j),
@@ -229,7 +239,7 @@ c            TXY(I,J)=TphotoXY(I,J)
 
          end do
       end do
-
+      
       call cpu_time(finish_time)
 c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
 c     $     TOTALTpracticalXY(i/2,j/2)
