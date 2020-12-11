@@ -71,9 +71,9 @@ c      rn = sqrt(myx**2.d0+myy**2.d0+(myz-myzmax)**2.d0)
       ! Orient to the surface normal
       
       
-      write(*,*) alpha,theta,cos(alpha+theta)
+      write(o,*) alpha,theta,cos(alpha+theta)
 ! The angle our viewing angle makes with the observer
-c      write(*,*) xin,yin,zin,cos(alpha+theta),thetai,theta
+c      write(o,*) xin,yin,zin,cos(alpha+theta),thetai,theta
       getLocalAngle = cos(alpha+theta)
       
       

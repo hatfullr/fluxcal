@@ -68,13 +68,13 @@ c      csize = (nx-kx-1)*(ny-ky-1)
       
       s = 0.                    ! Smoothness factor
 
-      write(*,*) "Trying to get past extrapolate_helper"
+      write(o,*) "Trying to get past extrapolate_helper"
       call extrapolate_helper(x,y,z,zarr,
      $     iopt,mx,xarr,my,yarr,zarr1D,xb,xe,yb,ye,
      $     kx,ky,s,nxest,nyest,nx,ny,fp,lwrk,kwrk,ier,
      $     csize,nmax)
 
-      write(*,*) "I made it here"
+      write(o,*) "I made it here"
       end subroutine
 
 
@@ -125,33 +125,33 @@ c      csize = (nx-kx-1)*(ny-ky-1)
      $     nxest,nyest,nx,tx,ny,ty,c,fp,wrk,lwrk,iwrk,kwrk,ier)
 
       if ( ier .gt. 0 ) then
-         write(*,*) "iopt = ",iopt
-         write(*,*) "kx = ",kx
-         write(*,*) "ky = ",ky
-         write(*,*) "mx = ",mx
-         write(*,*) "my = ",my
-         write(*,*) "nxest = ",nxest,2*kx+2
-         write(*,*) "nyest = ",nyest,2*ky+2
-         write(*,*) "kwrk = ",kwrk,3+mx+my+nxest+nyest
-         write(*,*) "lwrk = ",lwrk,4+nxest*(my+2*kx+5)+nyest*(2*ky+5)+
+         write(o,*) "iopt = ",iopt
+         write(o,*) "kx = ",kx
+         write(o,*) "ky = ",ky
+         write(o,*) "mx = ",mx
+         write(o,*) "my = ",my
+         write(o,*) "nxest = ",nxest,2*kx+2
+         write(o,*) "nyest = ",nyest,2*ky+2
+         write(o,*) "kwrk = ",kwrk,3+mx+my+nxest+nyest
+         write(o,*) "lwrk = ",lwrk,4+nxest*(my+2*kx+5)+nyest*(2*ky+5)+
      $        mx*(kx+1)+my*(ky+1) + max(my,nxest)
-         write(*,*) "xb = ",xb
-         write(*,*) "xe = ",xe
-         write(*,*) "yb = ",yb
-         write(*,*) "ye = ",ye
-         write(*,*) "ier = ",ier
+         write(o,*) "xb = ",xb
+         write(o,*) "xe = ",xe
+         write(o,*) "yb = ",yb
+         write(o,*) "ye = ",ye
+         write(o,*) "ier = ",ier
 
          if (ier.eq.10) then
-            write(*,*) -1.le.iopt .and. iopt.le.1," -1<=iopt<=1"
-            write(*,*) 1.le.kx," 1<=kx"
-            write(*,*) ky.le.5," ky<=5"
-            write(*,*) mx.gt.kx," mx>kx"
-            write(*,*) my.gt.ky," my>ky"
-            write(*,*) nxest.ge.2*kx+2," nxest>=2*kx+2"
-            write(*,*) nyest.ge.2*ky+2," nyest>=2*ky+2"
-            write(*,*) kwrk.ge.3+mx+my+nxest+nyest," kwrk>=3+mx+my"//
+            write(o,*) -1.le.iopt .and. iopt.le.1," -1<=iopt<=1"
+            write(o,*) 1.le.kx," 1<=kx"
+            write(o,*) ky.le.5," ky<=5"
+            write(o,*) mx.gt.kx," mx>kx"
+            write(o,*) my.gt.ky," my>ky"
+            write(o,*) nxest.ge.2*kx+2," nxest>=2*kx+2"
+            write(o,*) nyest.ge.2*ky+2," nyest>=2*ky+2"
+            write(o,*) kwrk.ge.3+mx+my+nxest+nyest," kwrk>=3+mx+my"//
      $           "+nxest+nyest"
-            write(*,*) lwrk.ge.4+nxest*(my+2*kx+5)+nyest*(2*ky+5)+
+            write(o,*) lwrk.ge.4+nxest*(my+2*kx+5)+nyest*(2*ky+5)+
      $           mx*(kx+1)+my*(ky+1) + max(my,nxest)," lwrk>=4+nxest*"//
      $           "(my+2*kx+5)+nyest*(2*ky+5)+mx*(kx+1)+my*(ky+1)"//
      $           "+max(my,nxest)"
@@ -159,7 +159,7 @@ c      csize = (nx-kx-1)*(ny-ky-1)
             do i=2,mx
                if (.not.(xb.le.xarr(i-1) .and. xarr(i-1).lt.xarr(i).and.
      $              xarr(i).le.xe)) then
-                  write(*,*) "F","  xb<=x(i-1)<x(i)<=xe"
+                  write(o,*) "F","  xb<=x(i-1)<x(i)<=xe"
                   exit
                end if
             end do
@@ -167,23 +167,23 @@ c      csize = (nx-kx-1)*(ny-ky-1)
             do j=2,my
                if (.not.(yb.le.yarr(j-1) .and. yarr(j-1).lt.yarr(j).and.
      $              yarr(j).le.ye)) then
-                  write(*,*) "F","  yb<=y(j-1)<y(j)<=ye"
+                  write(o,*) "F","  yb<=y(j-1)<y(j)<=ye"
                   exit
                end if
             end do
 
             if (iopt.ge.0) then
-               write(*,*) s.lt.0," s<0"
+               write(o,*) s.lt.0," s<0"
                if ( s.ge.0 ) then
-                  write(*,*) s.eq.0," s=0"
-                  write(*,*) nxest.ge.mx+kx+1," nxest>=mx+kx+1"
-                  write(*,*) nyest.ge.my+ky+1," nyest>=my+ky+1"
+                  write(o,*) s.eq.0," s=0"
+                  write(o,*) nxest.ge.mx+kx+1," nxest>=mx+kx+1"
+                  write(o,*) nyest.ge.my+ky+1," nyest>=my+ky+1"
                end if
             end if
          end if
          
          
-         write(*,*) "ier > 0. Check regrid.f for error codes."
+         write(o,*) "ier > 0. Check regrid.f for error codes."
          error stop "extrapolate.f"
       end if
 
@@ -192,13 +192,13 @@ c      csize = (nx-kx-1)*(ny-ky-1)
      $     zresult_array,wrk,lwrk,iwrk,kwrk,ier)
 
       if ( ier .gt. 0 ) then
-         write(*,*) "ier = ",ier
-         write(*,*) "ier returned non-zero. Check bispev.f for error "//
+         write(o,*) "ier = ",ier
+         write(o,*) "ier returned non-zero. Check bispev.f for error "//
      $        "codes."
          error stop "extrapolate.f"
       end if
 
-      write(*,*) "I am finishing in extrapolate_helper"
+      write(o,*) "I am finishing in extrapolate_helper"
 
       end subroutine
 

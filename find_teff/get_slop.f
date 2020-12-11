@@ -46,7 +46,7 @@ c     default slop
                   ! the fractional position of ggg within grid_gn(i) <= ggg <= grid_gn(i+1).
                   ! We add nabla(i,j) to this to get the actual value of nabla for this ggg.
                   slop=nabla(i,j)+f_g*(nabla(i+1,j)-nabla(i,j))
-c                  write(*,*) slop,grid_tn(j),nabla(i,j),nabla(i+1,j),f_g
+c                  write(o,*) slop,grid_tn(j),nabla(i,j),nabla(i+1,j),f_g
                   exit
                end if
                ! If the slope value is very small (-20, or -10 or so) for this value of ggg and ttt,

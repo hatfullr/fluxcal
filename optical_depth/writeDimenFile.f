@@ -13,7 +13,7 @@ c 103  format(" ",ES23.15e3," ",ES23.15e3," ",i5," ",ES23.15e3," ",
 c     $     ES23.15e3," ",i5)
       
 c     write to dimen*.dat file
-      write(*,*) "Writing dimen file"
+      write(o,*) "Writing dimen file"
       open (73,file=trim(adjustl(fname2)))
       write(73,*)xminmap,hxmap,nxmap,
      $     yminmap,hymap,nymap

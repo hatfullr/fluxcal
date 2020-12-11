@@ -39,32 +39,32 @@ c     $        +(z(lastpart)-depth)**2.d0
 c         index=int(ctab*r2/hp(lastpart)**2.d0)+1
 c         wpc=wtab(index)/hp(lastpart)**3.d0
 c         rhoxyz = am(lastpart)*wpc
-c         write(*,*) "xpos, ypos, zpos = ",xpos/runit_out,ypos/runit_out,
+c         write(o,*) "xpos, ypos, zpos = ",xpos/runit_out,ypos/runit_out,
 c     $        depth/runit_out
-c         write(*,*) "x(i), y(i), z(i), 2*hp(i) = ",
+c         write(o,*) "x(i), y(i), z(i), 2*hp(i) = ",
 c     $        x(lastpart)/runit_out,
 c     $        y(lastpart)/runit_out,z(lastpart)/runit_out,
 c     $        2.d0*hp(lastpart)/runit_out
-c         write(*,*) "rho(i) = ",rho(lastpart)
-c         write(*,*) "rhoxyz = ",rhoxyz
-c         write(*,*) "sqrt(r2), sqrt(r2)/(2*hp(i)) = ",
+c         write(o,*) "rho(i) = ",rho(lastpart)
+c         write(o,*) "rhoxyz = ",rhoxyz
+c         write(o,*) "sqrt(r2), sqrt(r2)/(2*hp(i)) = ",
 c     $        (r2**0.5d0)/runit_out,
 c     $        (r2**0.5d0)/(2.d0*hp(lastpart))
-c         write(*,*) "rhocgs, tem, lastpart = ",rhocgs,tem,lastpart
+c         write(o,*) "rhocgs, tem, lastpart = ",rhocgs,tem,lastpart
 c         getOpacity = -1.d30
 c         return
 c      end if
       
       
-c      write(*,*) "rhocgs, tem = ",rhocgs,tem
+c      write(o,*) "rhocgs, tem = ",rhocgs,tem
       if ( rhocgs .le. opacity_rho_cutoff ) then
          getOpacity = 0.d0
          return
       end if
 
       if ( tem.eq.0.d0 ) then
-         write(*,*) "(rho,T) = (",rhocgs,tem,")"
-         write(*,*) "Cannot compute the opacity of a T = 0 K fluid."
+         write(o,*) "(rho,T) = (",rhocgs,tem,")"
+         write(o,*) "Cannot compute the opacity of a T = 0 K fluid."
          error stop "getOpacity.f"
       end if
 
@@ -72,7 +72,7 @@ c      write(*,*) "rhocgs, tem = ",rhocgs,tem
       logrho = log10(rhocgs)
       logR = logrho - 3.d0*logtem + 18.d0
 
-c      write(*,*) "logR, logtem = ",logR,logtem
+c      write(o,*) "logR, logtem = ",logR,logtem
 
       ! We do not care about these temperature ranges. There is no
       ! way to calculate the opacity there in a way that makes sense,
@@ -84,7 +84,7 @@ c      write(*,*) "logR, logtem = ",logR,logtem
          getOpacity = calculate_table_opacity(
      $        10.d0**(0.5d0*(logRmaxs(1)+logRmins(1))),
      $        10.d0**logTmins(1))
-c         write(*,*) "log10(opacity) = ",log10(opacity)
+c         write(o,*) "log10(opacity) = ",log10(opacity)
       else
          opacity = calculate_table_opacity(10.d0**logR,tem)
       end if
@@ -98,7 +98,7 @@ c         write(*,*) "log10(opacity) = ",log10(opacity)
 
 
       if(getOpacity.ne.getOpacity) then
-         write(*,*) "tem, rhocgs = ",tem,rhocgs
+         write(o,*) "tem, rhocgs = ",tem,rhocgs
          stop
       end if
       
@@ -123,7 +123,7 @@ c$$$         dist = minmydr2**0.5d0 / (2.d0*hp(closestparticle))
 c$$$
 c$$$         write(writefile,'(3E15.7)') rhocgs,tem,dist
          
-c$$$c     write(*,*) "xpos, ypos, depth = ",xpos,ypos,depth
+c$$$c     write(o,*) "xpos, ypos, depth = ",xpos,ypos,depth
 c$$$         
 c$$$         
 c$$$         nnbr = 0
@@ -132,35 +132,35 @@ c$$$         nnbitot = 0
 c$$$         do i=1,n
 c$$$            hp2 = (2.d0*hp(i))**2.d0
 c$$$            mydr2=(xpos-x(i))**2.d0+(ypos-y(i))**2.d0+(depth-z(i))**2.d0
-c$$$c     write(*,*) "mydr2.le.hp2, mydr2, hp2",mydr2.le.hp2,mydr2,hp2
+c$$$c     write(o,*) "mydr2.le.hp2, mydr2, hp2",mydr2.le.hp2,mydr2,hp2
 c$$$            if(mydr2.le.hp2) then
 c$$$               nnbr = nnbr + 1
 c$$$               nnbitot = nnbitot + neighbors(i)
 c$$$c     if ( neighbors(i).eq.0 ) then
-c$$$c     write(*,*) "Problem i,n = ",i,n
+c$$$c     write(o,*) "Problem i,n = ",i,n
 c$$$c     error stop "getOpacity.f"
 c$$$c     end if
 c$$$            end if
 c$$$         end do
 c$$$         
 c$$$         nnbfrac = float(nnbr) / (float(nnbitot)/float(nnbr))
-c$$$c     write(*,*) "nnbr,nnbitot,<nnbi>,nnbfrac = ",
+c$$$c     write(o,*) "nnbr,nnbitot,<nnbi>,nnbfrac = ",
 c$$$c     $        nnbr,nnbitot,
 c$$$c     $        float(nnbr)/(float(nnbitot)/float(nnbr)),nnbfrac
 c$$$         if ( nnbr.eq.0 .or. nnbitot.eq.0 ) then
-c$$$            write(*,*) "This should never happen."
+c$$$            write(o,*) "This should never happen."
 c$$$            call getLocalQuantities(xpos,ypos,depth)
-c$$$            write(*,*) "Called getLocalQuantities"
-c$$$            write(*,*) "xpos,ypos,depth = ",xpos/runit_out,
+c$$$            write(o,*) "Called getLocalQuantities"
+c$$$            write(o,*) "xpos,ypos,depth = ",xpos/runit_out,
 c$$$     $           ypos/runit_out,depth/runit_out
-c$$$            write(*,*) "rho, T = ",rhocgs,tem
-c$$$            write(*,*) "nnbr,nnbitot,<nnbi>,nnbfrac = ",
+c$$$            write(o,*) "rho, T = ",rhocgs,tem
+c$$$            write(o,*) "nnbr,nnbitot,<nnbi>,nnbfrac = ",
 c$$$     $           nnbr,nnbitot,
 c$$$     $           float(nnbr)/(float(nnbitot)/float(nnbr)),nnbfrac
 c$$$c     error stop "getOpacity.f"
 c$$$         end if
 c$$$         write(writefile,'(3E15.7)') rhocgs,tem,nnbfrac
-c$$$c     write(*,*)
+c$$$c     write(o,*)
 c$$$
 c$$$      end if
 c$$$  ------------------------------------
@@ -539,8 +539,8 @@ c     4 = Upper-right
       ! We have not found a domain for (rho,T) within which we can
       ! calculate opacity. We need to use analytic approximations in
       ! a last-ditch effort to calculate opacity.
-c     write(*,*) "We are not using a table"
-c     write(*,*) "rho,logR,logT = ",rhocgs,logR,logtem
+c     write(o,*) "We are not using a table"
+c     write(o,*) "rho,logR,logT = ",rhocgs,logR,logtem
       closestR = -1.d30
       closestT = -1.d30
       closestopac = -1.d30
@@ -767,13 +767,13 @@ c     Do not edit these values. If you do, also edit opacityTables.f
 
 
       if(opacity.ne.opacity) then
-         write(*,*) "logR, logtem = ",logR,logtem
-         write(*,*) "closest_opacityfileR, closest_opacityfileT,",
+         write(o,*) "logR, logtem = ",logR,logtem
+         write(o,*) "closest_opacityfileR, closest_opacityfileT,",
      $        "closest_opacityfile = ",closest_opacityfileR,
      $        closest_opacityfileT,closest_opacityfile
-         write(*,*) "closestR, closestT = ",closestR, closestT
-         write(*,*) "cornerR, cornerT = ",cornerR, cornerT
-         write(*,*) "xhy = ",xhy
+         write(o,*) "closestR, closestT = ",closestR, closestT
+         write(o,*) "cornerR, cornerT = ",cornerR, cornerT
+         write(o,*) "xhy = ",xhy
          stop
       end if
       
@@ -807,7 +807,7 @@ c     to -1.d30.
       real*8 R1,R2,T1,T2,weightR,weightT,weight
       real*8 smooth
 
-c      write(*,*) "closest_opacityfileR, closest_opacityfileT, "//
+c      write(o,*) "closest_opacityfileR, closest_opacityfileT, "//
 c     $     "closest_opacityfile = ",closest_opacityfileR,
 c     $     closest_opacityfileT,closest_opacityfile
       
@@ -845,7 +845,7 @@ c     $     closest_opacityfileT,closest_opacityfile
      $     closest_opacityfileT.ne.0 .and. 
      $     closest_opacityfile.ne.closest_opacityfileT .and.
      $     closest_opacityfile.ne.0)) then
-c         write(*,*) "Corner case"
+c         write(o,*) "Corner case"
          closestopac = calculate_table_opacity(10.d0**cornerR,
      $        10.d0**cornerT)
          R1 = cornerR
@@ -853,10 +853,10 @@ c         write(*,*) "Corner case"
          opacity = ext_Teq(10.d0**cornerR,10.d0**logR,10.d0**cornerT,
      $        closestopac,xhy,metallicity,.false.)
 
-c         write(*,*) "cornerR = ",cornerR
-c         write(*,*) "cornerT = ",cornerT
-c         write(*,*) "closestopac = ",closestopac
-c         write(*,*) "opacity = ",opacity
+c         write(o,*) "cornerR = ",cornerR
+c         write(o,*) "cornerT = ",cornerT
+c         write(o,*) "closestopac = ",closestopac
+c         write(o,*) "opacity = ",opacity
 
          if ( opacity.ne.-1.d30 ) then
             ! Test the T direction (constant R)
@@ -873,8 +873,8 @@ c         write(*,*) "opacity = ",opacity
                ! Test the R direction (constant T)
                opac_test = ext_Teq(10.d0**cornerR,10.d0**logR,
      $              10.d0**cornerT,opacity,xhy,metallicity,.false.)
-c               write(*,*) "opac_test = ",opac_test
-c               write(*,*) "opacity, opac_test = ",opacity,opac_test
+c               write(o,*) "opac_test = ",opac_test
+c               write(o,*) "opacity, opac_test = ",opacity,opac_test
                if ( opac_test .ne. -1.d30 ) then
                   opacity = opac_test
                end if
@@ -889,7 +889,7 @@ c               write(*,*) "opacity, opac_test = ",opacity,opac_test
      $        (closest_opacityfileR.le.2 .and.
      $        closest_opacityfileR.gt.0)) then
 
-c         write(*,*) "Teq case"
+c         write(o,*) "Teq case"
          closestopac = calculate_table_opacity(10.d0**closestR,
      $        10.d0**logT)
          if ( cornerR.ne.1.d30 .and. cornerT.ne.1.d30 ) then
@@ -899,7 +899,7 @@ c         write(*,*) "Teq case"
             R1 = closestR
             T1 = logT
          end if
-c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
+c         write(o,*) "cornerR,cornerT = ",cornerR,cornerT
          opacity = ext_Teq(10.d0**closestR,10.d0**logR,10.d0**logT,
      $        closestopac,xhy,metallicity,.false.) ! If error, opacity=-1.d30
          if ( opacity.eq.-1.d30 ) then
@@ -913,7 +913,7 @@ c         write(*,*) "cornerR,cornerT = ",cornerR,cornerT
       ! We have found an opacityfile that has logR in its logR range
       else if(closest_opacityfileR.eq.0 .and.
      $        closest_opacityfileT.ne.0)then
-c         write(*,*) "Req case"
+c         write(o,*) "Req case"
 
          closestopac = calculate_table_opacity(10.d0**logR,
      $        10.d0**closestT)
@@ -928,10 +928,10 @@ c         write(*,*) "Req case"
             T1 = closestT
          end if
 
-c         write(*,*) "cornerR = ",cornerR
-c         write(*,*) "cornerT = ",cornerT
+c         write(o,*) "cornerR = ",cornerR
+c         write(o,*) "cornerT = ",cornerT
 
-c         write(*,*) "closestopac = ",closestopac
+c         write(o,*) "closestopac = ",closestopac
          opacity = ext_Req(10.d0**logR,10.d0**closestT,10.d0**logT,
      $        closestopac,xhy,metallicity,.false.) ! If error, opacity=-1.d30
          if ( opacity.eq.-1.d30 ) then
@@ -945,7 +945,7 @@ c         write(*,*) "closestopac = ",closestopac
       else if((closest_opacityfileR.ne.0 .and.
      $         closest_opacityfileT.ne.0) .and.
      $        (closest_opacityfileR.gt.2)) then
-c         write(*,*) "Between case"
+c         write(o,*) "Between case"
          ! Try extrapolating with constant T
          closestopacTeq = calculate_table_opacity(10.d0**closestR,
      $        10.d0**logT)
@@ -969,8 +969,8 @@ c         write(*,*) "Between case"
                T1 = closestT
             end if
             R1 = closestR
-c            write(*,*) "closestR = ",closestR
-c            write(*,*) "cornerT = ",cornerT
+c            write(o,*) "closestR = ",closestR
+c            write(o,*) "cornerT = ",cornerT
          else if( opacityReq.ne.-1.d30 ) then ! If Teq extrapolation failed
             opacity = opacityReq ! Take the Req extrapolation result
             closestopac = closestopacReq
@@ -994,8 +994,8 @@ c            write(*,*) "cornerT = ",cornerT
       else if(closest_opacityfileR.eq.0 .and.
      $        closest_opacityfileT.eq.0 .and.
      $        closest_opacityfile.eq.0)then
-         write(*,*) "(rho,T) = (",rhocgs,10.d0**logT,")"
-         write(*,*) "Could not find the closest opacityfile to"//
+         write(o,*) "(rho,T) = (",rhocgs,10.d0**logT,")"
+         write(o,*) "Could not find the closest opacityfile to"//
      $        " (rho,T). Check your input file for missing "//
      $        "opacityfiles or incorrect logTmins, logTmaxs, "//
      $        "logRmins, and logRmaxs values."
@@ -1005,8 +1005,8 @@ c            write(*,*) "cornerT = ",cornerT
 
       if ( opacity.eq.-1.d30 ) then ! Error
          if ( opacity_oob_warning .or. opacity_oob_error ) then
-            write(*,*) "(rho,T) = (",rhocgs,10.d0**logT,")"
-            write(*,*) "WARNING (getOpacity.f): (rho,T) is out "//
+            write(o,*) "(rho,T) = (",rhocgs,10.d0**logT,")"
+            write(o,*) "WARNING (getOpacity.f): (rho,T) is out "//
      $           "of bounds of your opacityfiles and FluxCal is"//
      $           " unable to extrapolate an opacity value from "//
      $           "your provided opacityfiles."
@@ -1051,9 +1051,9 @@ c            write(*,*) "cornerT = ",cornerT
             weight = 0.d0
          end if
          
-c         write(*,*) "T1,logT,T2 = ",T1,logT,T2
-c         write(*,*) "weight = ",weight
-c         write(*,*) "weightR, weightT = ",weightR,weightT
+c         write(o,*) "T1,logT,T2 = ",T1,logT,T2
+c         write(o,*) "weight = ",weight
+c         write(o,*) "weightR, weightT = ",weightR,weightT
          
          ! weight = 1 when logR = R1 or logT = T1
          ! weight = 0 when logR = R2 or logT = T2
@@ -1136,8 +1136,8 @@ c         calculate_table_opacity = opacities(1)
 c         return
 
 c         if(myT.lt.10.d0**(2)) then
-c            write(*,*) "This is happening", log10(myrho),log10(myT)
-c            write(*,*) opacities(1),opacity_P,opacity_R
+c            write(o,*) "This is happening", log10(myrho),log10(myT)
+c            write(o,*) opacities(1),opacity_P,opacity_R
 c         end if
 
 c         ! We need to stitch the Planck and Rosseland files together
@@ -1190,7 +1190,7 @@ c         end if
          end if
       end if
 
-c      write(*,*) "logmyT, logmyR = ",logmyT,logmyR
+c      write(o,*) "logmyT, logmyR = ",logmyT,logmyR
 
       
       ! Search through the rest of the opacityfiles for
@@ -1271,9 +1271,9 @@ c      write(*,*) "logmyT, logmyR = ",logmyT,logmyR
          ! that the main opacity routine can try extrapolating
          calculate_table_opacity = -1.d30
       else
-         write(*,*) "sum(opacities), sum(weights) = ",sum(opacities),
+         write(o,*) "sum(opacities), sum(weights) = ",sum(opacities),
      $        sum(weights)
-         write(*,*) "When trying to calculate the opacity from the "//
+         write(o,*) "When trying to calculate the opacity from the "//
      $        "opacityfiles, the sum of the weights was <= 0 and"//
      $        " the sum of the opacities was =/= 0."
          error stop "getOpacity.f"

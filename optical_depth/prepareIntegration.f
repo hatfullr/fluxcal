@@ -36,7 +36,7 @@ c
 c      ccphoto=0
 
       if(dimenFileAlreadyExists) then
-         write(*,*) "Creating the driving grid"
+         write(o,*) "Creating the driving grid"
       end if
 
 c     Find limits of integration:
@@ -98,7 +98,7 @@ c     $                    (tauA(ip) .gt. tau_thick_envfit)) then
       enddo
 
       if(dimenFileAlreadyExists) then
-         write(*,*) "Creating the integrating grid"
+         write(o,*) "Creating the integrating grid"
       end if
 c     Find 3d density grid for quick look-up later
       DO J=1,NYMAP

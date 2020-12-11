@@ -74,7 +74,7 @@ c      NYMAPnext=3
      $     " ",ES11.4,          !<F>
      $     " ",A10              !reason
      $     )
-      write(*,102)
+      write(o,102)
      $     "iter",
      $     "xmin",
      $     "hx",
@@ -88,7 +88,7 @@ c      NYMAPnext=3
      $     "maxNstp",
      $     "<F>",
      $     "reason"
-      write(*,102)
+      write(o,102)
      $     repeat("-",5),       !iter
      $     repeat("-",11),      !xmin
      $     repeat("-",11),      !hx
@@ -144,7 +144,7 @@ c     Compute cell widths:
       ! Determine the luminosity from the grid
       call getFlux
 
-c      write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+c      write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
 c     $     yminmap/runit_out,hymap/runit_out,nymap,
 cc     $     TOTALpracticalLUM/Lunit_out
 c     $     TOTALflux/numcell,reason
@@ -229,16 +229,18 @@ c         endif
          lastnumcell = numcell
 
          if(TOTALflux.eq.0) then
-            write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+            write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
      $           max_step_size,min_steps_taken,max_steps_taken,
      $           0.d0,"Finished  "
+            call flush(o)
             goto 42
          else
-            write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+            write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
      $           max_step_size,min_steps_taken,max_steps_taken,
      $           TOTALflux/numcell,reason
+            call flush(o)
          end if
 
          counter = counter+1
@@ -247,15 +249,16 @@ c         endif
       end if
 
       if(TOTALflux.eq.0) then
-         write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+         write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
      $        max_step_size,min_steps_taken,max_steps_taken,
      $        0.d0,"Finished  "
       else
-         write(*,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+         write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
      $        max_step_size,min_steps_taken,max_steps_taken,
      $        TOTALflux/numcell,"Finished  "
       end if
+      call flush(o)
 
  42   end subroutine

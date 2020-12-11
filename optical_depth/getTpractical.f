@@ -68,13 +68,13 @@ c
 c      if(mu .eq. 0.d0) then
 c         mu = 1.d-30
 c      end if
-c      write(*,*) "Inside getTpractical.f ",z1,zstop
+c      write(o,*) "Inside getTpractical.f ",z1,zstop
       if(z1.ne.zstop)then
-c         write(*,*) "Running getTpractical.f with integrator = ",
+c         write(o,*) "Running getTpractical.f with integrator = ",
 c     $        integrator
 
          if ( z1.lt.zstop ) then
-            write(*,*) "ERROR: Should have z1 > zstop always. "//
+            write(o,*) "ERROR: Should have z1 > zstop always. "//
      $           "This means the integrator is starting at a z "//
      $           "position that is less than the z position it "//
      $           "expects to stop at. "//
@@ -95,7 +95,7 @@ c     $        integrator
          else if (integrator.eq.1) then
             call simpson(xpos,ypos,z1,zstop,Tthin4,tau_thin,kount1)
          else
-            write(*,*) "ERROR: integrator =",integrator," not "//
+            write(o,*) "ERROR: integrator =",integrator," not "//
      $           "recognized."
             error stop "getTpractical.f"
          end if
@@ -122,7 +122,7 @@ c     $        integrator
       Tpractical = (Tthick4 + Tthin4)**0.25d0
       
 cc     zstop = max(z0,zthick)
-cc     write(*,*) "zthick,z0,z1 = ",zthick,z0,z1
+cc     write(o,*) "zthick,z0,z1 = ",zthick,z0,z1
 c      if(thick_p.gt.0) then     ! There is a thick particle along the LOS
 c         ! We need to try and integrate down to the surface of the thick
 c         ! particle to check if thin particles create a thick region, and
@@ -160,19 +160,19 @@ c            Tthin = t6*1.d6
 c         else                   ! Integrator did not find a photosphere
 c            sphoto = zthick     ! Photosphere must be at surface of thick particle
 c            if(Teff(thick_p).lt.0.and.Teff(thick_p).ge.-15000) then
-c               write(*,*) "a really hot particle is outside"
+c               write(o,*) "a really hot particle is outside"
 c               stop
 c            end if
 c            
 cc            if(Teff(thick_p).ge.7000) then
-cc               write(*,*) "a moderately hot particle is outside:",
+cc               write(o,*) "a moderately hot particle is outside:",
 cc           &              tempp(thick_p),Teff(thick_p), thick_p
 cc            end if
 c            
 c            
 c            if(Teff(thick_p).lt.-15000.and.
 c     $           Teff(thick_p).ge.-25000) then
-cc               write(*,*) "a cold particle is outside",
+cc               write(o,*) "a cold particle is outside",
 cc           &              tempp(thick_p), rho(thick_p),
 cc           &              tauA(thick_p), opac_sph(thick_p),
 cc           &              hp(thick_p)*2./6.06e10,thick_p
@@ -186,7 +186,7 @@ c
 c            ! Use the smallest temperature possible, because the SPH methods will be more accurate
 c            ! at low T than the envelope fitting routine
 c            if(tempp(thick_p) .lt. Tthick) then
-c               write(*,*) " strange place. Why I am here?",
+c               write(o,*) " strange place. Why I am here?",
 c     &              tempp(thick_p),Teff(thick_p), Tthick, thick_p
 c               Tthick = tempp(thick_p)
 c               stop
@@ -234,11 +234,11 @@ c
 c      end if
 c      
       if(tau_thin .lt. 0.d0) then
-         write(*,*) "tauthin < 0! Something went wrong in"//
+         write(o,*) "tauthin < 0! Something went wrong in"//
      $        " getTpractical.f"
-         write(*,*) "tau_thin = ",tau_thin
-         write(*,*) "Tthin4 = ",Tthin4
-         write(*,*) "Tthick4 = ",Tthick4
+         write(o,*) "tau_thin = ",tau_thin
+         write(o,*) "Tthin4 = ",Tthin4
+         write(o,*) "Tthick4 = ",Tthick4
          error stop "getTpractical.f"
       end if
       

@@ -6,7 +6,7 @@
       character*255 filename
 
 c     initialize opacity file for photosphere fit
-      write(*,*) "Reading envfit nabla file"
+      write(o,*) "Reading envfit nabla file"
       open(1,file=trim(adjustl(filename)),status='old')
       num_g=51
       num_t=271

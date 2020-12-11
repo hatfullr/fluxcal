@@ -159,9 +159,9 @@ c     At extreme densities we will use ideal gas + radiation pressure
             return
          endif 
          if(gam1.lt.0.999*4.d0/3.d0 .or. gam1.gt.1.001*5.d0/3.d0) then
-            write(*,*) "WARNING: useeostable found a bad gamma value."
-            write(*,*) "4/3 < gamma < 5/3"
-c            write(*,*) beta1,pgas,prad,temperature,
+            write(o,*) "WARNING: useeostable found a bad gamma value."
+            write(o,*) "4/3 < gamma < 5/3"
+c            write(o,*) beta1,pgas,prad,temperature,
 c     $           -ucgs*rhocgs/arad
 c            stop 'GAM1 value does not make sense'
          endif

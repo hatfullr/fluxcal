@@ -1,7 +1,8 @@
       subroutine makeOutputFile(filename)
+      include 'flux_cal.h'
       character*255 filename
 
-      write(*,*) "Initializing '",trim(adjustl(filename)),"'"
+      write(o,*) "Initializing '",trim(adjustl(filename)),"'"
       
  101  format(16A22)
       open(10,file=trim(adjustl(filename)),status='replace')

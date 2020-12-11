@@ -42,7 +42,7 @@
       avgrpos=0.d0
       avgxhp=0.d0
 c      if(dimenFileAlreadyExists) then
-c         write(*,*) "Integrating through each point on the driving grid"
+c         write(o,*) "Integrating through each point on the driving grid"
 c     end if
       min_step_size = 1.d30
       max_step_size = -1
@@ -58,15 +58,15 @@ c     end if
 
             if(zmin(i,j).lt.1d30)then
                nstp = 0
-c               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
+c               write(o,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
 c     $              zmax(i,j)/runit_out
                if ( debug ) then
-                  write(*,*) ""
-                  write(*,*) "Inspecting grid cell i,j = ",i,j
-                  write(*,*) "zmin(i,j),zmax(i,j)=",
+                  write(o,*) ""
+                  write(o,*) "Inspecting grid cell i,j = ",i,j
+                  write(o,*) "zmin(i,j),zmax(i,j)=",
      $                 zmin(i,j)/runit_out,zmax(i,j)/runit_out
-                  write(*,*) "thick_part(i,j)=",thick_part(i,j)
-                  write(*,*) "zmax_thick(i,j)=",
+                  write(o,*) "thick_part(i,j)=",thick_part(i,j)
+                  write(o,*) "zmax_thick(i,j)=",
      $                 zmax_thick(i,j)/runit_out
                end if
                call getTpractical(zmin(i,j),zmax(i,j),
@@ -241,8 +241,8 @@ c            TXY(I,J)=TphotoXY(I,J)
       end do
       
       call cpu_time(finish_time)
-c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
+c      write(o,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
 c     $     TOTALTpracticalXY(i/2,j/2)
-c      write(*,*) "integrateTau took ",finish_time-start_time
+c      write(o,*) "integrateTau took ",finish_time-start_time
 
       end subroutine

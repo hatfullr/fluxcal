@@ -74,15 +74,15 @@ c     t6 is the temperature in millions of degrees Kelvin
       if(t6.gt.0) then
          opacit = getOpacity(t6*1d6,rhocgs,xh)
 c         if(opacit.eq.-1.d30) then
-c            write(*,*) "derivs.f"
-c            write(*,*) "xpos,ypos,zpos = ",xpos/runit_out,
+c            write(o,*) "derivs.f"
+c            write(o,*) "xpos,ypos,zpos = ",xpos/runit_out,
 c     $           ypos/runit_out,
 c     $           zpos/runit_out
 c            
 c            do i=1,n
 c               r2=(x(i)-xpos)**2.d0+(y(i)-ypos)**2.d0+(z(i)-zpos)**2.d0
 c               if ( r2.lt.4.d0*hp(i)**2.d0 ) then
-c                  write(*,*) "i = ",i
+c                  write(o,*) "i = ",i
 c               end if
 c            end do
 c            
@@ -90,7 +90,7 @@ c            stop
 c         end if
 
          if(opacit.le.1d30) then
-c            write(*,*) "opacit, rhocgs, dtauds(1) = ",opacit,rhocgs,
+c            write(o,*) "opacit, rhocgs, dtauds(1) = ",opacit,rhocgs,
 c     $           -opacit*rhocgs
             dtauds(1)=-opacit*rhocgs ! NEGATIVE SIGN IS BECAUSE STEP IS IN NEGATIVE DIRECTION
             dtauds(2)=dtauds(1)

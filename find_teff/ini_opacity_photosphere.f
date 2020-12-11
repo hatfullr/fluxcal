@@ -7,7 +7,7 @@
       character*255 filename
        
 c     initialize opacities for a photospheric fit
-      write(*,*) "Reading envfit opacity file"
+      write(o,*) "Reading envfit opacity file"
       open(100,file=trim(adjustl(filename)),status='old')
 
       numr=19
@@ -34,7 +34,7 @@ c     initialize opacities for a photospheric fit
        
 c     initialize opacities for a photospheric fit
 c     open(1,file="lowT_fa05_gs98_z0.02_x0.7.data ",status='old')
-      write(*,*) "Reading envfit cold opacity file"
+      write(o,*) "Reading envfit cold opacity file"
       open(100,file=trim(adjustl(filename)),status='old')
 
       numr=46

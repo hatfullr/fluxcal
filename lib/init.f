@@ -9,33 +9,35 @@
       logical use_rosseland, use_planck
       logical throw_error
 
-      write(*,*)" ___________________________________________________  "
-      write(*,*)"/         ___  _              ___        _          \ "
-      write(*,*)"|        | __|| | _  _ __ __ / __| __ _ | |         | "
-      write(*,*)"|        | _| | || || |\ \ /| (__ / _` || |         | "
-      write(*,*)"|        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | "
-      write(*,*)"\___________________________________________________/ "
-      write(*,*)"|                                                   | "
-      write(*,*)"|  FluxCal Copyright (C) 2020. Written by,          | "
-      write(*,*)"|                                                   | "
-      write(*,*)"|   Roger Hatfull      [University of Alberta]      | "
-      write(*,*)"|   Natasha Ivanova    [University of Alberta]      | "
-      write(*,*)"|   James C. Lombardi  [Allegheny College]          | "
-      write(*,*)"|                                                   | "
-      write(*,*)"|  This program comes with ABSOLUTELY NO WARRANTY.  | "
-      write(*,*)"|  This is free software, and you are welcome to    | "
-      write(*,*)"|  redistribute it under certain conditions. See    | "
-      write(*,*)"|  LICENSE file for details, or visit               | "
-      write(*,*)"|  https://www.gnu.org/licenses                     | "
-      write(*,*)"\___________________________________________________/ "
-      write(*,*)"|                   |                                 "
-      write(*,*)"|   Version 1.0.0   |                                 "
-      write(*,*)"\___________________/                                 "
-      write(*,*)"                                                      "
+      write(o,*)" ___________________________________________________  "
+      write(o,*)"/         ___  _              ___        _          \ "
+      write(o,*)"|        | __|| | _  _ __ __ / __| __ _ | |         | "
+      write(o,*)"|        | _| | || || |\ \ /| (__ / _` || |         | "
+      write(o,*)"|        |_|  |_| \_,_|/_\_\ \___|\__,_||_|         | "
+      write(o,*)"\___________________________________________________/ "
+      write(o,*)"|                                                   | "
+      write(o,*)"|  FluxCal Copyright (C) 2020. Written by,          | "
+      write(o,*)"|                                                   | "
+      write(o,*)"|   Roger Hatfull      [University of Alberta]      | "
+      write(o,*)"|   Natasha Ivanova    [University of Alberta]      | "
+      write(o,*)"|   James C. Lombardi  [Allegheny College]          | "
+      write(o,*)"|                                                   | "
+      write(o,*)"|  This program comes with ABSOLUTELY NO WARRANTY.  | "
+      write(o,*)"|  This is free software, and you are welcome to    | "
+      write(o,*)"|  redistribute it under certain conditions. See    | "
+      write(o,*)"|  LICENSE file for details, or visit               | "
+      write(o,*)"|  https://www.gnu.org/licenses                     | "
+      write(o,*)"\___________________________________________________/ "
+      write(o,*)"|                   |                                 "
+      write(o,*)"|   Version 1.0.0   |                                 "
+      write(o,*)"\___________________/                                 "
+      write(o,*)"                                                      "
 
+      call flush(o)
+      
       call sleep(1)
       
-      write(*,*) "** Initializing **"
+      write(o,*) "** Initializing **"
 
 
 
@@ -510,7 +512,7 @@
          read(44,input)
          close(44)
       else
-         write(*,*) "No 'flux_cal.input' file found."
+         write(e,*)"No 'flux_cal.input' file found."
          error stop "init.f"
       end if
 
@@ -529,7 +531,7 @@ c      end if
       ! Get the base units
       inquire(file='flux_cal.baseunits',exist=baseunitsexists)
       if(baseunitsexists) then
-         write(*,*) "'flux_cal.baseunits' file found. Using"//
+         write(o,*)"'flux_cal.baseunits' file found. Using"//
      $        " user-specified physical base units."
          open(42,file='flux_cal.baseunits')
          read(42,baseunits)
@@ -538,17 +540,17 @@ c      end if
          inquire(file=trim(adjustl(flux_cal_dir))//
      $        "/defaults/flux_cal.baseunits",exist=baseunitsexists)
          if(baseunitsexists) then
-            write(*,*) "Using default baseunits file '"//
-     $           trim(adjustl(flux_cal_dir))//"/defaults/"//
+            write(o,*)"Using default baseunits file '",
+     $           trim(adjustl(flux_cal_dir)),"/defaults/",
      $           "flux_cal.baseunits'."
             open(42,file=trim(adjustl(flux_cal_dir))//
      $           "/defaults/flux_cal.baseunits")
             read(42,baseunits)
             close(42)
          else
-            write(*,*)"WARNING: No 'flux_cal.baseunits' default file "//
+            write(e,*)"WARNING: No 'flux_cal.baseunits' default file "//
      $           "found in either the current working directory or "//
-     $           "'",trim(adjustl(flux_cal_dir)),"/defaults'. "//
+     $           "'"//trim(adjustl(flux_cal_dir))//"/defaults'. "//
      $           "Assuming cgs units for all variables."
          end if
       end if
@@ -611,130 +613,145 @@ c      end if
  113  format(A27," = ",E10.4)
 
 c     Write everything to the terminal
-      write(*,*) ""
-      write(*,99) "gram  ",gram  ,"arad       ",arad
-      write(*,99) "sec   ",sec   ,"gravconst  ",gravconst
-      write(*,99) "cm    ",cm    ,"pc         ",pc
-      write(*,99) "kelvin",kelvin,"distance   ",distance
-      write(*,99) "erg   ",erg   ,"boltz      ",boltz
-      write(*,99) "crad  ",crad  ,"planck     ",planck
-      write(*,99) "sigma ",sigma
-      write(*,*) ""
-      write(*,99) "runit       ",runit       ,"munit      ",munit
-      write(*,99) "tunit       ",tunit       ,"vunit      ",vunit
-      write(*,99) "Eunit       ",Eunit       ,"rhounit    ",rhounit
-      write(*,99) "muunit      ",muunit      ,"gunit      ",gunit
-      write(*,*) ""
-      write(*,99) "runit_out   ",runit_out   ,"munit_out  ",munit_out
-      write(*,99) "tunit_out   ",tunit_out   ,"vunit_out  ",vunit_out
-      write(*,99) "Eunit_out   ",Eunit_out   ,"rhounit_out",rhounit_out
-      write(*,99) "muunit_out  ",muunit_out  ,"gunit_out  ",gunit_out
-      write(*,99) "tempunit_out",tempunit_out,"punit_out  ",punit_out
-      write(*,99) "Lunit_out   ",Lunit_out   ,"kunit_out  ",kunit_out
-      write(*,999)"sunit_out   ",sunit_out
-      write(*,*) ""
+      write(o,*) ""
+      write(o,99) "gram  ",gram  ,"arad       ",arad
+      write(o,99) "sec   ",sec   ,"gravconst  ",gravconst
+      write(o,99) "cm    ",cm    ,"pc         ",pc
+      write(o,99) "kelvin",kelvin,"distance   ",distance
+      write(o,99) "erg   ",erg   ,"boltz      ",boltz
+      write(o,99) "crad  ",crad  ,"planck     ",planck
+      write(o,99) "sigma ",sigma
+      write(o,*) ""
+      write(o,99) "runit       ",runit       ,"munit      ",munit
+      write(o,99) "tunit       ",tunit       ,"vunit      ",vunit
+      write(o,99) "Eunit       ",Eunit       ,"rhounit    ",
+     $     rhounit
+      write(o,99) "muunit      ",muunit      ,"gunit      ",gunit
+      write(o,*) ""
+      write(o,99) "runit_out   ",runit_out   ,"munit_out  ",
+     $     munit_out
+      write(o,99) "tunit_out   ",tunit_out   ,"vunit_out  ",
+     $     vunit_out
+      write(o,99) "Eunit_out   ",Eunit_out   ,"rhounit_out",
+     $     rhounit_out
+      write(o,99) "muunit_out  ",muunit_out  ,"gunit_out  ",
+     $     gunit_out
+      write(o,99) "tempunit_out",tempunit_out,"punit_out  ",
+     $     punit_out
+      write(o,99) "Lunit_out   ",Lunit_out   ,"kunit_out  ",
+     $     kunit_out
+      write(o,999)"sunit_out   ",sunit_out
+      write(o,*) ""
       
-      write(*,97) "start ",start ,"anglexdeg",anglexdeg
-      write(*,97) "finish",finish,"angleydeg",angleydeg
-      write(*,97) "step  ",step  ,"anglezdeg",anglezdeg
+      write(o,97) "start ",start ,"anglexdeg",anglexdeg
+      write(o,97) "finish",finish,"angleydeg",angleydeg
+      write(o,97) "step  ",step  ,"anglezdeg",anglezdeg
 
-      write(*,109) "flux_cal_dir",trim(adjustl(flux_cal_dir))
+      write(o,109) "flux_cal_dir",trim(adjustl(flux_cal_dir))
       
-      write(*,*) ""
-      write(*,101) "nkernel               ",nkernel
-      write(*,100) "yscalconst            ",yscalconst
-      write(*,100) "fracaccuracy          ",fracaccuracy
-      write(*,101) "MAXSTP                ",MAXSTP
-      write(*,101) "min_Nx                ",min_Nx
-      write(*,101) "min_Ny                ",min_Ny
-      write(*,101) "max_Nx                ",max_Nx
-      write(*,101) "max_Ny                ",max_Ny
-      write(*,*) ""
+      write(o,*) ""
+      write(o,101) "nkernel               ",nkernel
+      write(o,100) "yscalconst            ",yscalconst
+      write(o,100) "fracaccuracy          ",fracaccuracy
+      write(o,101) "MAXSTP                ",MAXSTP
+      write(o,101) "min_Nx                ",min_Nx
+      write(o,101) "min_Ny                ",min_Ny
+      write(o,101) "max_Nx                ",max_Nx
+      write(o,101) "max_Ny                ",max_Ny
+      write(o,*) ""
       if ( integrator .eq. 0 ) then
-         write(*,100) "step1                 ",step1
-         write(*,100) "step2                 ",step2
-         write(*,100) "step3                 ",step3
-         write(*,100) "step4                 ",step4
+         write(o,100) "step1                 ",step1
+         write(o,100) "step2                 ",step2
+         write(o,100) "step3                 ",step3
+         write(o,100) "step4                 ",step4
       else if(integrator.eq.1) then
-         write(*,100) "simps_min_dz          ",simps_min_dz
-         write(*,100) "simps_max_dz          ",simps_max_dz
-         write(*,100) "simps_min_dtau        ",simps_min_dtau
-         write(*,100) "simps_min_dtau        ",simps_max_dtau
-         write(*,100) "simps_min_frac_dF     ",simps_min_frac_dF
-         write(*,100) "simps_max_frac_dF     ",simps_max_frac_dF
-         write(*,100) "simps_F_cutoff        ",simps_f_cutoff
-         write(*,108) "simps_max_step_error  ",simps_max_step_error
-         write(*,108) "simps_max_step_warning",simps_max_step_warning
-         write(*,100) "taulimit_threshold    ",taulimit_threshold
+         write(o,100) "simps_min_dz          ",simps_min_dz
+         write(o,100) "simps_max_dz          ",simps_max_dz
+         write(o,100) "simps_min_dtau        ",simps_min_dtau
+         write(o,100) "simps_min_dtau        ",simps_max_dtau
+         write(o,100) "simps_min_frac_dF     ",simps_min_frac_dF
+         write(o,100) "simps_max_frac_dF     ",simps_max_frac_dF
+         write(o,100) "simps_F_cutoff        ",simps_f_cutoff
+         write(o,108) "simps_max_step_error  ",simps_max_step_error
+         write(o,108) "simps_max_step_warning",
+     $        simps_max_step_warning
+         write(o,100) "taulimit_threshold    ",taulimit_threshold
       end if
-      write(*,*) ""
-      write(*,100) "taulimit              ",taulimit
-      write(*,100) "tau_thick_integrator  ",tau_thick_integrator
-      write(*,100) "tau_thick_envfit      ",tau_thick_envfit
-      write(*,108) "envfit                ",envfit
-      write(*,*) ""
-      write(*,100) "metallicity           ",metallicity
+      write(o,*) ""
+      write(o,100) "taulimit              ",taulimit
+      write(o,100) "tau_thick_integrator  ",tau_thick_integrator
+      write(o,100) "tau_thick_envfit      ",tau_thick_envfit
+      write(o,108) "envfit                ",envfit
+      write(o,*) ""
+      write(o,100) "metallicity           ",metallicity
       
-      write(*,*) ""
-      write(*,102) "get_fluxes                ",get_fluxes
-      write(*,102) "get_true_luminosity       ",get_true_luminosity
-      write(*,102) "get_particles_at_pos      ",get_particles_at_pos
-      write(*,102) "get_integration_at_pos    ",get_integration_at_pos
-      write(*,102) "get_integration_at_all_pos",
+      write(o,*) ""
+      write(o,102) "get_fluxes                ",get_fluxes
+      write(o,102) "get_true_luminosity       ",get_true_luminosity
+      write(o,102) "get_particles_at_pos      ",get_particles_at_pos
+      write(o,102) "get_integration_at_pos    ",
+     $     get_integration_at_pos
+      write(o,102) "get_integration_at_all_pos",
      $     get_integration_at_all_pos
       
       if(get_particles_at_pos.or.get_integration_at_pos) then
-         write(*,105) "posx",posx
-         write(*,105) "posy",posy
+         write(o,105) "posx",posx
+         write(o,105) "posy",posy
       end if
       
-      write(*,102) "get_closest_particles     ",get_closest_particles
-      write(*,102) "track_particles           ",track_particles
+      write(o,102) "get_closest_particles     ",
+     $     get_closest_particles
+      write(o,102) "track_particles           ",track_particles
       
       if(track_particles) then
-         write(*,104) "track_all           ",track_all
-         write(*,104) "binary_tracking_file",binary_tracking_file
-         write(*,106) "trackfile           ",trim(adjustl(trackfile))
+         write(o,104) "track_all           ",track_all
+         write(o,104) "binary_tracking_file",binary_tracking_file
+         write(o,106) "trackfile           ",
+     $        trim(adjustl(trackfile))
       end if
       
-      write(*,102) "get_info_of_particle      ",get_info_of_particle
+      write(o,102) "get_info_of_particle      ",get_info_of_particle
       if(get_info_of_particle) then
-         write(*,107) "info_particle", info_particle
+         write(o,107) "info_particle", info_particle
       end if
 
-      write(*,*)
-      write(*,112) "opacity_oob_error         ",opacity_oob_error
-      write(*,112) "opacity_oob_warning       ",opacity_oob_warning
-      write(*,112) "opacity_analytic_warning  ",opacity_analytic_warning
-      write(*,113) "opacity_rho_cutoff        ",opacity_rho_cutoff
-      write(*,113) "smoothing_window_T        ",smoothing_window_T
+      write(o,*)
+      write(o,112) "opacity_oob_error         ",opacity_oob_error
+      write(o,112) "opacity_oob_warning       ",opacity_oob_warning
+      write(o,112) "opacity_analytic_warning  ",
+     $     opacity_analytic_warning
+      write(o,113) "opacity_rho_cutoff        ",opacity_rho_cutoff
+      write(o,113) "smoothing_window_T        ",smoothing_window_T
       
 
       do i=1,numopacityfiles
          if(len(trim(adjustl(opacityfiles(i)))).gt.0) then
-            write(*,*)
-            write(*,110) "opacityfiles",i,trim(adjustl(opacityfiles(i)))
-            write(*,111) "      logTmins",i,logTmins(i)
-            write(*,111) "      logTmaxs",i,logTmaxs(i)
-            write(*,111) "      logRmins",i,logRmins(i)
-            write(*,111) "      logRmaxs",i,logRmaxs(i)
-            write(*,111) "   logT_blend1",i,logT_blend1(i)
-            write(*,111) "   logT_blend2",i,logT_blend2(i)
-            write(*,111) "   logR_blend1",i,logR_blend1(i)
-            write(*,111) "   logR_blend2",i,logR_blend2(i)
+            write(o,*)
+            write(o,110) "opacityfiles",i,
+     $           trim(adjustl(opacityfiles(i)))
+            write(o,111) "      logTmins",i,logTmins(i)
+            write(o,111) "      logTmaxs",i,logTmaxs(i)
+            write(o,111) "      logRmins",i,logRmins(i)
+            write(o,111) "      logRmaxs",i,logRmaxs(i)
+            write(o,111) "   logT_blend1",i,logT_blend1(i)
+            write(o,111) "   logT_blend2",i,logT_blend2(i)
+            write(o,111) "   logR_blend1",i,logR_blend1(i)
+            write(o,111) "   logR_blend2",i,logR_blend2(i)
          end if
       end do
       
-      write(*,*) ""
-      write(*,103) "eosfile              ",trim(adjustl(eosfile))
-      write(*,103) "filtersfile          ",trim(adjustl(filtersfile))
-      write(*,103) "outfile              ",trim(adjustl(outfile))
-      write(*,*) ""
+      write(o,*) ""
+      write(o,103) "eosfile              ",trim(adjustl(eosfile))
+      write(o,103) "filtersfile          ",
+     $     trim(adjustl(filtersfile))
+      write(o,103) "outfile              ",trim(adjustl(outfile))
+      write(o,*) ""
 
+      call flush(o)
 
 c     Catch some runtime errors
       if(tau_thick_integrator .gt. taulimit) then
-         write(*,*) "tau_thick_integrator > taulimit. Integration "//
+         write(o,*) "tau_thick_integrator > taulimit. Integration "//
      $        "will always stop before reaching optically thick "//
      $        "material."
          error stop "init.f"
@@ -742,33 +759,33 @@ c     Catch some runtime errors
 
       if((tau_thick_integrator .gt. tau_thick_envfit).and.
      $     (envfit)) then
-         write(*,*) "tau_thick_integrator > tau_thick_envfit. "//
+         write(o,*) "tau_thick_integrator > tau_thick_envfit. "//
      $        "Integrator will not return physical values."
          error stop "init.f"
       end if
       
       if((.not.envfit).and.(taulimit.lt.tau_thick).and.
      $     (tau_thick.ne.-1.d30)) then ! LEGACY
-         write(*,*) "envfit is off and taulimit < tau_thick. "//
+         write(o,*) "envfit is off and taulimit < tau_thick. "//
      $        "Integration will always stop before reaching "//
      $        "optically thick material."
          error stop "init.f"
       end if
       
       if ((start.gt.finish).and.(step.gt.0)) then
-         write(*,*) "Must have start < finish when step > 0."
-         write(*,*) "start=",start,"finish=",finish
+         write(o,*) "Must have start < finish when step > 0."
+         write(o,*) "start=",start,"finish=",finish
          error stop "init.f"
       end if
       if ((start.lt.finish).and.(step.lt.0)) then
-         write(*,*) "Must have start > finish when step < 0."
-         write(*,*) "start=",start,"finish=",finish
+         write(o,*) "Must have start > finish when step < 0."
+         write(o,*) "start=",start,"finish=",finish
          error stop "init.f"
       end if
 
       if(start.lt.0) then
-         write(*,*) "Starting file index must be > 0."
-         write(*,*) "start=",start
+         write(o,*) "Starting file index must be > 0."
+         write(o,*) "start=",start
          error stop "init.f"
       end if
 
@@ -778,70 +795,71 @@ c     Catch some runtime errors
       end if
 
       if (MAXSTP.eq.0) then
-         write(*,*) "Cannot have MAXSTP = 0"
+         write(o,*) "Cannot have MAXSTP = 0"
          error stop "init.f"
       end if
       if (abs(MAXSTP).eq.1) then
-         write(*,*) "Cannot have |MAXSTP| = 1"
+         write(o,*) "Cannot have |MAXSTP| = 1"
          error stop "init.f"
       end if
       if ( integrator.eq.1 ) then
          if ( (simps_min_dz.ne.0 .and. simps_max_dz.ne.0) .and.
      $        (dabs(simps_min_dz).gt.dabs(simps_max_dz)) ) then
-            write(*,*) "|simps_min_dz| > |simps_max_dz|"
-            write(*,*) "simps_min_dz = ",simps_min_dz
-            write(*,*) "simps_max_dz = ",simps_max_dz
+            write(o,*) "|simps_min_dz| > |simps_max_dz|"
+            write(o,*) "simps_min_dz = ",simps_min_dz
+            write(o,*) "simps_max_dz = ",simps_max_dz
             error stop "init.f"
          end if
          if ( (simps_min_dtau.ne.0 .and. simps_max_dtau.ne.0) .and.
      $        (dabs(simps_min_dtau).gt.dabs(simps_max_dtau)) ) then
-            write(*,*) "|simps_min_dtau| > |simps_max_dtau|"
-            write(*,*) "simps_min_dtau = ",simps_min_dtau
-            write(*,*) "simps_max_dtau = ",simps_max_dtau
+            write(o,*) "|simps_min_dtau| > |simps_max_dtau|"
+            write(o,*) "simps_min_dtau = ",simps_min_dtau
+            write(o,*) "simps_max_dtau = ",simps_max_dtau
             error stop "init.f"
          end if
          if ( (simps_min_frac_dF.ne.0.and.simps_max_frac_dF.ne.0).and.
      $        (dabs(simps_min_frac_dF).gt.dabs(simps_max_frac_dF)))then
-            write(*,*) "|simps_min_frac_dF| > |simps_max_frac_dF|"
-            write(*,*) "simps_min_frac_dF = ",simps_min_frac_dF
-            write(*,*) "simps_max_frac_dF = ",simps_max_frac_dF
+            write(o,*) "|simps_min_frac_dF| > |simps_max_frac_dF|"
+            write(o,*) "simps_min_frac_dF = ",simps_min_frac_dF
+            write(o,*) "simps_max_frac_dF = ",simps_max_frac_dF
             error stop "init.f"
          end if
          if ( simps_min_frac_dF.ne.0 .and. simps_max_frac_dF.ne.0 .and.
      $        simps_F_cutoff.eq.0 ) then
-            write(*,*) "Must give a non-zero value for simps_F_cutoff"//
+            write(o,*) "Must give a non-zero value for simps_F_cutoff"//
      $           " when simps_min_frac_dF != 0 and simps_max_frac_dF "//
      $           "!= 0"
             error stop "init.f"
          end if
          if ( taulimit.ne.0 .and. taulimit_threshold.le.0 ) then
-            write(*,*) "When taulimit=0, you must give a positive, "//
+            write(o,*) "When taulimit=0, you must give a positive, "//
      $           "non-zero value for taulimit_threshold"
             error stop "init.f"
          end if
       end if
 
       if (min_Nx.lt.3) then
-         write(*,*) "min_Nx = ",min_Nx
-         write(*,*) "Must have min_Nx >= 3"
+         write(o,*) "min_Nx = ",min_Nx
+         write(o,*) "Must have min_Nx >= 3"
          error stop "init.f"
       end if
       if (min_Ny.lt.3) then
-         write(*,*) "min_Ny = ",min_Ny
-         write(*,*) "Must have min_Ny >= 3"
+         write(o,*) "min_Ny = ",min_Ny
+         write(o,*) "Must have min_Ny >= 3"
          error stop "init.f"
       end if
       if (max_Nx.gt.NXMAPMAX) then
-         write(*,*) "max_Nx,NXMAPMAX = ",max_Nx,NXMAPMAX
-         write(*,*) "Must have max_Nx <= NXMAPMAX"
+         write(o,*) "max_Nx = ",max_Nx
+         write(o,*) "Must have max_Nx <= ",NXMAPMAX
          error stop "init.f"
       end if
       if (max_Ny.gt.NYMAPMAX) then
-         write(*,*) "max_Ny,NYMAPMAX = ",max_Ny,NYMAPMAX
-         write(*,*) "Must have max_Ny <= NYMAPMAX"
+         write(o,*) "max_Ny = ",max_Ny
+         write(o,*) "Must have max_Ny <= ",NYMAPMAX
          error stop "init.f"
       end if
 
+      call flush(o)
       
  200  format(A,"/defaults/",A)
       
@@ -849,8 +867,8 @@ c     Catch some runtime errors
      $     trim(adjustl(eosfile))
       inquire(file=trim(adjustl(inputfile)),exist=fileexists)
       if(.not. fileexists) then
-         write(*,*) "Could not find EOS file '",
-     $        trim(adjustl(eosfile)),"' in flux_cal_dir/defaults."
+         write(o,*) "Could not find EOS file '"//
+     $        trim(adjustl(eosfile))//"' in flux_cal_dir/defaults."
          error stop "init.f"
       end if
       call readineostable(inputfile)
@@ -860,11 +878,11 @@ c     Catch some runtime errors
 
       if ( len(trim(adjustl(opacityfiles(1)))).eq.0 .and.
      $     len(trim(adjustl(opacityfiles(2)))).eq.0 ) then
-         write(*,*) "opacityfiles(1) = '"//
+         write(o,*) "opacityfiles(1) = '"//
      $        trim(adjustl(opacityfiles(1)))//"'"
-         write(*,*) "opacityfiles(2) = '"//
+         write(o,*) "opacityfiles(2) = '"//
      $        trim(adjustl(opacityfiles(2)))//"'"
-         write(*,*) "There must be valid arguments for one"//
+         write(o,*) "There must be valid arguments for one"//
      $        "of or both opacityfiles(1) and opacityfiles(2)"//
      $        " (Planck and Rosseland opacities, respectively)."
          error stop "init.f"
@@ -876,7 +894,7 @@ c     Catch some runtime errors
       if (len(trim(adjustl(opacityfiles(2)))).ne.0) use_rosseland=.true.
 
       if((use_planck.eqv..false.).and.(use_rosseland.eqv..false.)) then
-         write(*,*) "No Planck or Rosseland file found. There should"//
+         write(o,*) "No Planck or Rosseland file found. There should"//
      $        " at least be 'kP_h2001.dat' and 'kR_h2001.dat' in the"//
      $        " defaults directory of your flux_cal installation." //
      $        " Please check that flux_cal installed properly."
@@ -890,7 +908,7 @@ c     Catch some runtime errors
             inquire(file=trim(adjustl(opacityfiles(i))),
      $           exist=fileexists)
             if (fileexists.eqv..false.) then
-               write(*,*) "WARNING: Could not find '"//
+               write(o,*) "WARNING: Could not find '"//
      $              trim(adjustl(opacityfiles(i)))//"'. "//
      $              "Checking the defaults directory in '"//
      $              trim(adjustl(flux_cal_dir))//"/defaults'."
@@ -900,9 +918,10 @@ c     Catch some runtime errors
                inquire(file=trim(adjustl(opacityfiles(i))),
      $              exist=fileexists)
                if(fileexists) then
-                  write(*,*) "Found '"//trim(adjustl(opacityfiles(i)))//"'."
+                  write(o,*) "Found '"//trim(adjustl(opacityfiles(i)))//
+     $                 "'."
                else
-                  write(*,*)"Could not find '"//
+                  write(o,*)"Could not find '"//
      $                 trim(adjustl(opacityfiles(i)))//"' in "//
      $                 "flux_cal_dir/defaults. make sure flux_cal_dir"//
      $                 " is correct, and if flux_cal was properly "//
@@ -919,7 +938,7 @@ c     Catch some runtime errors
      $           .or.
      $           (logTmaxs(i).ne.-1.d30 .and.
      $           logT_blend1(i).gt.logTmaxs(i)))) then
-               write(*,*) "Your logT_blend1(i) is invalid for"//
+               write(o,*) "Your logT_blend1(i) is invalid for"//
      $              " opacityfiles(i) = '"//
      $              trim(adjustl(opacityfiles(i)))//"'."
                throw_error = .true.
@@ -931,7 +950,7 @@ c     Catch some runtime errors
      $           .or.
      $           (logTmins(i).ne.-1.d30 .and.
      $           logT_blend2(i).lt.logTmins(i)))) then
-               write(*,*) "Your logT_blend2(i) is invalid for"//
+               write(o,*) "Your logT_blend2(i) is invalid for"//
      $              " opacityfiles(i) = '"//
      $              trim(adjustl(opacityfiles(i)))//"'."
                throw_error = .true.
@@ -943,7 +962,7 @@ c     Catch some runtime errors
      $           .or.
      $           (logRmaxs(i).ne.-1.d30 .and.
      $           logR_blend1(i).gt.logRmaxs(i)))) then
-               write(*,*) "Your logR_blend1(i) is invalid for"//
+               write(o,*) "Your logR_blend1(i) is invalid for"//
      $              " opacityfiles(i) = '"//
      $              trim(adjustl(opacityfiles(i)))//"'."
                throw_error = .true.
@@ -955,7 +974,7 @@ c     Catch some runtime errors
      $           .or.
      $           (logRmins(i).ne.-1.d30 .and.
      $           logR_blend2(i).lt.logRmins(i)))) then
-               write(*,*) "Your logR_blend2(i) is invalid for"//
+               write(o,*) "Your logR_blend2(i) is invalid for"//
      $              " opacityfiles(i) = '"//
      $              trim(adjustl(opacityfiles(i)))//"'."
                throw_error = .true.
@@ -968,17 +987,17 @@ c     Catch some runtime errors
 
       if (use_planck .or. use_rosseland) then
          if(use_planck) then
-            write(*,*)"Using Planck opacities from '"//
+            write(o,*)"Using Planck opacities from '"//
      $           trim(adjustl(opacityfiles(1)))//"'"
          else
-            write(*,*) "WARNING (init.f): Not using any Planck"//
+            write(o,*) "WARNING (init.f): Not using any Planck"//
      $           " opacities."
          end if
          if(use_rosseland) then
-            write(*,*)"Using Rosseland opacities from '"//
+            write(o,*)"Using Rosseland opacities from '"//
      $           trim(adjustl(opacityfiles(2)))//"'"
          else
-            write(*,*) "WARNING (init.f): Not using any "//
+            write(o,*) "WARNING (init.f): Not using any "//
      $           "Rosseland opacities."
          end if
          call init_lowT_opac(use_planck,use_rosseland,
@@ -997,9 +1016,9 @@ c     Catch some runtime errors
      $        "lowT_fa05_gs98_z0.02_x0.7.data"
          inquire(file=trim(adjustl(inputfile)), exist=fileexists)
          if(.not. fileexists) then
-            write(*,*) "Could not find '",trim(adjustl(inputfile)),
+            write(o,*) "Could not find '"//trim(adjustl(inputfile))//
      $           "' in"
-            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
+            write(o,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
      $           "is correct, and if flux_cal was properly installed."
             error stop "init.f"
          end if
@@ -1011,9 +1030,9 @@ c     Catch some runtime errors
      $        "table_nabla.dat"
          inquire(file=trim(adjustl(inputfile)),exist=fileexists)
          if(.not. fileexists) then
-            write(*,*) "Could not find '",trim(adjustl(inputfile)),
+            write(o,*) "Could not find '"//trim(adjustl(inputfile))//
      $           "' in"
-            write(*,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
+            write(o,*)"flux_cal_dir/defaults. make sure flux_cal_dir "//
      $           "is correct, and if flux_cal was properly installed."
             error stop "init.f"
          end if
@@ -1027,13 +1046,14 @@ c     Check to see if the filtersfile exists and read it if it does
      $        trim(adjustl(filtersfile))
          inquire(file=trim(adjustl(inputfile)),exist=fileexists)
          if(.not.fileexists) then
-            write(*,*) "Could not find '",trim(adjustl(inputfile)),"'"//
+            write(o,*) "Could not find '"//trim(adjustl(inputfile))//
+     $           "'"//
      $           " in flux_cal_dir/defaults. make sure flux_cal_dir"//
      $           " is correct, and if flux_cal was properly installed."
             error stop "init.f"
          end if
       
-         write(*,*) "Reading filtersfile"
+         write(o,*) "Reading filtersfile"
          open(16,file=trim(adjustl(inputfile)),status='old')
          read (16,*) numfilters
       
@@ -1049,18 +1069,18 @@ c     Check to see if the filtersfile exists and read it if it does
          if(.not.track_all) then ! Use trackfile
             inquire(file=trim(adjustl(trackfile)),exist=fileexists)
             if(.not.fileexists) then
-               write(*,*) "Could not find trackfile '",
-     $              trim(adjustl(trackfile)),"'."
+               write(o,*) "Could not find trackfile '"//
+     $              trim(adjustl(trackfile))//"'."
                error stop "init.f"
             end if
          end if                 ! If track_all, don't use trackfile
       end if
 
 c      if(taulimit.lt.tau_thick) then
-c         write(*,*) "WARNING: taulimit < tau_thick. This will result in"
-c         write(*,*) "integrations that stop part way through optically"
-c         write(*,*) "thin material, and as such, results should not be"
-c         write(*,*) "expected to be physical."
+c         write(o,*) "WARNING: taulimit < tau_thick. This will result in"
+c         write(o,*) "integrations that stop part way through optically"
+c         write(o,*) "thin material, and as such, results should not be"
+c         write(o,*) "expected to be physical."
 c      end if
 
 c     Initialize some variables
@@ -1075,8 +1095,10 @@ c     Initialize some variables
          call makeOutputFile(pinfo_file)
       end if
       
-      write(*,*) "** Complete **"
-      write(*,*) ""
+      write(o,*) "** Complete **"
+      write(o,*) ""
 
+      call flush(o)
+      
       return
       end subroutine

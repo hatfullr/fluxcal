@@ -30,7 +30,7 @@ c      enddo
       if(codeerror) goto 626
 
       if(dimenFileAlreadyExists) then
-         write(*,*) "Calculating the flux at each grid point"
+         write(o,*) "Calculating the flux at each grid point"
       end if
       Atot = 0.d0
       DO J=1,NYMAP
@@ -101,24 +101,24 @@ c     luminosity without worrying about surface areas.
             TOTALflux = TOTALflux + TOTALTpracticalXY(i,j)**4.d0
 
             if(TOTALflux.ne.TOTALflux) then
-               write(*,*) "i,j,xpos,ypos = ",i,j,xpos,ypos
-               write(*,*) "TOTALflux = ",TOTALflux
-               write(*,*) "TOTALTpracticalXY(i,j) = ",
+               write(o,*) "i,j,xpos,ypos = ",i,j,xpos,ypos
+               write(o,*) "TOTALflux = ",TOTALflux
+               write(o,*) "TOTALTpracticalXY(i,j) = ",
      $              TOTALTpracticalXY(i,j)
-               write(*,*) "Acell = ", Acell
-               write(*,*) "ERROR: NaN flux"
+               write(o,*) "Acell = ", Acell
+               write(o,*) "ERROR: NaN flux"
                error stop "getFlux.f"
             end if
 
             
             if(totalpracticallum.ne.totalpracticallum)then
                print *,'impractical practical luminsoity at ',i,j
-               write(*,*) tauthin(i,j)
-               write(*,*) exp(-tauthin(i,j))
-               write(*,*) TOTALpracticalLUM
-               write(*,*) TOTALTpracticalXY(i,j)
-               write(*,*) thick_part(i,j)
-               write(*,*) Avis(thick_part(i,j))
+               write(o,*) tauthin(i,j)
+               write(o,*) exp(-tauthin(i,j))
+               write(o,*) TOTALpracticalLUM
+               write(o,*) TOTALTpracticalXY(i,j)
+               write(o,*) thick_part(i,j)
+               write(o,*) Avis(thick_part(i,j))
                error stop "getFlux.f"
             endif
 
@@ -230,8 +230,8 @@ c     $     TOTALpracticalLUM*sigma*4d0*HXMAP*HYMAP/Lunit_out
       TOTALflux = TOTALflux*sigma
       TOTALpracticalLUM=TOTALflux*4.d0*hxmap*hymap
 
-c      write(*,*) Atot/runit_out**2.d0
-c      write(*,*) Atot/runit_out**2.d0 / nxmap/nymap,
+c      write(o,*) Atot/runit_out**2.d0
+c      write(o,*) Atot/runit_out**2.d0 / nxmap/nymap,
 c     $     hxmap*hymap / runit_out**2.d0
 
 c     We might want this later

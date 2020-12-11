@@ -1,3 +1,5 @@
+
+c      use iso_fortran_env
       include 'lib/flux_cal.h'
       real*8 TOTALpracticalLUM,avgrpos,avgxhp
       common/analysis2/ avgrpos,avgxhp
@@ -28,10 +30,10 @@ c      open(writefile,file="opacity_calls.dat",status="unknown") ! Remove later
 
  234  format(A,"_",I3.3)
       
-      write(*,*) "** Main loop **"
+      write(o,*) "** Main loop **"
       inquire(file=trim(adjustl(outfile)),exist=fileexists)
       if(fileexists) then
-         write(*,*) "File '",trim(adjustl(outfile)),"' "//
+         write(o,*) "File '",trim(adjustl(outfile)),"' "//
      $        "already exists"
          do i=1,imax
             write(newoutfile,234) trim(adjustl(outfile)),i
@@ -43,9 +45,9 @@ c      open(writefile,file="opacity_calls.dat",status="unknown") ! Remove later
          outfile=newoutfile
       end if
 
-      write(*,*) 
+      write(o,*) 
       
-      write(*,*) "Creating '",trim(adjustl(outfile)),"'"
+      write(o,*) "Creating '",trim(adjustl(outfile)),"'"
       open(89,file=trim(adjustl(outfile)),status='replace')
       write(89,230) "start","finish","step"
       write(89,231) start,finish,step
@@ -60,7 +62,7 @@ c      open(writefile,file="opacity_calls.dat",status="unknown") ! Remove later
          call read_fluxcal(innit)
          call setViewingAngle
          isInitGrid = .false.
-         write(*,*) ""
+         write(o,*) ""
 
          ! Remove if statement when finished testing
 c         if(.not.get_true_luminosity) then
@@ -69,7 +71,7 @@ c         end if
 
 c        ****************************************************************
          if(get_fluxes) then
-            ! write(*,*) "Finding the fluxes at each grid point"
+            ! write(o,*) "Finding the fluxes at each grid point"
             call init_grid
 
             if(dimenFileAlreadyExists) then
@@ -78,26 +80,26 @@ c        ****************************************************************
             end if
             
             call writeTempsFile
-            write(*,*) ""
-            write(*,'(A,ES22.14)')' Luminosity =',
+            write(o,*) ""
+            write(o,'(A,ES22.14)')' Luminosity =',
      $           TOTALpracticalLUM/Lunit_out
-!write(*,'(A,ES22.14)')' Maximum Teff=',TMAX/tempunit_out
+!write(o,'(A,ES22.14)')' Maximum Teff=',TMAX/tempunit_out
             if(avgt.eq.0) then
-               write(*,'(A,ES22.14)')' Average Teff =',0.d0
+               write(o,'(A,ES22.14)')' Average Teff =',0.d0
             else
-               write(*,'(A,ES22.14)')' Average Teff =',avgt/numcell/
+               write(o,'(A,ES22.14)')' Average Teff =',avgt/numcell/
      $              tempunit_out
             end if
-            write(*,'(A,ES22.14)') ' Effective visible area =',
+            write(o,'(A,ES22.14)') ' Effective visible area =',
      $           Atot/runit_out**2.d0
-            write(*,*) ""
-            write(*,*) "Writing to '",trim(adjustl(outfile)),"'"
+            write(o,*) ""
+            write(o,*) "Writing to '",trim(adjustl(outfile)),"'"
             open(89,file=trim(adjustl(outfile)),action='write',
      $           position='append')
             write(89,232) trim(adjustl(infname)), t/tunit_out,
      $           TOTALpracticalLUM/Lunit_out,avgt/numcell/tempunit_out
             close(89)
-            write(*,*) ""
+            write(o,*) ""
          end if
 c        ****************************************************************
 
@@ -118,7 +120,7 @@ c        ****************************************************************
 c        ****************************************************************
          if(get_closest_particles) then
             call init_grid
-            write(*,*) "Finding information on the closest particles"
+            write(o,*) "Finding information on the closest particles"
             call getClosestParticles
          end if
 c        ****************************************************************
@@ -129,7 +131,7 @@ c        ****************************************************************
          
 c        ****************************************************************
          if(get_particles_at_pos) then
-            write(*,*) "Finding all particles at posx, posy"
+            write(o,*) "Finding all particles at posx, posy"
             call particlesAtPos(posx,posy,pid,nid)
          end if
 c        ****************************************************************
@@ -140,7 +142,7 @@ c        ****************************************************************
 
 c        ****************************************************************
          if(get_integration_at_pos) then
-            write(*,*) "Finding data at integration steps at posx,posy"
+            write(o,*) "Finding data at integration steps at posx,posy"
             call integrationAtPos
          end if
 c        ****************************************************************
@@ -152,7 +154,7 @@ c        ****************************************************************
 c        ****************************************************************
          if(get_integration_at_all_pos) then
             call init_grid
-            write(*,*) "Finding data at integration steps at posx,posy"
+            write(o,*) "Finding data at integration steps at posx,posy"
             call integrationAtAllPos
          end if
 c        ****************************************************************
@@ -163,7 +165,7 @@ c        ****************************************************************
          
 c        ****************************************************************
          if(track_particles) then
-            write(*,*) "Tracking particles"
+            write(o,*) "Tracking particles"
             call trackParticles
          end if
 c        ****************************************************************
@@ -174,7 +176,7 @@ c        ****************************************************************
          
 c        ****************************************************************
          if(get_info_of_particle) then
-            write(*,*) "Finding data of particle ",info_particle
+            write(o,*) "Finding data of particle ",info_particle
             call output(pinfo_file,info_particle,.false.)
          end if
 c        ****************************************************************
@@ -182,12 +184,12 @@ c        ****************************************************************
 
          
 
-         write(*,*) ""
-         write(*,*) "**************************************************"
-         write(*,*) ""
+         write(o,*) ""
+         write(o,*) "**************************************************"
+         write(o,*) ""
       enddo
-      write(*,*) "** Complete **"
-      write(*,*) ""
+      write(o,*) "** Complete **"
+      write(o,*) ""
  500  format(A20," ",f15.7," ",A4)
 
 c      close(writefile)          ! Remove later

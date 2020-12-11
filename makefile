@@ -21,6 +21,7 @@ findTefflib = find_teff
 math_modules = $(mathlib)/bilinear_interpolation.o \
 	       $(mathlib)/toms760.o                \
 
+lib_modules = $(llib)/iso_fortran_env.o
 
 # Library objects
 lib_obj = $(llib)/getTemperature.o      \
@@ -77,7 +78,7 @@ findTeff_obj = $(findTefflib)/get_slop.o                \
                $(findTefflib)/ini_slops.o               \
 
 # All modules
-modules = $(math_modules)
+modules = $(lib_modules) $(math_modules)
 
 # All objects
 process_obj = $(modules) $(lib_obj) $(math_obj) $(opdep_obj) $(findTeff_obj)

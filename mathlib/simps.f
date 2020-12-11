@@ -196,10 +196,10 @@ c     Prevent stepsize underflow and overflow
          if (dabs(zpos-z2).le.1.d-30) exit
          if ( (z2-z1.gt.0 .and. zpos.gt.z2) .or.
      $        (z2-z1.lt.0 .and. zpos.lt.z2) ) then
-            write(*,*) "This should never happen, but somehow the"//
+            write(o,*) "This should never happen, but somehow the"//
      $           " integrator managed to get outside the integration"//
      $           " bounds... Good luck!"
-            write(*,*) "xpos,ypos,zpos,tau,z1,z2=",
+            write(o,*) "xpos,ypos,zpos,tau,z1,z2=",
      $        xpos/runit_out,ypos/runit_out,zpos/runit_out,
      $        tau_thin,z1/runit_out,z2/runit_out
             error stop "simps.f"
@@ -208,20 +208,20 @@ c     Prevent stepsize underflow and overflow
          ! If we have exceeded the maximum allowed iterations
          if (MAXSTP.gt.0 .and. nstp.ge.abs(MAXSTP)) then
             if (simps_max_step_error) then
-               write(*,*) "Reached maximum number of steps "//
+               write(o,*) "Reached maximum number of steps "//
      $              "MAXSTP=",MAXSTP,"at xpos,ypos,zpos,tau,z1,z2=",
      $              xpos/runit_out,ypos/runit_out,zpos/runit_out,
      $              tau_thin,z1/runit_out,z2/runit_out
-               write(*,*) "You should do one of the following "//
+               write(o,*) "You should do one of the following "//
      $              "(in order of safety):"
-               write(*,*) "   (1) Increase MAXSTP"
-               write(*,*) "   (2) Set MAXSTP to a negative value"
-               write(*,*) "   (3) Adjust your integration limits"
-               write(*,*) "   (4) Set simps_max_step_error=.false. "//
+               write(o,*) "   (1) Increase MAXSTP"
+               write(o,*) "   (2) Set MAXSTP to a negative value"
+               write(o,*) "   (3) Adjust your integration limits"
+               write(o,*) "   (4) Set simps_max_step_error=.false. "//
      $              "in flux_cal.input"
                error stop "simps.f"
             else if (simps_max_step_warning) then
-               write(*,*) "WARNING: Reached maximum number "//
+               write(o,*) "WARNING: Reached maximum number "//
      $              "integration steps MAXSTP=",MAXSTP,"at "//
      $              "xpos,ypos,zpos,tau,z1,z2=",
      $              xpos/runit_out,ypos/runit_out,zpos/runit_out,
@@ -236,52 +236,52 @@ c     Prevent stepsize underflow and overflow
       call cpu_time(finish_time)
       
       if ( debug ) then
-         write(*,*) ""
-         write(*,*) "simps.f: Finished integration"
-         write(*,*) "Total time        = ",finish_time-start_time
-         write(*,*) "time_get_dtaudz_T = ",time_get_dtaudz_T
-         write(*,*) "time_increase_dz  = ",time_increase_dz
-         write(*,*) "time_decrease_dz  = ",time_decrease_dz
-         write(*,*) "xpos,ypos,zpos = ",
+         write(o,*) ""
+         write(o,*) "simps.f: Finished integration"
+         write(o,*) "Total time        = ",finish_time-start_time
+         write(o,*) "time_get_dtaudz_T = ",time_get_dtaudz_T
+         write(o,*) "time_increase_dz  = ",time_increase_dz
+         write(o,*) "time_decrease_dz  = ",time_decrease_dz
+         write(o,*) "xpos,ypos,zpos = ",
      $        xpos/runit_out,ypos/runit_out,zpos/runit_out
-         write(*,*) "z1,z2 = ",z1/runit_out,z2/runit_out
-         write(*,*) "nstp = ",nstp
-         write(*,*) "ndz_decrease   = ",ndz_decrease
-         write(*,*) "ndtau_decrease = ",ndtau_decrease
-         write(*,*) "ndF_decrease   = ",ndF_decrease
-         write(*,*) "ndz_increase   = ",ndz_increase
-         write(*,*) "ndtau_increase = ",ndtau_increase
-         write(*,*) "ndF_increase   = ",ndF_increase
-         write(*,*) "tau_thin = ",tau_thin
+         write(o,*) "z1,z2 = ",z1/runit_out,z2/runit_out
+         write(o,*) "nstp = ",nstp
+         write(o,*) "ndz_decrease   = ",ndz_decrease
+         write(o,*) "ndtau_decrease = ",ndtau_decrease
+         write(o,*) "ndF_decrease   = ",ndF_decrease
+         write(o,*) "ndz_increase   = ",ndz_increase
+         write(o,*) "ndtau_increase = ",ndtau_increase
+         write(o,*) "ndF_increase   = ",ndF_increase
+         write(o,*) "tau_thin = ",tau_thin
       end if
       
       if (1.d0/dz.eq.0) then    ! Detect stepsize overflow
-         write(*,*) "xpos,ypos,zpos,tau,z1,z2=",
+         write(o,*) "xpos,ypos,zpos,tau,z1,z2=",
      $        xpos/runit_out,ypos/runit_out,zpos/runit_out,
      $        tau_thin,z1/runit_out,z2/runit_out
-         write(*,*) "Stepsize overflow (1/dz = 0)"
+         write(o,*) "Stepsize overflow (1/dz = 0)"
          error stop "simps.f"
       else if (dz.eq.0) then    ! Detect stepsize underflow
-         write(*,*) "xpos,ypos,zpos,tau,z1,z2=",
+         write(o,*) "xpos,ypos,zpos,tau,z1,z2=",
      $        xpos/runit_out,ypos/runit_out,zpos/runit_out,
      $        tau_thin,z1/runit_out,z2/runit_out
-         write(*,*) "Stepsize underflow (dz = 0)"
+         write(o,*) "Stepsize underflow (dz = 0)"
          error stop "simps.f"
       else if (ncycle.gt.1) then ! Detect falling out of limits
-         write(*,*) "xpos,ypos,zpos,tau,z1,z2=",
+         write(o,*) "xpos,ypos,zpos,tau,z1,z2=",
      $        xpos/runit_out,ypos/runit_out,zpos/runit_out,
      $        tau_thin,z1/runit_out,z2/runit_out
-         write(*,*) "Could not increase/decrease the step size "//
+         write(o,*) "Could not increase/decrease the step size "//
      $        "above/below limits simps_max_dz/simps_min_dz."
-         write(*,*) "Current dz=",dz
+         write(o,*) "Current dz=",dz
          tempdz1 = dz
          tempdz2 = dz
          call decrease_dz(tempdz1,simps_min_dz,simps_alpha,-1)
          call increase_dz(tempdz2,simps_max_dz,simps_alpha,-1)
          if (tempdz1.le.simps_min_dz) then
-            write(*,*) "Desired dz=",tempdz1
+            write(o,*) "Desired dz=",tempdz1
          else if (tempdz2.ge.simps_max_dz) then
-            write(*,*) "Desired dz=",tempdz2
+            write(o,*) "Desired dz=",tempdz2
          end if
          error stop "simps.f"
       end if
@@ -453,42 +453,42 @@ c$$$
 c$$$c     These lines will go in init.f
 c$$$c     ----------------------------------------------------
 c$$$      if (MAXSTP.eq.0) then
-c$$$         write(*,*) "Cannot have MAXSTP = 0"
+c$$$         write(o,*) "Cannot have MAXSTP = 0"
 c$$$         error stop "init.f"
 c$$$      end if
 c$$$      if (abs(MAXSTP).eq.1) then
-c$$$         write(*,*) "Cannot have |MAXSTP| = 1"
+c$$$         write(o,*) "Cannot have |MAXSTP| = 1"
 c$$$         error stop "init.f"
 c$$$      end if
 c$$$      if ( (simps_min_dz.ne.0 .and. simps_max_dz.ne.0) .and.
 c$$$     $     (dabs(simps_min_dz).gt.dabs(simps_max_dz)) ) then
-c$$$         write(*,*) "|simps_min_dz| > |simps_max_dz|"
-c$$$         write(*,*) "simps_min_dz = ",simps_min_dz
-c$$$         write(*,*) "simps_max_dz = ",simps_max_dz
+c$$$         write(o,*) "|simps_min_dz| > |simps_max_dz|"
+c$$$         write(o,*) "simps_min_dz = ",simps_min_dz
+c$$$         write(o,*) "simps_max_dz = ",simps_max_dz
 c$$$         error stop "init.f"
 c$$$      end if
 c$$$      if ( (simps_min_dtau.ne.0 .and. simps_max_dtau.ne.0) .and.
 c$$$     $     (dabs(simps_min_dtau).gt.dabs(simps_max_dtau)) ) then
-c$$$         write(*,*) "|simps_min_dtau| > |simps_max_dtau|"
-c$$$         write(*,*) "simps_min_dtau = ",simps_min_dtau
-c$$$         write(*,*) "simps_max_dtau = ",simps_max_dtau
+c$$$         write(o,*) "|simps_min_dtau| > |simps_max_dtau|"
+c$$$         write(o,*) "simps_min_dtau = ",simps_min_dtau
+c$$$         write(o,*) "simps_max_dtau = ",simps_max_dtau
 c$$$         error stop "init.f"
 c$$$      end if
 c$$$      if ( (simps_min_frac_dF.ne.0 .and. simps_max_frac_dF.ne.0) .and.
 c$$$     $     (dabs(simps_min_frac_dF).gt.dabs(simps_max_frac_dF)) ) then
-c$$$         write(*,*) "|simps_min_frac_dF| > |simps_max_frac_dF|"
-c$$$         write(*,*) "simps_min_frac_dF = ",simps_min_frac_dF
-c$$$         write(*,*) "simps_max_frac_dF = ",simps_max_frac_dF
+c$$$         write(o,*) "|simps_min_frac_dF| > |simps_max_frac_dF|"
+c$$$         write(o,*) "simps_min_frac_dF = ",simps_min_frac_dF
+c$$$         write(o,*) "simps_max_frac_dF = ",simps_max_frac_dF
 c$$$         error stop "init.f"
 c$$$      end if
 c$$$      if ( simps_min_frac_dF.ne.0 .and. simps_max_frac_dF.ne.0 .and.
 c$$$     $     simps_F_cutoff.eq.0 ) then
-c$$$         write(*,*) "Must give a non-zero value for simps_F_cutoff "//
+c$$$         write(o,*) "Must give a non-zero value for simps_F_cutoff "//
 c$$$     $        "when simps_min_frac_dF != 0 and simps_max_frac_dF != 0"
 c$$$         error stop "init.f"
 c$$$      end if
 c$$$      if ( taulimit.ne.0 .and. taulimit_threshold.le.0 ) then
-c$$$         write(*,*) "When taulimit=0, you must give a positive, "//
+c$$$         write(o,*) "When taulimit=0, you must give a positive, "//
 c$$$     $        "non-zero value for taulimit_threshold"
 c$$$         error stop "init.f"
 c$$$      end if
@@ -500,34 +500,34 @@ c$$$      call simpson(xpos,ypos,z1,z2,Tthin4,tau_thin,kount1)
 c$$$      call cpu_time(time2)
 c$$$
 c$$$c     Print the reuslts
-c$$$      write(*,*) "Integrator results:"
-c$$$      write(*,*) "That took ",time2-time1,"seconds"
-c$$$      write(*,*) "Final zpos=",zpos
-c$$$      write(*,*) "z1,z2 = ",z1,z2
-c$$$      write(*,*) "nstp = ",nstp
+c$$$      write(o,*) "Integrator results:"
+c$$$      write(o,*) "That took ",time2-time1,"seconds"
+c$$$      write(o,*) "Final zpos=",zpos
+c$$$      write(o,*) "z1,z2 = ",z1,z2
+c$$$      write(o,*) "nstp = ",nstp
 c$$$      if (kount1.eq.1) then
-c$$$         write(*,*) "photosphere detected"
+c$$$         write(o,*) "photosphere detected"
 c$$$      else
-c$$$         write(*,*) "No photosphere detected"
+c$$$         write(o,*) "No photosphere detected"
 c$$$      end if
-c$$$      write(*,*) "tau_thin = ",tau_thin
-c$$$      write(*,*) "Tthin4 = ",Tthin4
-c$$$      write(*,*) ""
-c$$$      write(*,*) "ndtaulimit_increase = ",ndtaulimit_increase
-c$$$      write(*,*) "ndtaulimit_decrease = ",ndtaulimit_decrease
-c$$$      write(*,*) ""
-c$$$      write(*,*) "ndtau_increase      = ",ndtau_increase
-c$$$      write(*,*) "ndtau_decrease      = ",ndtau_decrease
-c$$$      write(*,*) ""
-c$$$      write(*,*) "ndF_increase        = ",ndF_increase
-c$$$      write(*,*) "ndF_decrease        = ",ndF_decrease
-c$$$      write(*,*) ""
-c$$$      write(*,*) "ndz_increase        = ",ndz_increase
-c$$$      write(*,*) "ndz_decrease        = ",ndz_decrease
-c$$$      write(*,*) ""
-c$$$      write(*,*) "----------------------------------------"
-c$$$      write(*,*) ""
-c$$$      write(*,*) "Expected analytic results:"
+c$$$      write(o,*) "tau_thin = ",tau_thin
+c$$$      write(o,*) "Tthin4 = ",Tthin4
+c$$$      write(o,*) ""
+c$$$      write(o,*) "ndtaulimit_increase = ",ndtaulimit_increase
+c$$$      write(o,*) "ndtaulimit_decrease = ",ndtaulimit_decrease
+c$$$      write(o,*) ""
+c$$$      write(o,*) "ndtau_increase      = ",ndtau_increase
+c$$$      write(o,*) "ndtau_decrease      = ",ndtau_decrease
+c$$$      write(o,*) ""
+c$$$      write(o,*) "ndF_increase        = ",ndF_increase
+c$$$      write(o,*) "ndF_decrease        = ",ndF_decrease
+c$$$      write(o,*) ""
+c$$$      write(o,*) "ndz_increase        = ",ndz_increase
+c$$$      write(o,*) "ndz_decrease        = ",ndz_decrease
+c$$$      write(o,*) ""
+c$$$      write(o,*) "----------------------------------------"
+c$$$      write(o,*) ""
+c$$$      write(o,*) "Expected analytic results:"
 c$$$      if (trial.eq.0) then
 c$$$         ! Just need to be careful to make sure we are integrating
 c$$$         ! "downward" into the "fluid". That is, so that the integration
@@ -551,11 +551,11 @@ c$$$            my_tau_thin = exp(z2)-exp(z1)
 c$$$         end if
 c$$$      end if
 c$$$
-c$$$      write(*,*) "tau_thin = ",my_tau_thin
-c$$$      write(*,*) "Tthin4 = ",1.d0-exp(-my_tau_thin)
-c$$$      write(*,*) "% difference in tau_thin = ",
+c$$$      write(o,*) "tau_thin = ",my_tau_thin
+c$$$      write(o,*) "Tthin4 = ",1.d0-exp(-my_tau_thin)
+c$$$      write(o,*) "% difference in tau_thin = ",
 c$$$     $     dabs(my_tau_thin-tau_thin)/my_tau_thin * 100.d0
-c$$$      write(*,*) "% difference in Tthin4 = ",
+c$$$      write(o,*) "% difference in Tthin4 = ",
 c$$$     $     dabs((1.d0-exp(-my_tau_thin))-Tthin4)/
 c$$$     $     (1.d0-exp(-my_tau_thin)) * 100.d0
 c$$$      
@@ -725,7 +725,7 @@ c$$$
 c$$$         ! Refine the step
 c$$$         frac_Tthin4 = dabs(dTthin4/(Tthin4+simps_F_cutoff))
 c$$$         
-c$$$c         write(*,'(A,7E15.7)')
+c$$$c         write(o,'(A,7E15.7)')
 c$$$c     $        " zpos,tau,Tthin4,dz,dtau,dTthin4,frac_Tthin4=",
 c$$$c     $        zpos,tau_thin,Tthin4,dz,dtau,dTthin4,frac_Tthin4
 c$$$         
@@ -801,7 +801,7 @@ c$$$         ! If we are outside integration bounds
 c$$$         if (dabs(zpos-z2).le.1.d-30) exit
 c$$$         if ( (z2-z1.gt.0 .and. zpos.gt.z2) .or.
 c$$$     $        (z2-z1.lt.0 .and. zpos.lt.z2) ) then
-c$$$            write(*,*) "This should never happen, but somehow the"//
+c$$$            write(o,*) "This should never happen, but somehow the"//
 c$$$     $           " integrator managed to get outside the integration"//
 c$$$     $           " bounds... Good luck!"
 c$$$            error stop "simps.f"
@@ -810,19 +810,19 @@ c$$$
 c$$$         ! If we have exceeded the maximum allowed iterations
 c$$$         if (MAXSTP.gt.0 .and. nstp.ge.abs(MAXSTP)) then
 c$$$            if (simps_max_step_error) then
-c$$$               write(*,*) "Reached maximum number of steps "//
+c$$$               write(o,*) "Reached maximum number of steps "//
 c$$$     $              "MAXSTP=",MAXSTP,"at xpos,ypos,zpos,tau,z1,z2=",
 c$$$     $              xpos,ypos,zpos,tau_thin,z1,z2
-c$$$               write(*,*) "You should do one of the following "//
+c$$$               write(o,*) "You should do one of the following "//
 c$$$     $              "(in order of safety):"
-c$$$               write(*,*) "   (1) Increase MAXSTP"
-c$$$               write(*,*) "   (2) Set MAXSTP to a negative value"
-c$$$               write(*,*) "   (3) Adjust your integration limits"
-c$$$               write(*,*) "   (4) Set simps_max_step_error=.false. "//
+c$$$               write(o,*) "   (1) Increase MAXSTP"
+c$$$               write(o,*) "   (2) Set MAXSTP to a negative value"
+c$$$               write(o,*) "   (3) Adjust your integration limits"
+c$$$               write(o,*) "   (4) Set simps_max_step_error=.false. "//
 c$$$     $              "in flux_cal.input"
 c$$$               error stop "simps.f"
 c$$$            else if (simps_max_step_warning) then
-c$$$               write(*,*) "WARNING: Reached maximum number "//
+c$$$               write(o,*) "WARNING: Reached maximum number "//
 c$$$     $              "integration steps MAXSTP=",MAXSTP,"at "//
 c$$$     $              "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
 c$$$     $              tau_thin,z1,z2
@@ -835,29 +835,29 @@ c$$$
 c$$$      end do
 c$$$      
 c$$$      if (1.d0/dz.eq.0) then    ! Detect stepsize overflow
-c$$$         write(*,*) "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
+c$$$         write(o,*) "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
 c$$$     $        tau_thin,z1,z2
-c$$$         write(*,*) "Stepsize overflow (1/dz = 0)"
+c$$$         write(o,*) "Stepsize overflow (1/dz = 0)"
 c$$$         error stop "simps.f"
 c$$$      else if (dz.eq.0) then    ! Detect stepsize underflow
-c$$$         write(*,*) "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
+c$$$         write(o,*) "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
 c$$$     $        tau_thin,z1,z2
-c$$$         write(*,*) "Stepsize underflow (dz = 0)"
+c$$$         write(o,*) "Stepsize underflow (dz = 0)"
 c$$$         error stop "simps.f"
 c$$$      else if (ncycle.gt.1) then ! Detect falling out of limits
-c$$$         write(*,*) "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
+c$$$         write(o,*) "xpos,ypos,zpos,tau,z1,z2=",xpos,ypos,zpos,
 c$$$     $        tau_thin,z1,z2
-c$$$         write(*,*) "Could not increase/decrease the step size "//
+c$$$         write(o,*) "Could not increase/decrease the step size "//
 c$$$     $        "above/below limits simps_max_dz/simps_min_dz."
-c$$$         write(*,*) "Current dz=",dz
+c$$$         write(o,*) "Current dz=",dz
 c$$$         tempdz1 = dz
 c$$$         tempdz2 = dz
 c$$$         call decrease_dz(tempdz1,simps_min_dz,-1)
 c$$$         call increase_dz(tempdz2,simps_max_dz,-1)
 c$$$         if (tempdz1.le.simps_min_dz) then
-c$$$            write(*,*) "Desired dz=",tempdz1
+c$$$            write(o,*) "Desired dz=",tempdz1
 c$$$         else if (tempdz2.ge.simps_max_dz) then
-c$$$            write(*,*) "Desired dz=",tempdz2
+c$$$            write(o,*) "Desired dz=",tempdz2
 c$$$         end if
 c$$$         error stop "simps.f"
 c$$$      end if
@@ -880,7 +880,7 @@ c$$$      subroutine increase_dz(dz,simps_max_dz,ncycle)
 c$$$      implicit none
 c$$$      real*8 dz,simps_max_dz
 c$$$      integer ncycle
-c$$$      write(*,*) "Increase"
+c$$$      write(o,*) "Increase"
 c$$$      dz = 1.5d0*dz
 c$$$      if (ncycle.lt.0) return   ! -1 for debugging
 c$$$      if (simps_max_dz.ne.0 .and. dz.ge.simps_max_dz) then
@@ -894,7 +894,7 @@ c$$$      subroutine decrease_dz(dz,simps_min_dz,ncycle)
 c$$$      implicit none
 c$$$      real*8 dz,simps_min_dz
 c$$$      integer ncycle
-c$$$      write(*,*) "Decrease"
+c$$$      write(o,*) "Decrease"
 c$$$      dz = 0.5d0*dz
 c$$$      if (ncycle.lt.0) return   ! -1 for debugging
 c$$$      if (simps_min_dz.ne.0 .and. dz.le.simps_min_dz) then

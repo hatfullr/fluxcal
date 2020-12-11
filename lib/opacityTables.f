@@ -131,15 +131,15 @@ c     the format of MESA opacity files (I think OPAL?)
 
          if ( nrows_tables(i).gt.nrows_opac_table .or.
      $        ncols_tables(i).gt.ncols_opac_table ) then
-            write(*,*) "opacityfiles(i) = ",
+            write(o,*) "opacityfiles(i) = ",
      $           trim(adjustl(opacityfiles(i)))
-            write(*,*) "nrows_tables(i), ncols_tables(i) = ",
+            write(o,*) "nrows_tables(i), ncols_tables(i) = ",
      $           nrows_tables(i),ncols_tables(i)
-            write(*,*) "nrows_opac_table, ncols_opac_table = ",
+            write(o,*) "nrows_opac_table, ncols_opac_table = ",
      $           nrows_opac_table, ncols_opac_table
-            write(*,*) "Must have nrows_tables(i) <= nrows_opac_table"//
+            write(o,*) "Must have nrows_tables(i) <= nrows_opac_table"//
      $           " and ncols_tables(i) <= ncols_opac_table"
-            write(*,*) "Try manually increasing the nrows_opac_table "//
+            write(o,*) "Try manually increasing the nrows_opac_table "//
      $           "and ncols_opac_table parameters in lib/flux_cal.h "//
      $           "to fit your opacityfiles, or use smaller "//
      $           "opacityfiles."
@@ -158,14 +158,14 @@ c     the format of MESA opacity files (I think OPAL?)
 
          if ( ncols_tables(i).gt.ncols_opac_table .or.
      $        nrows_tables(i) .gt. nrows_opac_table ) then
-            write(*,*) "i = ",i
-            write(*,*) "opacityfiles(i) = '"//
+            write(o,*) "i = ",i
+            write(o,*) "opacityfiles(i) = '"//
      $           trim(adjustl(opacityfiles(i)))//"'"
-            write(*,*) "nrows in opacityfiles(i) = ",nrows_tables(i)
-            write(*,*) "ncols in opacityfiles(i) = ",ncols_tables(i)
-            write(*,*) "nrows_opac_table = ",nrows_opac_table
-            write(*,*) "ncols_opac_table = ",ncols_opac_table
-            write(*,*) "The size of the high temperature"//
+            write(o,*) "nrows in opacityfiles(i) = ",nrows_tables(i)
+            write(o,*) "ncols in opacityfiles(i) = ",ncols_tables(i)
+            write(o,*) "nrows_opac_table = ",nrows_opac_table
+            write(o,*) "ncols_opac_table = ",ncols_opac_table
+            write(o,*) "The size of the high temperature"//
      $           " opacity table must be greater than the maximum"//
      $           " possible size of all input opacity tables."
             error stop "opacityTables.f"
@@ -185,11 +185,11 @@ c     the format of MESA opacity files (I think OPAL?)
      $        logTmaxs(i).gt.logT_max .or.
      $        logRmins(i).lt.logR_min .or.
      $        logRmaxs(i).gt.logR_max ) then
-            write(*,100) i,i,logTmins(i),logTmaxs(i)
-            write(*,101) i,i,logRmins(i),logRmaxs(i)
-            write(*,102) logT_min,logT_max
-            write(*,103) logR_min,logR_max
-            write(*,*) "The specified logT,logR domain is out "//
+            write(o,100) i,i,logTmins(i),logTmaxs(i)
+            write(o,101) i,i,logRmins(i),logRmaxs(i)
+            write(o,102) logT_min,logT_max
+            write(o,103) logR_min,logR_max
+            write(o,*) "The specified logT,logR domain is out "//
      $           "of bounds for '",trim(adjustl(opacityfiles(i))),"'."
             error stop "opacityTables.f"
          end if
@@ -199,7 +199,7 @@ c     the format of MESA opacity files (I think OPAL?)
 
 
       if(numtabused.eq.0) then
-         write(*,*) "No opacity tables are being used."
+         write(o,*) "No opacity tables are being used."
          error stop "opacityTables.f"
       end if
 
@@ -222,9 +222,9 @@ c     the format of MESA opacity files (I think OPAL?)
      $     maxT.eq.-1.d30 .or.
      $     minR.eq.1.d30 .or.
      $     maxR.eq.-1.d30 ) then
-         write(*,*) "minT,maxT = ",minT,maxT
-         write(*,*) "minR,maxR = ",minR,maxR
-         write(*,*) "Could not find proper R,T bounds. Check "//
+         write(o,*) "minT,maxT = ",minT,maxT
+         write(o,*) "minR,maxR = ",minR,maxR
+         write(o,*) "Could not find proper R,T bounds. Check "//
      $        "your domain for your opacityfiles in your input file."
          error stop "opacityTables.f"
       end if
@@ -280,11 +280,11 @@ c$$$     $        (testlogopacity(j,k),k=1,ncols_opac_table)
 c$$$      end do
 c$$$      close(45)
 c$$$
-c$$$      write(*,*) "BREAK"
-c$$$      write(*,*) ""
-c$$$      write(*,*) getOpacity(10.d0**(3.753),10.d0**(4.849+3.*3.753-18),0.7d0)
-c$$$      write(*,*) ""
-c$$$      write(*,*) "WE ARE OUT"
+c$$$      write(o,*) "BREAK"
+c$$$      write(o,*) ""
+c$$$      write(o,*) getOpacity(10.d0**(3.753),10.d0**(4.849+3.*3.753-18),0.7d0)
+c$$$      write(o,*) ""
+c$$$      write(o,*) "WE ARE OUT"
 c$$$      
 c$$$      stop
 
@@ -329,11 +329,11 @@ c$$$     $        (testlogopacity(j,k),k=1,ncols_opac_table)
 c$$$      end do
 c$$$      close(45)
 c$$$
-c$$$c      write(*,*) "BREAK"
-c$$$c      write(*,*) ""
-c$$$c      write(*,*) getOpacity(10.d0**(3.753),10.d0**(4.849+3.*3.753-18),0.7d0)
-c$$$c      write(*,*) ""
-c$$$c      write(*,*) "WE ARE OUT"
+c$$$c      write(o,*) "BREAK"
+c$$$c      write(o,*) ""
+c$$$c      write(o,*) getOpacity(10.d0**(3.753),10.d0**(4.849+3.*3.753-18),0.7d0)
+c$$$c      write(o,*) ""
+c$$$c      write(o,*) "WE ARE OUT"
 c$$$      
 c$$$      stop
 

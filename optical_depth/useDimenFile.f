@@ -17,13 +17,13 @@ c     already exists. If so, read from it. If not, throw an error.
 
       inquire(file=trim(adjustl(dimenfname)),exist=fileexists)
       if(.not.fileexists) then
-         write(*,*) "Could not find dimen file '",
+         write(o,*) "Could not find dimen file '",
      $        trim(adjustl(dimenfname)),"'."
-         write(*,*) "Try setting get_fluxes=.true."
+         write(o,*) "Try setting get_fluxes=.true."
          error stop "useDimenFile.f"
       end if
       
-      write(*,*) "Reading pre-existing dimen file '" //
+      write(o,*) "Reading pre-existing dimen file '" //
      $     trim(adjustl(dimenfname)) // "'"
       open (73,file=trim(adjustl(dimenfname)))
       read(73,*) xminmap,hxmap,nxmap,yminmap,hymap,nymap

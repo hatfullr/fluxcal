@@ -13,7 +13,7 @@ c     this function creates a table to get back density if T and P are known
       integer  jrho, ju, jp, jt
 c     real*8 useeostable
 
-      write(*,*) "Creating envfit density lookup table"
+      write(o,*) "Creating envfit density lookup table"
 
       nt=150
       np=340
@@ -67,7 +67,7 @@ c     real*8 useeostable
          end do
       end do
 
-c      write(*,*) "look up table for density is created"
+c      write(o,*) "look up table for density is created"
 
       return
       end
