@@ -185,7 +185,7 @@
       simps_max_step_warning=.false.
             
       ! Optical depth at which to stop the integration. Only applies if
-      ! get_fluxes or get_integration_at_pos are .true.. Set to 0 to
+      ! get_fluxes or get_integration_at_pos are .true.. Set to 1.d30 to
       ! integrate through the entirety of the fluid on each line of
       ! sight. The value of taulimit_threshold determines how close to
       ! taulimit the integrator must be to stop integration (1.d-6
