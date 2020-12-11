@@ -16,6 +16,11 @@
       external get_dtaudz_T
       external increase_dz,decrease_dz
 
+      if ( debug ) then
+         write(o,*) "simps.f: Using Simpson's Rule integration "//
+     $        "(integrator=1)"
+      end if
+      
       call cpu_time(start_time)
       time_get_dtaudz_T = 0.
       time_increase_dz = 0.
@@ -83,8 +88,11 @@ c     Prevent stepsize underflow and overflow
      $        t2**4.d0*exp(-(tau_thin+dtau)))*dtau
          
          ! Check against the taulimit
-         if ( taulimit.ne.0 .and.
+         if ( taulimit.ne.1.d30 .and.
      $        tau_thin+dtau.gt.taulimit-taulimit_threshold ) then
+            if ( debug ) then
+               write(o,*) "tau+dtau > taulimit, refining dz"
+            end if
             ! Refine dz if tau is not within the taulimit_threshold
             do while(tau_thin+dtau.gt.taulimit+taulimit_threshold .or.
      $           tau_thin+dtau.lt.taulimit-taulimit_threshold)
@@ -115,6 +123,10 @@ c     Prevent stepsize underflow and overflow
             tau_thin = tau_thin + dtau
             t2 = t1
             zpos = zpos+dz
+            if ( debug ) then
+               write(o,*) "Integration exited at the taulimit"
+               stop
+            end if
             exit                ! Stop integration
          end if
          
@@ -193,7 +205,7 @@ c     Prevent stepsize underflow and overflow
          ! Most of the stopping conditions:
 
          ! If we are outside integration bounds
-         if (dabs(zpos-z2).le.1.d-30) exit
+         if (dabs(zpos-z2).le.1.d-8) exit
          if ( (z2-z1.gt.0 .and. zpos.gt.z2) .or.
      $        (z2-z1.lt.0 .and. zpos.lt.z2) ) then
             write(o,*) "This should never happen, but somehow the"//
@@ -487,8 +499,8 @@ c$$$         write(o,*) "Must give a non-zero value for simps_F_cutoff "//
 c$$$     $        "when simps_min_frac_dF != 0 and simps_max_frac_dF != 0"
 c$$$         error stop "init.f"
 c$$$      end if
-c$$$      if ( taulimit.ne.0 .and. taulimit_threshold.le.0 ) then
-c$$$         write(o,*) "When taulimit=0, you must give a positive, "//
+c$$$      if ( taulimit.ne.1.d30 .and. taulimit_threshold.le.0 ) then
+c$$$         write(o,*) "When taulimit=1.d30, you must give a positive, "//
 c$$$     $        "non-zero value for taulimit_threshold"
 c$$$         error stop "init.f"
 c$$$      end if
@@ -687,7 +699,7 @@ c$$$         dTthin4 = 0.5*(t1**4.d0*exp(-tau_thin)+
 c$$$     $        t2**4.d0*exp(-(tau_thin+dtau)))*dtau
 c$$$         
 c$$$         ! Check against the taulimit
-c$$$         if ( taulimit.ne.0 .and.
+c$$$         if ( taulimit.ne.1.d30 .and.
 c$$$     $        tau_thin+dtau.gt.taulimit-taulimit_threshold ) then
 c$$$            ! Refine dz if tau is not within the taulimit_threshold
 c$$$            do while(tau_thin+dtau.gt.taulimit+taulimit_threshold .or.
