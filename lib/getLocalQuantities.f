@@ -26,6 +26,8 @@ c      write(o,*) "hzmap = ",hzmap
          write(o,*) "ERROR: getLocalQuantities is trying to "//
      $        "calculate values at a position that is outside "//
      $        "the integration grid."
+         write(o,*) "xpos,ypos,zpos=",myx/runit_out,myy/runit_out,
+     $        myz/runit_out
          write(o,*) "ix,iy,iz,nxmap,nymap,nzmap = ",ix,iy,iz,
      $        nxmap,nymap,nzmap
          error stop "getLocalQuantities.f"
