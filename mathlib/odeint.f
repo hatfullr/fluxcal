@@ -85,11 +85,11 @@ c      kount2=0
       do 16 nstp=1,MAXSTP
 c     print *,'looping',x,y(1)
         if(min_step_size.eq.0.d0 .and. abs(h).ne.0.d0) then
-           min_step_size = abs(h)
+           min_step_size = h
         else
-           min_step_size = min(min_step_size,abs(h))
+           min_step_size = min(min_step_size,h)
         end if
-        max_step_size = max(max_step_size,abs(h))
+        max_step_size = max(max_step_size,h)
 
         depth = xint
         call derivs(xint,yint,dydx)
