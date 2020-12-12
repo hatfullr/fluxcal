@@ -52,8 +52,8 @@ c      NYMAPnext=3
      $     " ",A11,             !ymin
      $     " ",A11,             !hy
      $     " ",A5,              !Ny
-     $     " ",A12,             !|minstpsize|
-     $     " ",A12,             !|maxstpsize|
+     $     " ",A12,             !minstpsize
+     $     " ",A12,             !maxstpsize
      $     " ",A8,              !minNstp
      $     " ",A8,              !maxNstp
      $     " ",A11,             !<F>
@@ -67,8 +67,8 @@ c      NYMAPnext=3
      $     " ",ES11.4,          !ymin
      $     " ",ES11.4,          !hy
      $     " ",i5,              !Ny
-     $     " ",ES12.5,          !|minstpsize|
-     $     " ",ES12.5,          !|maxstpsize|
+     $     " ",ES12.5,          !minstpsize
+     $     " ",ES12.5,          !maxstpsize
      $     " ",i8,              !minNstp
      $     " ",i8,              !maxNstp
      $     " ",ES11.4,          !<F>
@@ -82,8 +82,8 @@ c      NYMAPnext=3
      $     "ymin",
      $     "hy",
      $     "Ny",
-     $     "|minstpsize|",
-     $     "|maxstpsize|",
+     $     "minstpsize",
+     $     "maxstpsize",
      $     "minNstp",
      $     "maxNstp",
      $     "<F>",
@@ -96,8 +96,8 @@ c      NYMAPnext=3
      $     repeat("-",11),      !ymin
      $     repeat("-",11),      !hy
      $     repeat("-",5),       !Ny
-     $     repeat("-",12),      !|minstpsize|
-     $     repeat("-",12),      !|maxstpsize|
+     $     repeat("-",12),      !minstpsize
+     $     repeat("-",12),      !maxstpsize
      $     repeat("-",8),       !minNstp
      $     repeat("-",8),       !maxNstp
      $     repeat("-",11),      !<F>
@@ -228,11 +228,31 @@ c         endif
          lasttotalflux = TOTALflux
          lastnumcell = numcell
 
+         if ( min_step_size.lt.0 .or.
+     $        max_step_size.lt.0 .or.
+     $        min_steps_taken.lt.0 .or.
+     $        max_steps_taken.lt.0 .or.
+     $        numcell.eq.0 ) then
+            ! This only happens when we get -1.d30 for the opacity
+            ! everywhere while trying to integrate, and is a really
+            ! bad situation. The best we can do is try to increase the
+            ! grid resolution in the hopes that the problem goes away...
+            ! Can also happen if we get <F> = NaN...
+            nxmapnext=nxmap*2
+            nymapnext=nymap*2
+            write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+     $           max_step_size,min_steps_taken,max_steps_taken,
+     $           TOTALflux/numcell,"Try again "
+            call flush(o)
+            goto 41
+         end if
+         
          if(TOTALflux.eq.0) then
             write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
      $           max_step_size,min_steps_taken,max_steps_taken,
-     $           0.d0,"Finished  "
+     $           TOTALflux/numcell,"Finished  "
             call flush(o)
             goto 42
          else
@@ -252,7 +272,7 @@ c         endif
          write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
      $        max_step_size,min_steps_taken,max_steps_taken,
-     $        0.d0,"Finished  "
+     $        TOTALflux/numcell,"Finished  "
       else
          write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
      $        yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
