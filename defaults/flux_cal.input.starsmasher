@@ -296,11 +296,11 @@
    
       opacityfiles(2)='kR_h2001.dat' ! Rosseland opacities (lowT)
       logTmins(2)=2.995635d0    ! Not using Rosseland opacities below this
-      logTmaxs(2)=-1.d30       ! This does nothing. Limits are set in code
+      logTmaxs(2)=-1.d30        ! This does nothing. Limits are set in code
       logRmins(2)=-1.d30        ! This does nothing. Limits are set in code
       logRmaxs(2)=-1.d30        ! This does nothing. Limits are set in code
       logT_blend1(2)=3.041393d0 ! Stop blending from Planck to Rosseland 
-      logT_blend2(2)=-1.d30     ! Start blending from Ross. to user files
+      logT_blend2(2)=3.75d0     ! Start blending from Ross. to user files
       logR_blend1(2)=-1.d30     ! No blending at lower R bound
       logR_blend2(2)=-1.d30     ! No blending at upper R bound
       
