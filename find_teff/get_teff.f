@@ -19,7 +19,7 @@ c     implicit none
 
 c      if(log10(t_sph).gt.6) then
 cc      if(log10(t_sph).ge.5.999) then
-c         if(do_debug.eq.1) write(*,*) "THIS PARTICLE IS TOO HOT TO BE"//
+c         if(do_debug.eq.1) write(o,*) "THIS PARTICLE IS TOO HOT TO BE"//
 c     $        " OUTSIDE", t_sph
 c         get_teff=-10000.
 c         return
@@ -31,7 +31,7 @@ c      end if
       slop=get_slop(t_sph,g_sph,tmin,slop_type)
 
       if(slop .le. -10.d0) then
-         if(do_debug.eq.1) write(*,*) "No proper slope found."
+         if(do_debug.eq.1) write(o,*) "No proper slope found."
          get_teff = 0.d0
          return
       end if
@@ -39,7 +39,7 @@ c      end if
       slop=1./slop
 
 c      if(log10(t_sph).lt.tmin) then
-c         if(do_debug.eq.1) write(*,*) "THIS PARTICLE IS TOO COLD"//
+c         if(do_debug.eq.1) write(o,*) "THIS PARTICLE IS TOO COLD"//
 c     $        " TO BE TREATED", t_sph
 c         get_teff=-20000.
 c         return
@@ -92,12 +92,12 @@ c     open(50,file="teff_trace.dat",status='unknown')
          if(pg_high/p_high.le.1.and.pg_mid/p_mid.ge.1) then
             teff_low=teff_mid   ! Increase
             teff_mid=(teff_high+teff_low)/2.
-c            write(*,*) "I increased Teff_low"
+c            write(o,*) "I increased Teff_low"
          ! Otherwise, the highest pressure must be lower than the highest photospheric
          ! pressure AND the "actual" pressure must be higher than the "actual"
          ! photospheric pressure, so we need to take decreasing steps.
          else
-c            write(*,*) "I decreased teff_high"
+c            write(o,*) "I decreased teff_high"
             teff_high=teff_mid  ! Decrease
             teff_mid=(teff_high+teff_low)/2.
          end if
@@ -110,7 +110,7 @@ c     $        t_sph
 c      close(50)
       get_teff=teff_mid
 
-c      if(do_debug.eq.1) write(*,100)  1./slop,
+c      if(do_debug.eq.1) write(o,100)  1./slop,
 c     &     10.**tmin, tmin,g_sph, log10(g_sph),t_sph, p_sph, get_teff
  100  format(" DEBUG GETTEFF",F7.3," T_MIN=",
      &     F7.2,F7.3, " g=",F8.1, F7.3, " T_SPH=", E11.5,

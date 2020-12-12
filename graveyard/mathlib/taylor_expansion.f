@@ -30,11 +30,11 @@ c        f(x) as the taylor expansion about a
       
       if ( ((left.eqv..false.) .and. (N-a .lt. maxorder)) .or.
      $     ((left.eqv..true.) .and. (a .lt. maxorder)) ) then
-         write(*,*) "a = ",a
-         write(*,*) "N = ",N
-         write(*,*) "left = ",left
-         write(*,*) "maxorder = ",maxorder
-         write(*,*) "Cannot compute the finite difference taylor "//
+         write(o,*) "a = ",a
+         write(o,*) "N = ",N
+         write(o,*) "left = ",left
+         write(o,*) "maxorder = ",maxorder
+         write(o,*) "Cannot compute the finite difference taylor "//
      $        "expansion to the order specified: not enough data in "//
      $        "the input arrays, or the location 'a' at which to "//
      $        "expand the series is too close to the edge of the "//
@@ -55,7 +55,7 @@ c        f(x) as the taylor expansion about a
             x2 = a - (i-1)
 c            derivs(1,i)=(farr(x2)-farr(x1))/(xarr(x2)-xarr(x1))
             derivs = derivative(xarr(x1),xarr(x2),farr(x1),farr(x2))
-c            write(*,*) "derivs(1,i) = ",derivs(1,i)
+c            write(o,*) "derivs(1,i) = ",derivs(1,i)
          end do
          do j=2,maxorder-1
             do i=1,maxorder-1-j   ! Find higher order derivatives
@@ -65,7 +65,7 @@ c               derivs(j,i)=(derivs(j-1,i)-derivs(j-1,i+1))/
 c     $              (xarr(x2)-xarr(x1))
                derivs(j,i) = derivative(xarr(x1),xarr(x2),
      $              derivs(j-1,i+1),derivs(j-1,i))
-c               write(*,*) "j,i,derivs(j,i) = ",j,i,derivs(j,i)
+c               write(o,*) "j,i,derivs(j,i) = ",j,i,derivs(j,i)
             end do
          end do
       else                      ! Take derivatives moving rightward
@@ -74,7 +74,7 @@ c               write(*,*) "j,i,derivs(j,i) = ",j,i,derivs(j,i)
             x2 = a + i
 c            derivs(1,i)=(farr(x2)-farr(x1))/(xarr(x2)-xarr(x1))
             derivs(1,i)=derivative(xarr(x1),xarr(x2),farr(x1),farr(x2))
-c            write(*,*) "derivs(1,i) = ",derivs(1,i)
+c            write(o,*) "derivs(1,i) = ",derivs(1,i)
          end do
          do j=2,maxorder-1
             do i=1,maxorder-1-j   ! Find higher order derivatives
@@ -84,7 +84,7 @@ c               derivs(j,i)=(derivs(j-1,i+1)-derivs(j-1,i))/
 c     $              (xarr(x2)-xarr(x1))
                derivs(j,i) = derivative(xarr(x1),xarr(x2),
      $              derivs(j-1,i),derivs(j-1,i+1))
-c               write(*,*) "j,i,derivs(j,i) = ",j,i,derivs(j,i)
+c               write(o,*) "j,i,derivs(j,i) = ",j,i,derivs(j,i)
             end do
          end do
       end if
@@ -102,7 +102,7 @@ c               write(*,*) "j,i,derivs(j,i) = ",j,i,derivs(j,i)
          ! Compute the Taylor expansion
          result = result + (derivs(order,a)*(x-xarr(a))**order /
      $        factorial)
-c         write(*,*) "result = ",result
+c         write(o,*) "result = ",result
       end do
       
       taylor_expansion = result

@@ -22,7 +22,7 @@
       
       intout=655
       open(intout,file=trim(adjustl(myfname)),status='unknown')
-      write(*,*) "Writing to '",trim(adjustl(myfname)),"'"
+      write(o,*) "Writing to '",trim(adjustl(myfname)),"'"
 
 
       printIntegrationSteps=.true.

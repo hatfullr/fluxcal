@@ -53,7 +53,7 @@ c     pid.
             close(10)
          endif
       else
-         write(*,200)
+         write(o,200)
      $        x(pid)/runit_out,
      $        y(pid)/runit_out,
      $        z(pid)/runit_out,

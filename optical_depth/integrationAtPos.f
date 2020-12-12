@@ -50,7 +50,7 @@ c     xpos=posx and ypos=posy in its calculations.
       open(intout,file=trim(adjustl(myfname)),status='unknown')
  801  format(2ES22.14)
  802  format(11A22)
-      write(*,*) "Writing to ", trim(adjustl(myfname))
+      write(o,*) "Writing to ", trim(adjustl(myfname))
 c      write(intout,801) posx/runit_out, posy/runit_out
 c      write(intout,802)"z","h","rho","u","g","mu","P","T","kappa","tau",
 c     $     "particle"

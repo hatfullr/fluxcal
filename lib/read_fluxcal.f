@@ -42,11 +42,11 @@ c      character*255 fname
 
       inquire(file=trim(infname),exist=fileexists)
       if(.not.fileexists) then
-         write(*,*) "Could not find the next output file"
-         write(*,*) "Next file to read is '",trim(adjustl(infname)),"'"
+         write(o,*) "Could not find the next output file"
+         write(o,*) "Next file to read is '",trim(adjustl(infname)),"'"
          error stop "read_fluxcal.f"
       end if
-      write(*,*) "Reading '",trim(adjustl(infname)),"'"
+      write(o,*) "Reading '",trim(adjustl(infname)),"'"
       
       open(12,file=trim(adjustl(infname)),form='unformatted')
       read(12) t
@@ -97,13 +97,13 @@ c      character*255 fname
      $           +0.8d0*1.67262158d-24/wmeanmolecular(i)
             opac_sph(i) = getOpacity(tempp(i),rho(i),myxhi)
 c            if(opac_sph(i).eq.-1.d30) then
-c               write(*,*) "read_fluxcal.f"
+c               write(o,*) "read_fluxcal.f"
 c               stop
 c            end if
          else
             opac_sph(i) = 0.d0
          end if
-c         if(tempp(i).le.8000) write(*,*) "OPACITY", tempp(i), opacit
+c         if(tempp(i).le.8000) write(o,*) "OPACITY", tempp(i), opacit
          tauA(i) = taucoef*am(i)*opac_sph(i)/hp(i)**2.d0
 
 c     If the user wants to use get_teff, and particle i is optically
@@ -130,20 +130,20 @@ c                 if(i.eq.172258) do_debug=1
  200  close(12)
 
       if(i.eq.nmax) then
-         write(*,*) "Too many particles in simulation"
-         write(*,*) "Maximum number of particles allowed is ",nmax
+         write(o,*) "Too many particles in simulation"
+         write(o,*) "Maximum number of particles allowed is ",nmax
          error stop "read_fluxcal.f"
       end if
 
       if((moutsideTEOS .gt. 0.d0).or.(eoutsideTEOS .gt. 0.d0)) then
-         write(*,*) "WARNING: Some particles are outside the TEOS."//
+         write(o,*) "WARNING: Some particles are outside the TEOS."//
      $        " Their cumulative properties are:"
-         write(*,*) "         Mass = ",moutsideTEOS/munit_out
-         write(*,*) "         Internal energy = ",eoutsideTEOS/eunit_out
-         write(*,*) "         min(rho,T) = (",
+         write(o,*) "         Mass = ",moutsideTEOS/munit_out
+         write(o,*) "         Internal energy = ",eoutsideTEOS/eunit_out
+         write(o,*) "         min(rho,T) = (",
      $        minrhooutsideTEOS/rhounit_out,",",
      $        mintempoutsideTEOS/tempunit_out,")"
-         write(*,*) "         max(rho,T) = (",
+         write(o,*) "         max(rho,T) = (",
      $        maxrhooutsideTEOS/rhounit_out,",",
      $        maxtempoutsideTEOS/tempunit_out,")"
 
@@ -154,7 +154,7 @@ c                 if(i.eq.172258) do_debug=1
 
       
 c$$$      ! Calculate nnb for each particle (remove later!)
-c$$$      write(*,*) "Calculating the number of neighbors for each"//
+c$$$      write(o,*) "Calculating the number of neighbors for each"//
 c$$$     $     " particle. If you can see this, you have a debugging"//
 c$$$     $     " version of FluxCal! Abort immediately!"
 c$$$
@@ -189,6 +189,6 @@ c$$$         end do
 c$$$      end if
 c$$$      
 c$$$ 222  close(22)
-c$$$      write(*,*) "moving on..."
+c$$$      write(o,*) "moving on..."
       
       end subroutine

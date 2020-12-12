@@ -374,12 +374,12 @@ c     a value y, and an error estimate dy. If P(x) is the polynomial of degree N
 c     P(xa_i)=ya_i, i=1,...,n, then the returned value y = P(x).
 c      INTEGER i,m,ns
 c      REAL*8 den,dif,dift,ho,hp,w,c(NMAX),d(NMAX)
-c      write(*,*) "Calling polint"
+c      write(o,*) "Calling polint"
       ns=1
-c      write(*,*) xa(1), dif
-c      write(*,*) "Before dif"
+c      write(o,*) xa(1), dif
+c      write(o,*) "Before dif"
       dif=abs(x-xa(1))
-c      write(*,*) "After dif"
+c      write(o,*) "After dif"
       do i=1,n                  ! Here we find the index ns of the closest table entry.
          dift=abs(x-xa(i))
          if (dift.lt.dif) then
@@ -441,18 +441,18 @@ c     interpolation in the x1 direction, however).
       real*8, dimension(NMAX) :: yntmp
 c      INTEGER j,k
 c      REAL*8 ymtmp(MMAX), yntmp(NMAX)
-c      write(*,*) "Calling polin2"
+c      write(o,*) "Calling polin2"
       do j=1,m                                   ! Loop over rows.
          do k=1,n                                ! Copy the row into temporary storage.
             yntmp(k)=ya(j,k)
          enddo
-c         write(*,*) "End of k loop, j = ",j
-c         write(*,*) "x2a = ",x2a
-c         write(*,*) "yntmp = ",yntmp
-c         write(*,*) "n = ",n
-c         write(*,*) "x2 = ",x2
-c         write(*,*) "ymtmp(j) = ",ymtmp(j)
-c         write(*,*) "dy = ",dy
+c         write(o,*) "End of k loop, j = ",j
+c         write(o,*) "x2a = ",x2a
+c         write(o,*) "yntmp = ",yntmp
+c         write(o,*) "n = ",n
+c         write(o,*) "x2 = ",x2
+c         write(o,*) "ymtmp(j) = ",ymtmp(j)
+c         write(o,*) "dy = ",dy
 
          call polint(x2a,yntmp,n,x2,ymtmp(j),dy) ! Interpolate answer into temporary stor-
       enddo                                      !     age.

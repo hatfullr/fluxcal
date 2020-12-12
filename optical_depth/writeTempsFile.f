@@ -2,7 +2,7 @@
       include 'optical_depth.h'
       integer i,j
 
-      write(*,*) "Writing '" // trim(adjustl(fname)) // "'"
+      write(o,*) "Writing '" // trim(adjustl(fname)) // "'"
       open (72,file=fname)
  103  format(" ",ES22.14," ",ES22.14," ",i5," ",ES22.14," ",
      $     ES22.14," ",i5," ",ES22.14)

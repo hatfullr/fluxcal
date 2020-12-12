@@ -1,4 +1,6 @@
       implicit none
+      integer o,e
+      PARAMETER(o=6,e=0)
       integer NXMAPMAX,NYMAPMAX,NZMAP
 c      integer NXMAPMAX,NYMAPMAX,NZMAP
 c      PARAMETER (NXMAPMAX=999,NYMAPMAX=999,NZMAP=202)

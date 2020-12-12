@@ -11,8 +11,8 @@ c     compute tabulations of w(u):
       do i=1,ntab
          u = 2d0*(dble(i-1)/dble(ntab-1))**0.5d0
          if(u.lt.0 .or. u.gt.2.d0) then
-            write(*,*) "u=r/h is out of range"
-            write(*,*) "u=",u
+            write(o,*) "u=r/h is out of range"
+            write(o,*) "u=",u
             error stop "kernels.f"
          endif
 
@@ -26,7 +26,7 @@ c     Wendland 3,3 kernel
 c     Wendland C4 kernel
             wtab(i)=wc4(u)
          else
-            write(*,*) 'nkernel must equal 0, 1, or 2'
+            write(o,*) 'nkernel must equal 0, 1, or 2'
             stop
          endif
       enddo

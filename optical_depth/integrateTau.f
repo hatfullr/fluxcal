@@ -42,10 +42,10 @@
       avgrpos=0.d0
       avgxhp=0.d0
 c      if(dimenFileAlreadyExists) then
-c         write(*,*) "Integrating through each point on the driving grid"
+c         write(o,*) "Integrating through each point on the driving grid"
 c     end if
-      min_step_size = 1.d30
-      max_step_size = -1
+      min_step_size = 0.d0
+      max_step_size = 0.d0
       min_steps_taken = 2147483647
       max_steps_taken = -1
 
@@ -58,15 +58,15 @@ c     end if
 
             if(zmin(i,j).lt.1d30)then
                nstp = 0
-c               write(*,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
+c               write(o,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
 c     $              zmax(i,j)/runit_out
                if ( debug ) then
-                  write(*,*) ""
-                  write(*,*) "Inspecting grid cell i,j = ",i,j
-                  write(*,*) "zmin(i,j),zmax(i,j)=",
+                  write(o,*) ""
+                  write(o,*) "i,j = ",i,j,"fluid"
+                  write(o,*) "zmin(i,j),zmax(i,j)=",
      $                 zmin(i,j)/runit_out,zmax(i,j)/runit_out
-                  write(*,*) "thick_part(i,j)=",thick_part(i,j)
-                  write(*,*) "zmax_thick(i,j)=",
+                  write(o,*) "thick_part(i,j)=",thick_part(i,j)
+                  write(o,*) "zmax_thick(i,j)=",zmax_thick(i,j),
      $                 zmax_thick(i,j)/runit_out
                end if
                call getTpractical(zmin(i,j),zmax(i,j),
@@ -226,6 +226,9 @@ c                  else
 c                     TphotoXY(I,J) = 0.d0
                end if
             else
+               if ( debug ) then
+                  write(o,*) "i,j=",i,j,"no fluid"
+               end if
                TOTALTpracticalXY(i,j)=0.d0
 c     We might want this later
 c               do ifilter=1,numfilters
@@ -241,8 +244,8 @@ c            TXY(I,J)=TphotoXY(I,J)
       end do
       
       call cpu_time(finish_time)
-c      write(*,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
+c      write(o,*) "TOTALTpracticalXY(i/2,j/2) = ",i/2,j/2,
 c     $     TOTALTpracticalXY(i/2,j/2)
-c      write(*,*) "integrateTau took ",finish_time-start_time
+c      write(o,*) "integrateTau took ",finish_time-start_time
 
       end subroutine

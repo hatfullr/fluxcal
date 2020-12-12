@@ -10,14 +10,14 @@
       end do
 
       if(.not.track_all) then   ! Use the trackfile
-         write(*,*) "Reading trackfile"
+         write(o,*) "Reading trackfile"
          open(17,file=trim(adjustl(trackfile)),status='old')
          do i=1,nmax
             read(17,*,end=120) track(i)
          enddo
  120     close(17)
       else                      ! Track all the particles
-         write(*,*) "Tracking all particles"
+         write(o,*) "Tracking all particles"
          do i=1,n
             track(i) = i
          end do
@@ -32,7 +32,7 @@
       end if
 
       call makeOutputFile(trackingfile)
-      write(*,*) "Writing to '",trim(adjustl(trackingfile)),"'"
+      write(o,*) "Writing to '",trim(adjustl(trackingfile)),"'"
       do i=1,n
          if(track(i).gt.0) then
             call output(trackingfile,i,binary_tracking_file)
@@ -41,7 +41,7 @@
       
 c      if(binary_tracking_file) then
 c         open(44,file=trackingfile,form='unformatted',status='unknown')
-c         write(*,*) "Writing to binary file '",trim(trackingfile),"'"
+c         write(o,*) "Writing to binary file '",trim(trackingfile),"'"
 c         write(44) t*tunit
 c         do i=1,nmax
 c            if(track(i).gt.0) then
@@ -55,7 +55,7 @@ c         close(44)
 c      else
 c 104     format(14ES22.14,i22)
 c         open(44,file=trackingfile,status='unknown')
-c         write(*,*) "Writing to text file '",trim(trackingfile),"'"
+c         write(o,*) "Writing to text file '",trim(trackingfile),"'"
 c         write(44,"(ES22.14)") t*tunit
 c         do i=1,nmax
 c            if(track(i).gt.0) then

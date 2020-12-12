@@ -6,7 +6,7 @@
 
       if(isInitGrid) return
       
-      write(*,*) "Establishing the grid"
+      write(o,*) "Establishing the grid"
       prepareIntegrationCalled = .false.
       
 c     Initialize the file names for this iteration
@@ -70,7 +70,7 @@ c      enddo
       inquire(file=trim(adjustl(fname2)),exist=dimenFileAlreadyExists)
 
       if(dimenFileAlreadyExists) then ! Dimen file found
-         write(*,*) "Reading pre-existing dimen file '" //
+         write(o,*) "Reading pre-existing dimen file '" //
      $        trim(adjustl(fname2)) // "'"
          open (73,file=trim(adjustl(fname2)))
          read(73,*) xminmap,hxmap,nxmap,yminmap,hymap,nymap
@@ -108,26 +108,26 @@ c      enddo
 
  100  format(A25," = ",ES22.14,", ",ES22.14)
  101  format(A25," = ",I22,", ",I22)
-      write(*,*) ""
-      write(*,*) "Grid details:"
-      write(*,100) "xminmap,xmaxmap      ",xminmap/runit_out,
+      write(o,*) ""
+      write(o,*) "Grid details:"
+      write(o,100) "xminmap,xmaxmap      ",xminmap/runit_out,
      $     xmaxmap/runit_out
-      write(*,100) "yminmap,ymaxmap      ",yminmap/runit_out,
+      write(o,100) "yminmap,ymaxmap      ",yminmap/runit_out,
      $     ymaxmap/runit_out
-      write(*,100) "hxmap,hymap          ",hxmap/runit_out,
+      write(o,100) "hxmap,hymap          ",hxmap/runit_out,
      $     hymap/runit_out
-      write(*,101) "nxmap,nymap          ",nxmap,nymap
-c      write(*,100) "minstpsize,maxstpsize",min_step_size,max_step_size
-c      write(*,101) "minNstp,maxNstp      ",min_steps_taken,
+      write(o,101) "nxmap,nymap          ",nxmap,nymap
+c      write(o,100) "minstpsize,maxstpsize",min_step_size,max_step_size
+c      write(o,101) "minNstp,maxNstp      ",min_steps_taken,
 c     $     max_steps_taken
-      write(*,*) ""
+      write(o,*) ""
       
-c      write(*,*) ""
-c      write(*,*) "Grid details (cgs):"
-c      write(*,*) "   xminmap,xmaxmap = ",xminmap,xmaxmap
-c      write(*,*) "   yminmap,ymaxmap = ",yminmap,ymaxmap
-c      write(*,*) "   hxmap,hymap     = ",hxmap,hymap
-c      write(*,*) "   nxmap,nymap     = ",nxmap,nymap
-c      write(*,*) ""
+c      write(o,*) ""
+c      write(o,*) "Grid details (cgs):"
+c      write(o,*) "   xminmap,xmaxmap = ",xminmap,xmaxmap
+c      write(o,*) "   yminmap,ymaxmap = ",yminmap,ymaxmap
+c      write(o,*) "   hxmap,hymap     = ",hxmap,hymap
+c      write(o,*) "   nxmap,nymap     = ",nxmap,nymap
+c      write(o,*) ""
       
       end subroutine

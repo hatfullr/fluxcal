@@ -83,13 +83,16 @@ c      kount2=0
  11   continue
 
       do 16 nstp=1,MAXSTP
-c     print *,'looping',x,y(1)
-        if(min_step_size.eq.0.d0 .and. abs(h).ne.0.d0) then
-           min_step_size = abs(h)
-        else
-           min_step_size = min(min_step_size,abs(h))
-        end if
-        max_step_size = max(max_step_size,abs(h))
+        if(min_step_size.eq.0.d0 .and. abs(h).ne.0.d0)then
+            min_step_size = h
+         else
+            min_step_size = min(min_step_size,h)
+         end if
+         if(max_step_size.eq.0.d0 .and. abs(h).ne.0.d0)then
+            max_step_size = h
+         else
+            max_step_size = max(max_step_size,h)
+         end if
 
         depth = xint
         call derivs(xint,yint,dydx)
@@ -116,14 +119,14 @@ c     I want to make sure the penultimate step (the step right before the photos
         enddo
 
         if((xint+h-x2)*(xint+h-x1).gt.0.d0) h=x2-xint
-c     write(*,*) xpos/runit,ypos/runit
+c     write(o,*) xpos/runit,ypos/runit
 
-c        write(*,*) "yscal(1:4) = ",yscal(1:4)
+c        write(o,*) "yscal(1:4) = ",yscal(1:4)
         call rkqs(yint,dydx,nvar,xint,h,eps,yscal,hdid,hnext,derivs)
 
 c        call getLocalQuantities(xpos,ypos,xint)
 c        call getOpacity(dble(t6*1d6),rhocgs,xh)
-c        write(*,'(12ES22.14,I22,ES22.14)')xpos/runit_out,ypos/runit_out,
+c        write(o,'(12ES22.14,I22,ES22.14)')xpos/runit_out,ypos/runit_out,
 c     $       xint/runit_out,xhp/runit_out,rhocgs/rhounit_out,
 c     $       ucgs/Eunit_out*munit_out,xh/muunit_out,
 c     $       gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
@@ -162,7 +165,7 @@ c        endif
 c        print *,'ok,bad',nok,nbad,h,hdid,yint(1)
 c        if((yint(1).ge.1.d0 .and. kount1.eq.0) .or.
 c     $       (yint(1)*yint(2).ge.1.d0/3.d0 .and. kount2.eq.0))then
-c     write(*,*) yint(1)
+c     write(o,*) yint(1)
         if(yint(1).ge.tau_thick_integrator .and. kount1.eq.0) then
 c           print *,'ok,bad',nok,nbad,h,hdid,yint(1)
            kount=kount+1
