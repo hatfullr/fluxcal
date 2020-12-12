@@ -44,8 +44,8 @@
 c      if(dimenFileAlreadyExists) then
 c         write(o,*) "Integrating through each point on the driving grid"
 c     end if
-      min_step_size = 1.d30
-      max_step_size = -1
+      min_step_size = 0
+      max_step_size = 0
       min_steps_taken = 2147483647
       max_steps_taken = -1
 
@@ -62,11 +62,11 @@ c               write(o,*) "zmin(i,j), zmax(i,j) = ",zmin(i,j)/runit_out,
 c     $              zmax(i,j)/runit_out
                if ( debug ) then
                   write(o,*) ""
-                  write(o,*) "Inspecting grid cell i,j = ",i,j
+                  write(o,*) "i,j = ",i,j,"fluid"
                   write(o,*) "zmin(i,j),zmax(i,j)=",
      $                 zmin(i,j)/runit_out,zmax(i,j)/runit_out
                   write(o,*) "thick_part(i,j)=",thick_part(i,j)
-                  write(o,*) "zmax_thick(i,j)=",
+                  write(o,*) "zmax_thick(i,j)=",zmax_thick(i,j),
      $                 zmax_thick(i,j)/runit_out
                end if
                call getTpractical(zmin(i,j),zmax(i,j),
@@ -226,6 +226,9 @@ c                  else
 c                     TphotoXY(I,J) = 0.d0
                end if
             else
+               if ( debug ) then
+                  write(o,*) "i,j=",i,j,"no fluid"
+               end if
                TOTALTpracticalXY(i,j)=0.d0
 c     We might want this later
 c               do ifilter=1,numfilters
