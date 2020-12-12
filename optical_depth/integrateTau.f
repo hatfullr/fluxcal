@@ -44,8 +44,8 @@
 c      if(dimenFileAlreadyExists) then
 c         write(o,*) "Integrating through each point on the driving grid"
 c     end if
-      min_step_size = 0
-      max_step_size = 0
+      min_step_size = 0.d0
+      max_step_size = 0.d0
       min_steps_taken = 2147483647
       max_steps_taken = -1
 
