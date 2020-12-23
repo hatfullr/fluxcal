@@ -228,25 +228,23 @@ c         endif
          lasttotalflux = TOTALflux
          lastnumcell = numcell
 
-         if ( min_step_size.lt.0 .or.
-     $        max_step_size.lt.0 .or.
-     $        min_steps_taken.lt.0 .or.
-     $        max_steps_taken.lt.0 .or.
-     $        numcell.eq.0 ) then
-            ! This only happens when we get -1.d30 for the opacity
-            ! everywhere while trying to integrate, and is a really
-            ! bad situation. The best we can do is try to increase the
-            ! grid resolution in the hopes that the problem goes away...
-            ! Can also happen if we get <F> = NaN...
-            nxmapnext=nxmap*2
-            nymapnext=nymap*2
-            write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
-     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
-     $           max_step_size,min_steps_taken,max_steps_taken,
-     $           TOTALflux/numcell,"Try again "
-            call flush(o)
-            goto 41
-         end if
+c         if ( min_steps_taken.lt.0 .or.
+c     $        max_steps_taken.lt.0 .or.
+c     $        numcell.eq.0 ) then
+c            ! This only happens when we get -1.d30 for the opacity
+c            ! everywhere while trying to integrate, and is a really
+c            ! bad situation. The best we can do is try to increase the
+c            ! grid resolution in the hopes that the problem goes away...
+c            ! Can also happen if we get <F> = NaN...
+c            nxmapnext=nxmap*2
+c            nymapnext=nymap*2
+c            write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
+c     $           yminmap/runit_out,hymap/runit_out,nymap,min_step_size,
+c     $           max_step_size,min_steps_taken,max_steps_taken,
+c     $           TOTALflux/numcell,"Try again "
+c            call flush(o)
+c            goto 41
+c         end if
          
          if(TOTALflux.eq.0) then
             write(o,103) counter,xminmap/runit_out,hxmap/runit_out,nxmap,
