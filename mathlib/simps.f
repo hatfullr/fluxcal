@@ -1,16 +1,20 @@
       subroutine simpson(xpos,ypos,z1,z2,Tthin4,tau_thin,kount1)
       include '../lib/flux_cal.h'
       integer kount1,ncycle,flow,detect_flow
-      real*8 z1,z2,dz,Tthin4,tau_thin
+      real*8 z1,z2,dz,Tthin4,tau_thin,opacit
       real*8 rhocgs,dtaudz1,dtaudz2,t1,t2,dtau,dTthin4,frac_Tthin4
-      real*8 xpos,ypos,zpos,xhp
+      real*8 xpos,ypos,zpos,xhp,gcgs,pcgs,tcgs,ucgs
       real xh,t6
-      common/localQuantities/ rhocgs,xh,t6,xhp
+      common/localQuantities/ rhocgs,xh,t6,xhp,ucgs,gcgs,pcgs,tcgs
       real*8 z1temp,z2temp,tempdz1,tempdz2
       real start_time,finish_time
       real time_get_dtaudz_T,time_increase_dz,time_decrease_dz
       common/simps_timing/time_get_dtaudz_T,time_increase_dz,
      $     time_decrease_dz
+      integer lastpart
+      common/lastparticle/ lastpart
+      integer intout
+      common/intoutput/ intout
       
       external getLocalQuantities
       external get_dtaudz_T
@@ -64,6 +68,17 @@ c     we strictly enforce z1 > z2.
          dz = max(dz,sign(dabs(simps_min_dz),dz))
       else if (simps_min_dz.eq.0 .and. simps_max_dz.ne.0) then
          dz = min(dz,sign(dabs(simps_max_dz),dz))
+      end if
+
+      if(printIntegrationSteps) then
+         call getLocalQuantities(xpos,ypos,zpos)
+         opacit = getOpacity(dble(t6*1d6),rhocgs,xh)
+         write(intout,'(12ES22.14,I22)')xpos/runit_out,
+     $        ypos/runit_out,
+     $        zpos/runit_out,xhp/runit_out,rhocgs/rhounit_out,
+     $        ucgs/Eunit_out*munit_out,xh/muunit_out,
+     $        gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
+     $        opacit,tau_thin,lastpart
       end if
       
       flow=0
@@ -196,6 +211,18 @@ c            write(o,*) "We are in here"
                   write(o,*) "Integration exited at the taulimit "//
      $                 "tau,dtau = ",tau_thin,dtau
                end if
+
+               if(printIntegrationSteps) then
+                  call getLocalQuantities(xpos,ypos,zpos)
+                  opacit = getOpacity(dble(t6*1d6),rhocgs,xh)
+                  write(intout,'(12ES22.14,I22)')xpos/runit_out,
+     $                 ypos/runit_out,
+     $                 zpos/runit_out,xhp/runit_out,rhocgs/rhounit_out,
+     $                 ucgs/Eunit_out*munit_out,xh/muunit_out,
+     $                 gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
+     $                 opacit,tau_thin,lastpart
+               end if
+               
                exit             ! Stop integration
             end if
          end if
@@ -265,6 +292,8 @@ c            write(o,*) "We are in here"
             write(e,*) "Somehow we got a negative tau: tau = ",tau_thin
             error stop "simps.f"
          end if
+
+         
          
          ! Take the step forward
          dtaudz1=dtaudz2
@@ -272,6 +301,17 @@ c            write(o,*) "We are in here"
          zpos = zpos+dz
          nstp=nstp+1
 
+         if(printIntegrationSteps) then
+            call getLocalQuantities(xpos,ypos,zpos)
+            opacit = getOpacity(dble(t6*1d6),rhocgs,xh)
+            write(intout,'(12ES22.14,I22)')xpos/runit_out,
+     $           ypos/runit_out,
+     $           zpos/runit_out,xhp/runit_out,rhocgs/rhounit_out,
+     $           ucgs/Eunit_out*munit_out,xh/muunit_out,
+     $           gcgs/gunit_out,tcgs/tempunit_out,pcgs/punit_out,
+     $           opacit,tau_thin,lastpart
+         end if
+         
          if(min_step_size.eq.0.d0)then
             min_step_size = dz
          else
