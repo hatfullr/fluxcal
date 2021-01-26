@@ -79,7 +79,7 @@ c     open(50,file="teff_trace.dat",status='unknown')
          ! This assumes that g_sph = g_sph throughout the kernel, which is okay.
          ! g shouldn't be allowed to change through the kernel because the
          ! kernel function is not physical. These pressures represent the
-         ! maximum allowed pressure values, as they are at the photosphere.
+         ! minimum allowed pressure values, as they are at the photosphere.
          pg_high=2./3.*g_sph/kap_high
          pg_mid=2./3.*g_sph/kap_mid
          pg_low=2./3.*g_sph/kap_low
