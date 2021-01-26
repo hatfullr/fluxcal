@@ -2,10 +2,11 @@
       include '../lib/flux_cal.h'
       integer kount1,ncycle,flow,detect_flow
       real*8 z1,z2,dz,Tthin4,tau_thin,opacit
-      real*8 rhocgs,dtaudz1,dtaudz2,t1,t2,dtau,dTthin4,frac_Tthin4
-      real*8 xpos,ypos,zpos,xhp,gcgs,pcgs,tcgs,ucgs
+      real*8 dtaudz1,dtaudz2,t1,t2,dtau,dTthin4,frac_Tthin4
+      real*8 xpos,ypos,zpos
+      real*8 rhocgs,xhp,ucgs,gcgs,pcgs,tcgs
       real xh,t6
-      common/localQuantities/ rhocgs,xh,t6,xhp,ucgs,gcgs,pcgs,tcgs
+      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
       real*8 z1temp,z2temp,tempdz1,tempdz2
       real start_time,finish_time
       real time_get_dtaudz_T,time_increase_dz,time_decrease_dz
@@ -438,10 +439,11 @@ c      flow = detect_flow(dz,zpos)
 
       subroutine get_dtaudz_T(xpos,ypos,zpos,dtaudz,temp)
       implicit none
-      real*8 xpos,ypos,zpos,temp,dtaudz,rhocgs,xhp,
+      real*8 xpos,ypos,zpos,temp,dtaudz,
      $     opacit,getOpacity
+      real*8 rhocgs,xhp,ucgs,gcgs,pcgs,tcgs
       real xh,t6
-      common/localQuantities/ rhocgs,xh,t6,xhp
+      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
       external getLocalQuantities
       real start_time,finish_time
       real time_get_dtaudz_T,time_increase_dz,time_decrease_dz
@@ -750,9 +752,10 @@ c$$$      end program
 c$$$
 c$$$      subroutine getLocalQuantities(xpos,ypos,zpos)
 c$$$      implicit none
-c$$$      real*8 xpos,ypos,zpos,rhocgs,xhp
+c$$$      real*8 xpos,ypos,zpos
+c$$$      real*8 rhocgs,xhp,ucgs,gcgs,pcgs,tcgs
 c$$$      real xh,t6
-c$$$      common/localQuantities/ rhocgs,xh,t6,xhp
+c$$$      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
 c$$$      real*8 z1,z2,zp,zg,hole
 c$$$      common/intlimits/z1,z2,zp,zg,hole
 c$$$      integer trial
@@ -787,10 +790,11 @@ c$$$      integer kount1,MAXSTP,nstp,ndtau_increase,ndF_increase,
 c$$$     $     ndz_increase,ndtau_decrease,ndF_decrease,ndz_decrease,ncycle,
 c$$$     $     ndtaulimit_decrease,ndtaulimit_increase
 c$$$      real*8 z1,z2,dz,Tthin4,tau_thin
-c$$$      real*8 rhocgs,dtaudz1,dtaudz2,t1,t2,dtau,dTthin4,frac_Tthin4
-c$$$      real*8 xpos,ypos,zpos,xhp
+c$$$      real*8 dtaudz1,dtaudz2,t1,t2,dtau,dTthin4,frac_Tthin4
+c$$$      real*8 xpos,ypos,zpos
+c$$$      real*8 rhocgs,xhp,ucgs,gcgs,pcgs,tcgs
 c$$$      real xh,t6
-c$$$      common/localQuantities/ rhocgs,xh,t6,xhp
+c$$$      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
 c$$$      real*8 tau_thick_integrator,taulimit,
 c$$$     $     simps_max_frac_dF,simps_max_dtau,taulimit_threshold,
 c$$$     $     simps_max_dz,simps_min_dz,simps_min_frac_dF,
@@ -1051,10 +1055,11 @@ c$$$      end subroutine
 c$$$
 c$$$      subroutine get_dtaudz_T(xpos,ypos,zpos,dtaudz,T)
 c$$$      implicit none
-c$$$      real*8 xpos,ypos,zpos,T,dtaudz,rhocgs,xhp,
+c$$$      real*8 xpos,ypos,zpos,T,dtaudz,
 c$$$     $     opacit,getOpacity
+c$$$      real*8 rhocgs,xhp,ucgs,gcgs,pcgs,tcgs
 c$$$      real xh,t6
-c$$$      common/localQuantities/ rhocgs,xh,t6,xhp
+c$$$      common/localQuantities/ rhocgs,xh,t6, xhp,ucgs,gcgs,pcgs,tcgs
 c$$$      external getLocalQuantities
 c$$$      call getLocalQuantities(xpos,ypos,zpos)
 c$$$      T = t6*1d6
