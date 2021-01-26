@@ -109,6 +109,10 @@ c         if(tempp(i).le.8000) write(o,*) "OPACITY", tempp(i), opacit
 c     If the user wants to use get_teff, and particle i is optically
 c     thick, store get_teff for use in getTpractical.f
          Teff(i) = 0.d0
+         Penv(i) = 0.d0
+         Psurf(i) = 0.d0
+         opac_surf(i) = 0.d0
+         rho_surf(i) = 0.d0
          
          if(envfit .and. (tauA(i).gt.tau_thick_envfit)) then
 c            if((table_nabla_Tmin.lt.tempp(i)).and.
@@ -122,7 +126,12 @@ c     Calculate Teff iff tempp(i) and localg(i) fall within the tabulated values
      $              (log10(localg(i)).le.4.2d0)) then
                   do_debug = 0
 c                 if(i.eq.172258) do_debug=1
-                  Teff(i) = get_teff(pp(i),tempp(i),localg(i),do_debug)
+                  call get_teff(i,do_debug)
+c                  Teff(i) = get_teff(pp(i),tempp(i),localg(i),do_debug)
+c                  Penv(i) = Penvi
+c                  Psurf(i) = Psurfi
+c                  opac_surf(i) = opac_surfi
+c                  rho_surf(i) = rho_surfi
                end if
             end if
          end if

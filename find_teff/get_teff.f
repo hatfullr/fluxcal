@@ -1,4 +1,5 @@
-      function get_teff(p_sph, t_sph, g_sph,do_debug)
+      subroutine get_teff(pid,do_debug)
+c      function get_teff(p_sph, t_sph, g_sph,do_debug)
 c     Check out pg. 73 of "Stellar Structure and Evolution" by
 c     R. Kippenhahn & A. Weigert (1994)
 c     implicit none
@@ -13,15 +14,21 @@ c     implicit none
       real*8 slop
       real*8 get_slop,tmin
       real*8 rho_tab
+      integer pid
       
       integer i, do_debug
       real*8 get_density, rho_sph      
 
+      p_sph = pp(pid)
+      t_sph = tempp(pid)
+      g_sph = localg(pid)
+      
 c      if(log10(t_sph).gt.6) then
 cc      if(log10(t_sph).ge.5.999) then
 c         if(do_debug.eq.1) write(o,*) "THIS PARTICLE IS TOO HOT TO BE"//
 c     $        " OUTSIDE", t_sph
-c         get_teff=-10000.
+cc            get_teff=-10000.
+c            Teff(pid)=-10000.      
 c         return
 c      end if
       
@@ -32,7 +39,8 @@ c      end if
 
       if(slop .le. -10.d0) then
          if(do_debug.eq.1) write(o,*) "No proper slope found."
-         get_teff = 0.d0
+c         get_teff = 0.d0
+         Teff(pid) = 0.d0
          return
       end if
       
@@ -41,7 +49,8 @@ c      end if
 c      if(log10(t_sph).lt.tmin) then
 c         if(do_debug.eq.1) write(o,*) "THIS PARTICLE IS TOO COLD"//
 c     $        " TO BE TREATED", t_sph
-c         get_teff=-20000.
+cc         get_teff=-20000.
+c         Teff(pid)=-20000.
 c         return
 c      end if
 
@@ -107,8 +116,13 @@ c     $        t_sph
          if( (teff_high-teff_low).le.10) exit
          
       end do
-c      close(50)
-      get_teff=teff_mid
+c     close(50)
+      Penv(pid)=p_mid
+      Psurf(pid)=pg_mid
+      opac_surf(pid)=kap_mid
+      rho_surf(pid)=rho_mid
+      Teff(pid)=teff_mid
+c      get_teff=teff_mid
 
 c      if(do_debug.eq.1) write(o,100)  1./slop,
 c     &     10.**tmin, tmin,g_sph, log10(g_sph),t_sph, p_sph, get_teff

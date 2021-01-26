@@ -6,12 +6,12 @@ c     pid.
       integer pid
       logical binary
       
- 200  format(15ES22.14,i22)
+ 200  format(19ES22.14,i22)
 
       if(len(trim(adjustl(filename))).gt.0) then
          if(binary)then
             open(10,file=trim(adjustl(filename)),action='write',
-     $        position='append',form='unformatted')
+     $           position='append',form='unformatted')
             write(10)
      $           x(pid)/runit_out,
      $           y(pid)/runit_out,
@@ -25,7 +25,11 @@ c     pid.
      $           tempp(pid)/tempunit_out,
      $           Teff(pid)/tempunit_out,
      $           pp(pid)/punit_out,
+     $           Penv(pid)/punit_out,
+     $           Psurf(pid)/punit_out,
      $           opac_sph(pid)/kunit_out,
+     $           opac_surf(pid)/kunit_out,
+     $           rho_surf(pid)/rhounit_out,
      $           tauA(pid),
      $           entropy(pid)/sunit_out,
      $           pid
@@ -46,7 +50,11 @@ c     pid.
      $           tempp(pid)/tempunit_out,
      $           Teff(pid)/tempunit_out,
      $           pp(pid)/punit_out,
+     $           Penv(pid)/punit_out,
+     $           Psurf(pid)/punit_out,
      $           opac_sph(pid)/kunit_out,
+     $           opac_surf(pid)/kunit_out,
+     $           rho_surf(pid)/rhounit_out,
      $           tauA(pid),
      $           entropy(pid)/sunit_out,
      $           pid
@@ -66,7 +74,11 @@ c     pid.
      $        tempp(pid)/tempunit_out,
      $        Teff(pid)/tempunit_out,
      $        pp(pid)/punit_out,
+     $        Penv(pid)/punit_out,
+     $        Psurf(pid)/punit_out,
      $        opac_sph(pid)/kunit_out,
+     $        opac_surf(pid)/kunit_out,
+     $        rho_surf(pid)/rhounit_out,
      $        tauA(pid),
      $        entropy(pid)/sunit_out,
      $        pid

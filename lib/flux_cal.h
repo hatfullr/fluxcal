@@ -22,7 +22,7 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
      $      localg(nmax),metal(nmax),tempp(nmax),pp(nmax),entropy(nmax)
       common/part/ x,y,z,am,hp,rho,vx,vy,vz,a,wmeanmolecular,localg,
      $      metal,tempp,pp,entropy
-	   
+
       real*8 pi,kelvin,gram,sec,cm,erg,boltz,crad,planck,crad2,
      $      sigma,arad,qconst,coeff,pc,distance,gravconst
       parameter (pi=3.1415926535897932384626d0)
@@ -196,7 +196,7 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
       real*8 getOpacity
       real*8 useeostable
 
-      real*8 get_teff,getLocalAngle
+      real*8 getLocalAngle
       real*8 fourPointArea, fourPointArea2
 
       real*8 taucoef
@@ -204,7 +204,10 @@ c      PARAMETER (NMAX=180000,NNMAX=100)
 
       real*8 tauA(nmax), opac_sph(nmax)
       common/tauAopticaldepth/ tauA, opac_sph
-	   
+
+      real*8 Psurf(nmax),opac_surf(nmax),rho_surf(nmax),Penv(nmax)
+      common/env_fit_results/Penv,Psurf,opac_surf,rho_surf
+      
       real*8 Avis(nmax)
       common/surfaceareas/ Avis
 
